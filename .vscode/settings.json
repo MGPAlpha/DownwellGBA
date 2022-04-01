@@ -1,0 +1,7 @@
+{
+    "files.exclude": {
+        "**.i": true,
+        "**.o": true,
+        "**.s": true
+    }
+}
