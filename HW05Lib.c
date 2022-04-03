@@ -137,15 +137,6 @@ void flipPage() {
 unsigned short oldButtons;
 unsigned short buttons;
 
-OBJ_ATTR shadowOAM[128];
-void hideSprites(void) {
-    for (int i = 0; i < 128; i++) {
-        shadowOAM[i].attr0 = ATTR0_HIDE;
-    }
-    waitForVBlank();
-    DMANow(3, shadowOAM, OAM, 128*sizeof(OBJ_ATTR)/2);
-}
-
 // Set up and begin a DMA transfer
 void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned int cnt) {
     // Turn DMA off
