@@ -1,7 +1,6 @@
 {
     "files.exclude": {
-        "**.i": true,
-        "**.o": true,
-        "**.s": true
+        "**/*.[ois]": true,
+        "*.[ois]": true
     }
 }

@@ -3,9 +3,7 @@ PRODUCT_NAME       = Project
 # You probably won't need to touch anything below here!!!
 # The one exception is the cleanup stuff.
 
-SOURCES            = $(wildcard *.c)
-ASMSOURCES         = $(wildcard *.asm)
-AUDIOSOURCES       = $(wildcard *.wav)
+SOURCES            = $(wildcard *.c) $(wildcard art/*.c)
 DKPATH             = /opt/devkitpro
 FIND               = find
 COPY               = cp -r
@@ -81,6 +79,6 @@ $(AUDIOHEADERS) : %.h : %.c
 clean:
 	$(RM) $(ROM_NAME) $(ELF_NAME) $(BIN_NAME)
 	$(RM) $(AUDIOOBJECTS) $(AUDIOHEADERS)
-	$(RM) *.o *.i *.s
+	$(RM) **/*.[ois] *.[ois]
 
 audio: $(AUDIOOBJECTS)

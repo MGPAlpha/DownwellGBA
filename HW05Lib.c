@@ -120,7 +120,7 @@ void drawStringToMap(char *str, Vector2 pos, screenblock *map, char palBank) {
 
 // Pause code execution until vertical blank begins
 void waitForVBlank() {
-	while(SCANLINECOUNTER > 160);
+	while(SCANLINECOUNTER >= 160);
 	while(SCANLINECOUNTER < 160);
 }
 

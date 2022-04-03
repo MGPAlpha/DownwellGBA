@@ -49,6 +49,19 @@ typedef Rect Transform;
 #define BG_SIZE_TALL        (2<<14)  // 32x64 tiles
 #define BG_SIZE_LARGE       (3<<14)  // 64x64 tiles
 
+// Background Offset Registers
+#define REG_BG0HOFF (*(volatile unsigned short *)0x04000010)
+#define REG_BG0VOFF (*(volatile unsigned short *)0x04000012)
+
+#define REG_BG1HOFF (*(volatile unsigned short *)0x04000014)
+#define REG_BG1VOFF (*(volatile unsigned short *)0x04000016)
+
+#define REG_BG2HOFF (*(volatile unsigned short *)0x04000018)
+#define REG_BG2VOFF (*(volatile unsigned short *)0x0400001A)
+
+#define REG_BG3HOFF (*(volatile unsigned short *)0x0400001C)
+#define REG_BG3VOFF (*(volatile unsigned short *)0x0400001E)
+
 // Display Status Registers
 #define SCANLINECOUNTER (*(volatile unsigned short *)0x4000006)
 
