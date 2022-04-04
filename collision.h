@@ -3,6 +3,9 @@
 
 #include "HW05Lib.h"
 
+extern char *activeCollisionMap;
+extern char activeCollisionMapWidth;
+
 // To be returned by collision detection functions
 // collided represents boolean of whether a collision was detected
 // push represents adjustment necessary to move out of collision
@@ -16,5 +19,7 @@ Collision collideRects(Rect rect1, Rect rect2);
 
 // Check if obj is fully inside the bounds
 Collision collideRectBounds(Rect obj, Rect bounds);
+
+Collision collideCollisionMap(Rect obj, char* map, int mapWidth, int relativeMagnitude);
 
 #endif

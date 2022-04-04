@@ -108,16 +108,6 @@ void drawFullscreenImage4(const unsigned short *image) {
     DMANow(3, image, videoBuffer, SCREENWIDTH * SCREENHEIGHT / 2);
 }
 
-// Mode 0 Drawing Functions
-void drawStringToMap(char *str, Vector2 pos, screenblock *map, char palBank) {
-    short *charAddr = ((short*)map) + OFFSET(pos.x,pos.y,32);
-    while (*str) {
-        *charAddr = (short)*str | ATTR2_PALROW(palBank);
-        str++;
-        charAddr++;
-    }
-}
-
 // Pause code execution until vertical blank begins
 void waitForVBlank() {
 	while(SCANLINECOUNTER >= 160);

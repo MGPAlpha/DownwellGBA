@@ -124,9 +124,6 @@ void fillScreen4(volatile unsigned char colorIndex);
 void drawImage4(Vector2 pos, Vector2 size, const unsigned short *image);
 void drawFullscreenImage4(const unsigned short *image);
 
-// Mode 0 Drawing Functions
-void drawStringToMap(char *str, Vector2 pos, screenblock *map, char palBank);
-
 // Miscellaneous Drawing Functions
 void waitForVBlank();
 void flipPage();
