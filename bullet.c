@@ -25,7 +25,7 @@ int initializeBullet(GameObject* this) {
     data->collider.pos.x = 0;
     data->collider.pos.y = 0;
     data->collider.size.x = 6;
-    data->collider.size.y = 8;
+    data->collider.size.y = 4;
     this->data = data;
 
     return 0;
@@ -38,6 +38,12 @@ void updateBullet(GameObject* this) {
     data->collider.pos.y += bulletTravelFrames[travelFrameIndex] << BULLET_SIZE_FACTOR;
     if (this->lifetime >= 26) {
         destroyGameObject(this);
+        return;
+    }
+    Collision groundCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 4 + BULLET_SIZE_FACTOR);
+    if (groundCollision.collided) {
+        destroyGameObject(this);
+        return;
     }
 }
 

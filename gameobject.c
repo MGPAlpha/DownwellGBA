@@ -66,7 +66,6 @@ void consolidateActiveGameObjects(void) {
             i--;
         }
     }
-    mgba_printf("Next Inactive: %d", nextInactiveIndex);
 }
 
 void updateAllGameObjects(void) {
