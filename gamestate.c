@@ -20,6 +20,9 @@ int vBlankCount = 0;
 
 static int smoothCameraX = 0;
 
+GameObject *logoSprite0;
+GameObject *logoSprite1;
+
 void initSurface(void) {
 
     waitForVBlank();
@@ -59,14 +62,21 @@ void initSurface(void) {
         playerData->collider.pos.y = 136;
         playerData->collider.pos.x = 152;
         smoothCameraX = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
-
-        mgba_printf("%d", playerData->collider.pos.x);
     }
 
-    GameObject *logoSprite = newGameObject(&logoSpriteType);
-    if (logoSprite) {
-        LogoSpriteData *logoData = logoSprite->data;
+    logoSprite0 = newGameObject(&logoSpriteType);
+    if (logoSprite0) {
+        LogoSpriteData *logoData = logoSprite0->data;
+        logoData->pos.x = 288;
+        logoData->pos.y = 60;
         logoData->index = 0;
+    }
+    logoSprite1 = newGameObject(&logoSpriteType);
+    if (logoSprite1) {
+        LogoSpriteData *logoData = logoSprite1->data;
+        logoData->pos.x = 354;
+        logoData->pos.y = 60;
+        logoData->index = 1;
     }
 
 
@@ -91,8 +101,6 @@ void updateSurface(void) {
     }
 
     
-    PlayerData *playerData = playerSingleton->data;
-    mgba_printf("%d", playerData->collider.pos.x);
 
     int playerCanMove = stateTime > 8*6;
 
@@ -104,8 +112,19 @@ void updateSurface(void) {
 
     int cameraXTarget = 0;
 
+    PlayerData *playerData = playerSingleton->data;
     if (playerData->collider.pos.x >= 260) {
         cameraXTarget = 232 << 8;
+        if (logoSprite0 && logoSprite1){
+            LogoSpriteData *logoData0 = logoSprite0->data;
+            LogoSpriteData *logoData1 = logoSprite1->data;
+            if (!logoData0->animationStart && playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
+                logoData0->animationStart = logoSprite0->lifetime;
+                logoData1->animationStart = logoSprite1->lifetime;
+            }
+        }
+
+
     } else {
         cameraXTarget = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
         if (playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {

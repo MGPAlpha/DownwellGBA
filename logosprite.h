@@ -8,6 +8,7 @@ const extern GameObjectType logoSpriteType;
 typedef struct logospritedata {
     Vector2 pos;
     int index;
+    int animationStart;
 } LogoSpriteData;
 
 #endif
