@@ -67,6 +67,17 @@ void initSurface(void) {
 int cameraShiftProgress = 0;
 
 void updateSurface(void) {
+
+    if (BUTTON_PRESSED(BUTTON_L)) {
+        GameObject *playerObject = newGameObject(&playerType);
+
+        if (playerObject) {
+            PlayerData *playerData = playerObject->data;
+            playerData->collider.pos.y = 136;
+            playerData->collider.pos.x = 152;
+        }
+    }
+
     updateAllGameObjects();
     
     PlayerData *playerData = playerSingleton->data;

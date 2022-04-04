@@ -23,7 +23,7 @@ void initSpriteMemory(void) {
 }
 
 OBJ_ATTR *spriteAlloc(void) {
-    if (dynamicOAMIndex < sizeof dynamicOAM / sizeof(OBJ_ATTR)) {
+    if (dynamicOAMIndex < sizeof dynamicOAM / sizeof(OBJ_ATTR*)) {
         return dynamicOAM[dynamicOAMIndex++];
     }
     return NULL;
@@ -34,5 +34,5 @@ void spriteFree(OBJ_ATTR* sprite) {
 }
 
 void updateSprites(void) {
-    DMANow(3, shadowOAM, OAM, 128*sizeof(OBJ_ATTR)/2);
+    DMANow(3, shadowOAM, OAM, 512);
 }
