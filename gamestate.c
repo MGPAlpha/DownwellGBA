@@ -17,7 +17,7 @@ enum GAMESTATE gameState;
 int stateTime = 0;
 int vBlankCount = 0;
 
-static int cameraShiftProgress = 0;
+static int smoothCameraX = 0;
 
 void initSurface(void) {
 
@@ -53,12 +53,14 @@ void initSurface(void) {
     GameObject *playerObject = newGameObject(&playerType);
 
     if (playerObject) {
+        playerSingleton = playerObject;
         PlayerData *playerData = playerObject->data;
         playerData->collider.pos.y = 136;
         playerData->collider.pos.x = 152;
-    }
+        smoothCameraX = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
 
-    cameraShiftProgress = 1 << 8;
+        mgba_printf("%d", playerData->collider.pos.x);
+    }
 
     for (int i = 0; i < 60; i++) {
         waitForVBlank();
@@ -80,25 +82,41 @@ void updateSurface(void) {
         }
     }
 
-    updateAllGameObjects();
-    consolidateActiveGameObjects();
     
     PlayerData *playerData = playerSingleton->data;
+    mgba_printf("%d", playerData->collider.pos.x);
+
+    int playerCanMove = stateTime > 8*6;
+
+    if (playerCanMove) updateAllGameObjects();
+    
+    
+    consolidateActiveGameObjects();
+    
+
+    int cameraXTarget = 0;
 
     if (playerData->collider.pos.x >= 260) {
-        cameraShiftProgress -= 8;
-        if (cameraShiftProgress < 0) cameraShiftProgress = 0;
+        cameraXTarget = 232 << 8;
     } else {
-        cameraShiftProgress += 8;
-        if (cameraShiftProgress > 256) cameraShiftProgress = 256;
+        cameraXTarget = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
+        if (playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
+
+            if (playerData->dir == LEFT) cameraXTarget -= 48<<8;
+            if (playerData->dir == RIGHT) cameraXTarget += 48<<8;
+        }
+        
     }
 
-    int invertedCameraProgress = 256 - cameraShiftProgress;
+    // int invertedCameraProgress = 256 - cameraShiftProgress;
 
-    int cameraFollowedX = playerData->collider.pos.x + (playerData->collider.size.x - SCREENWIDTH) / 2;
-    if (cameraFollowedX < -8) cameraFollowedX = -8;
+    // int cameraFollowedX = playerData->collider.pos.x + (playerData->collider.size.x - SCREENWIDTH) / 2;
+    // if (cameraFollowedX < -8) cameraFollowedX = -8;
 
-    cameraPos.x = (cameraFollowedX * cameraShiftProgress + 232 * invertedCameraProgress) / 256;
+
+    smoothCameraX = smoothCameraX + (cameraXTarget - smoothCameraX) / 16;
+    if (smoothCameraX < -8) smoothCameraX = -8;
+    cameraPos.x = smoothCameraX >> 8;
     cameraPos.y = 0;
 
     waitForVBlank();
