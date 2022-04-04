@@ -11,6 +11,7 @@
 
 #include "player.h"
 #include "camera.h"
+#include "logosprite.h"
 
 enum GAMESTATE gameState;
 
@@ -61,6 +62,13 @@ void initSurface(void) {
 
         mgba_printf("%d", playerData->collider.pos.x);
     }
+
+    GameObject *logoSprite = newGameObject(&logoSpriteType);
+    if (logoSprite) {
+        LogoSpriteData *logoData = logoSprite->data;
+        logoData->index = 0;
+    }
+
 
     for (int i = 0; i < 60; i++) {
         waitForVBlank();
