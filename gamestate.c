@@ -17,6 +17,8 @@ enum GAMESTATE gameState;
 int stateTime = 0;
 int vBlankCount = 0;
 
+static int cameraShiftProgress = 0;
+
 void initSurface(void) {
 
     waitForVBlank();
@@ -56,6 +58,8 @@ void initSurface(void) {
         playerData->collider.pos.x = 152;
     }
 
+    cameraShiftProgress = 1 << 8;
+
     for (int i = 0; i < 60; i++) {
         waitForVBlank();
     }
@@ -63,8 +67,6 @@ void initSurface(void) {
     gameState = GAME_SURFACE;
     stateTime = 0;
 }
-
-int cameraShiftProgress = 0;
 
 void updateSurface(void) {
 
@@ -83,7 +85,7 @@ void updateSurface(void) {
     
     PlayerData *playerData = playerSingleton->data;
 
-    if (playerData->collider.pos.x >= 268) {
+    if (playerData->collider.pos.x >= 260) {
         cameraShiftProgress -= 8;
         if (cameraShiftProgress < 0) cameraShiftProgress = 0;
     } else {
