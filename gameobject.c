@@ -41,6 +41,7 @@ GameObject *newGameObject(GameObjectType *type) {
         return NULL;
     }
     gameObject->active = 1;
+    gameObject->lifetime = 0;
     nextInactiveIndex++;
     return gameObject;
 }
@@ -57,7 +58,7 @@ void destroyGameObject(GameObject *gameObject) {
 
 void consolidateActiveGameObjects(void) {
     for (int i = 0; i < nextInactiveIndex; i++) {
-        if (!gameObjectRefs[0]->active) {
+        if (!gameObjectRefs[i]->active) {
             nextInactiveIndex--;
             GameObject *temp = gameObjectRefs[i];
             gameObjectRefs[i] = gameObjectRefs[nextInactiveIndex];
@@ -65,6 +66,7 @@ void consolidateActiveGameObjects(void) {
             i--;
         }
     }
+    mgba_printf("Next Inactive: %d", nextInactiveIndex);
 }
 
 void updateAllGameObjects(void) {
@@ -72,6 +74,7 @@ void updateAllGameObjects(void) {
         GameObject *curr = gameObjectRefs[i];
         if (curr->active) {
             (*curr->type->update)(curr);
+            curr->lifetime++;
         }
     }
 }

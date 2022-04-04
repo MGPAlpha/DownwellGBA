@@ -8,6 +8,8 @@
 #include "stdlib.h"
 #include "gamestate.h"
 
+#include "bullet.h"
+
 int jumpFrames[] = {
     0,0,0,0,0,0,0,0,0,0,0,0,
     1,1,1,1,1,1,1,1,1,1,
@@ -75,6 +77,8 @@ int initializePlayer(GameObject* this) {
     data->stateTime = 0;
     data->dir = RIGHT;
     data->runningJump = 0;
+    data->canFire = 0;
+    data->fireTime = 0;
     this->data = data;
 
     return 0;
@@ -110,6 +114,7 @@ void updatePlayer(GameObject* this) {
             data->runningJump = (data->state == PLAYER_WALKING) ? 1 : 0;
             data->state = PLAYER_JUMPING;
             data->stateTime = 0;
+            data->canFire = 0;
         } else {
             data->collider.pos.y++;
             Collision fallCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 4);
@@ -136,6 +141,28 @@ void updatePlayer(GameObject* this) {
         }
     }
 
+    if (data->state == PLAYER_JUMPING) {
+        if (!data->canFire && !BUTTON_HELD(BUTTON_A) && !BUTTON_HELD(BUTTON_B)) {
+            data->canFire = 1;
+            data->fireTime = 7;
+        }
+
+        if (data->canFire && (BUTTON_HELD(BUTTON_A) || BUTTON_HELD(BUTTON_B)) && data->fireTime >= 7) {
+            data->fireTime = 0;
+            data->runningJump = 0;
+            GameObject *newBullet = newGameObject(&bulletType);
+            data->stateTime = 20;
+            if (newBullet->active) {
+                BulletData *bulletData = newBullet->data;
+                bulletData->collider.pos.x = data->collider.pos.x;
+                bulletData->collider.pos.y = data->collider.pos.y;
+                bulletData->collider = resizeRect(bulletData->collider, BULLET_SIZE_FACTOR);
+            }
+        }
+
+        data->fireTime++;
+    }
+
     data->stateTime++;
 }
 
@@ -148,7 +175,9 @@ void drawPlayer(GameObject* this) {
     } else if (data->state == PLAYER_WALKING) {
         this->sprite->attr2 = ATTR2_TILEID(vBlankCount / 4 % 8 * 2,2) | ATTR2_PRIORITY(2);
     } else if (data->state == PLAYER_JUMPING) {
-        if (data->runningJump) {
+        if (data->canFire && data->fireTime <= 5) {
+            this->sprite->attr2 = ATTR2_TILEID(0,8) | ATTR2_PRIORITY(2);
+        } else if (data->runningJump) {
             this->sprite->attr2 = ATTR2_TILEID(vBlankCount / 4 % 8 * 2,6) | ATTR2_PRIORITY(2);
         } else {
             int jumpAniFrame = data->stateTime;

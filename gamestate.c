@@ -79,6 +79,7 @@ void updateSurface(void) {
     }
 
     updateAllGameObjects();
+    consolidateActiveGameObjects();
     
     PlayerData *playerData = playerSingleton->data;
 

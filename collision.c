@@ -82,7 +82,6 @@ Collision collideCollisionMap(Rect obj, char* map, int mapWidth, int relativeMag
     if (upperLeftCollision) {
         rightPush = MAX(rightPush, ((upperLeftReduced.x+1)<<relativeMagnitude)-upperLeftCorner.x);
         downPush = MAX(downPush, ((upperLeftReduced.y+1)<<relativeMagnitude)-upperLeftCorner.y);
-        // mgba_printf("Right Push %d, Down Push %d", rightPush, downPush);
     }
     if (upperRightCollision) {
         leftPush = MAX(leftPush, upperRightCorner.x-(upperRightReduced.x<<relativeMagnitude)+1);

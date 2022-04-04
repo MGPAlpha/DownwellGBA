@@ -10,11 +10,6 @@
 // Typedefs & Structs
 typedef unsigned short u16;
 typedef u16 color;
-typedef struct rect {
-    Vector2 pos;
-    Vector2 size;
-} Rect;
-typedef Rect Transform;
 
 // Common Macros
 #define OFFSET(c, r, rowlen) ((r)*(rowlen)+(c))

@@ -18,6 +18,7 @@ typedef struct gameobject {
     GameObjectType *type;
     void *data;
     OBJ_ATTR *sprite;
+    int lifetime;
 } GameObject;
 
 void initGameObjects(void);

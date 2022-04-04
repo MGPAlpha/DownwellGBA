@@ -15,6 +15,8 @@ typedef struct playerdata {
     int stateTime;
     enum DIRECTION dir;
     int runningJump;
+    int canFire;
+    int fireTime;
 } PlayerData;
 
 #endif
