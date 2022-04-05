@@ -168,8 +168,14 @@ void updatePlayer(GameObject* this) {
 
 void drawPlayer(GameObject* this) {
     PlayerData *data = this->data;
-    this->sprite->attr0 = ATTR0_REGULAR | ATTR0_SQUARE | (data->collider.pos.y - cameraPos.y - 7) & 0x00ff;
-    this->sprite->attr1 = ATTR1_SMALL | (data->collider.pos.x - cameraPos.x - 5) & 0x01ff | data->dir << 12;
+    int posY = data->collider.pos.y - cameraPos.y - 7;
+    int posX = (data->collider.pos.x - cameraPos.x - 5);
+    if (posY < -16 || posY > 160 || posX < -16 || posX > 240) {
+        this->sprite->attr0 = ATTR0_HIDE;
+        return;
+    }
+    this->sprite->attr0 = ATTR0_REGULAR | ATTR0_SQUARE | posY & 0x00ff;
+    this->sprite->attr1 = ATTR1_SMALL | posX & 0x01ff | data->dir << 12;
     if (data->state == PLAYER_IDLE) {
         this->sprite->attr2 = ATTR2_TILEID(vBlankCount / 16 % 4 * 2,0) | ATTR2_PRIORITY(2);
     } else if (data->state == PLAYER_WALKING) {

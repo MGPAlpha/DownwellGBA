@@ -2,6 +2,7 @@
 #include "HW05Lib.h"
 #include "print.h"
 #include "collision.h"
+#include "stdlib.h"
 
 #include "art/title.h"
 // #include "art/overlay.h"
@@ -24,6 +25,8 @@ static int smoothCameraX = 0;
 
 GameObject *logoSprite0;
 GameObject *logoSprite1;
+
+int wellDescentTime = 0;
 
 void initSurface(void) {
 
@@ -58,6 +61,8 @@ void initSurface(void) {
 
     activeCollisionMap = titlecollision;
     activeCollisionMapWidth = TITLECOLLISION_WIDTH;
+
+    wellDescentTime = 0;
 
     GameObject *playerObject = newGameObject(&playerType);
 
@@ -117,8 +122,8 @@ void updateSurface(void) {
 
     int cameraXTarget = 0;
 
-    PlayerData *playerData = playerSingleton->data;
-    if (playerData->collider.pos.x >= 260) {
+    PlayerData *playerData = playerSingleton ? playerSingleton->data : NULL;
+    if (!playerSingleton || playerData->collider.pos.x >= 260) {
         cameraXTarget = 233 << 8;
         if (logoSprite0 && logoSprite1){
             LogoSpriteData *logoData0 = logoSprite0->data;
@@ -149,7 +154,18 @@ void updateSurface(void) {
     smoothCameraX = smoothCameraX + (cameraXTarget - smoothCameraX) / 16;
     if (smoothCameraX < -8) smoothCameraX = -8;
     cameraPos.x = smoothCameraX >> 8;
-    cameraPos.y = 0;
+    if (wellDescentTime) {
+        int totalDescentTime = stateTime - wellDescentTime - 40;
+        totalDescentTime = MAX(totalDescentTime, 0);
+        int pan = totalDescentTime * totalDescentTime / 32;
+        cameraPos.y = pan;
+        if (pan > 350) {
+            for (int i = 0; i < 60; i++) waitForVBlank();
+            initWin();
+        }
+    } else {
+        cameraPos.y = 0;
+    }
 
     waitForVBlank();
 
@@ -163,8 +179,9 @@ void updateSurface(void) {
 
     if (BUTTON_PRESSED(BUTTON_START)) {
         pauseFromSurface();
-    } else if (BUTTON_PRESSED(BUTTON_SELECT)) {
-        initWin();
+    } else if (!wellDescentTime && playerData && playerData->collider.pos.y > 160) {
+        destroyGameObject(playerSingleton);
+        wellDescentTime = stateTime;
     }
 }
 

@@ -27,15 +27,9 @@ void initOverlay(void) {
 
     clearOverlayCenter();
 
-    printToOverlay("DOWN", 26, 0, 0);
-    printToOverlay("WELL", 26, 1, 0);
-    printToOverlay("TEST", 26, 2, 0);
-    printToOverlay("DOWN", 26, 3, 1);
-    printToOverlay("WELL", 26, 4, 1);
-    printToOverlay("TEST", 26, 5, 1);
-    printToOverlay("DOWN", 26, 6, 2);
-    printToOverlay("WELL", 26, 7, 2);
-    printToOverlay("TEST", 26, 8, 2);
+    printToOverlay("DOWN", 26, 17, 0);
+    printToOverlay("WELL", 26, 18, 1);
+    printToOverlay("GBA", 26, 19, 2);
     
 }
 

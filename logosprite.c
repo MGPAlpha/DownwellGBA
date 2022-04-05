@@ -43,8 +43,14 @@ void drawLogoSprite(GameObject* this) {
         int dstOffset = 16*16+16*32*i+16*8*data->index;
         DMANow(3, logo + srcOffset, CHARBLOCK[4].tileimg + dstOffset, 16*8);
     }
-    this->sprite->attr0 = ATTR0_REGULAR | ATTR0_WIDE | (data->pos.y - cameraPos.y + yOffset) & 0x00ff;
-    this->sprite->attr1 = ATTR1_LARGE | (data->pos.x - cameraPos.x) & 0x01ff;
+    int posY = data->pos.y - cameraPos.y + yOffset;
+    int posX = data->pos.x - cameraPos.x;
+    if (posY < -32 || posY > 160 || posX < -64 || posY > 240) {
+        this->sprite->attr0 = ATTR0_HIDE;
+        return;
+    }
+    this->sprite->attr0 = ATTR0_REGULAR | ATTR0_WIDE | (posY) & 0x00ff;
+    this->sprite->attr1 = ATTR1_LARGE | (posX) & 0x01ff;
     this->sprite->attr2 = ATTR2_PRIORITY(2) | ATTR2_TILEID(16+8*data->index,0);
 }
 

@@ -49,8 +49,14 @@ void updateBullet(GameObject* this) {
 
 void drawBullet(GameObject* this) {
     BulletData *data = this->data;
-    this->sprite->attr0 = ATTR0_REGULAR | ATTR0_TALL | ((data->collider.pos.y>>BULLET_SIZE_FACTOR) - cameraPos.y - 7) & 0x00ff;
-    this->sprite->attr1 = ATTR1_TINY | ((data->collider.pos.x>>BULLET_SIZE_FACTOR) - cameraPos.x - 1) & 0x01ff;
+    int posY = (data->collider.pos.y>>BULLET_SIZE_FACTOR) - cameraPos.y - 7;
+    int posX = (data->collider.pos.x>>BULLET_SIZE_FACTOR) - cameraPos.x - 1;
+    if (posY < -16 || posY > 160 || posX < -8 || posX > 240) {
+        this->sprite->attr0 = ATTR0_HIDE;
+        return;
+    }
+    this->sprite->attr0 = ATTR0_REGULAR | ATTR0_TALL | posY & 0x00ff;
+    this->sprite->attr1 = ATTR1_TINY | posX & 0x01ff;
     if (this->lifetime <= 16) {
         this->sprite->attr2 = ATTR2_TILEID(0,10) | ATTR2_PRIORITY(2);
     } else {
