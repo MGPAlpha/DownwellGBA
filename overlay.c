@@ -27,6 +27,15 @@ void initOverlay(void) {
 
     clearOverlayCenter();
 
+    SCREENBLOCK[31].tilemap[26+32] = (32*9+4) | 1<<12;
+    SCREENBLOCK[31].tilemap[27+32] = (32*9+5) | 1<<12;
+    SCREENBLOCK[31].tilemap[28+32] = (32*9+6) | 1<<12;
+    SCREENBLOCK[31].tilemap[29+32] = (32*9+7) | 1<<12;
+    SCREENBLOCK[31].tilemap[28+32*2] = (32*10+6) | 1<<12;
+    SCREENBLOCK[31].tilemap[29+32*2] = (32*10+7) | 1<<12;
+
+    printToOverlay("0000", 26, 0, 0);
+
     printToOverlay("DOWN", 26, 17, 0);
     printToOverlay("WELL", 26, 18, 1);
     printToOverlay("GBA", 26, 19, 2);
