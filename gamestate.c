@@ -4,7 +4,7 @@
 #include "collision.h"
 
 #include "art/title.h"
-#include "art/overlay.h"
+// #include "art/overlay.h"
 #include "art/dither.h"
 #include "art/spritesheet.h"
 #include "art/titlecollision.h"
@@ -12,6 +12,7 @@
 #include "player.h"
 #include "camera.h"
 #include "logosprite.h"
+#include "overlay.h"
 
 enum GAMESTATE gameState;
 
@@ -32,8 +33,7 @@ void initSurface(void) {
     REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | BG3_ENABLE | SPRITE_ENABLE | SPRITE_MODE_2D;
 
     REG_BG0CNT = BG_CHARBLOCK(0) | BG_SCREENBLOCK(24) | BG_4BPP | BG_SIZE_LARGE | 2; // Terrain
-    REG_BG1CNT = BG_CHARBLOCK(1) | BG_SCREENBLOCK(30) | BG_4BPP | BG_SIZE_SMALL | 0; // Dither Layer
-    REG_BG2CNT = BG_CHARBLOCK(2) | BG_SCREENBLOCK(31) | BG_4BPP | BG_SIZE_SMALL | 1; // UI Overlay
+    REG_BG2CNT = BG_CHARBLOCK(1) | BG_SCREENBLOCK(30) | BG_4BPP | BG_SIZE_SMALL | 0; // Dither Layer
     REG_BG3CNT = BG_CHARBLOCK(0) | BG_SCREENBLOCK(28) | BG_4BPP | BG_SIZE_SMALL | 3; // Sky
 
     DMANow(3, title_palette, PALETTE, TITLE_PALETTE_LENGTH);
@@ -45,8 +45,10 @@ void initSurface(void) {
     DMANow(3, title_tiles, &CHARBLOCK[0], TITLE_TILES_LENGTH);
     DMANow(3, titlebg, &SCREENBLOCK[24], TITLEBG_MAP_LENGTH);
     DMANow(3, sky, &SCREENBLOCK[28], SKY_MAP_LENGTH);
-    DMANow(3, overlay_tiles, &CHARBLOCK[2], OVERLAY_TILES_LENGTH);
-    DMANow(3, overlay, &SCREENBLOCK[31], OVERLAY_MAP_LENGTH);
+
+    waitForVBlank();
+    initOverlay();
+    REG_BG1CNT |= 1; // UI Overlay
 
     DMANow(3, spritesheet_palette, SPRITEPALETTE, SPRITESHEET_PALETTE_LENGTH);
     DMANow(3, spritesheet, &CHARBLOCK[4], SPRITESHEET_LENGTH);
@@ -114,7 +116,7 @@ void updateSurface(void) {
 
     PlayerData *playerData = playerSingleton->data;
     if (playerData->collider.pos.x >= 260) {
-        cameraXTarget = 232 << 8;
+        cameraXTarget = 233 << 8;
         if (logoSprite0 && logoSprite1){
             LogoSpriteData *logoData0 = logoSprite0->data;
             LogoSpriteData *logoData1 = logoSprite1->data;

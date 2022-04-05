@@ -5,7 +5,6 @@
 #include "gamestate.h"
 
 #include "art/title.h"
-#include "art/overlay.h"
 #include "art/dither.h"
 #include "art/instructions.h"
 
@@ -28,11 +27,8 @@ int main() {
     DMANow(3, instructions, &SCREENBLOCK[24], INSTRUCTIONS_MAP_LENGTH);
     PALETTE[17] = 0;
     DMANow(3, &dither[6*16], &CHARBLOCK[1], 16);
-    unsigned short tileVal = 1<<12;
+    unsigned short tileVal = 0;
     DMANow(3, &tileVal, &SCREENBLOCK[30], 1024 | DMA_SOURCE_FIXED| DMA_16);
-
-    DMANow(3, overlay_tiles, &CHARBLOCK[2], OVERLAY_TILES_LENGTH);
-    DMANow(3, overlay, &SCREENBLOCK[31], OVERLAY_MAP_LENGTH);
 
     for (int i = 0; i < 30; i++) {
         waitForVBlank();

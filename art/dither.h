@@ -1,7 +1,7 @@
 /*
  * Exported with nin10kit v1.8
  * Invocation command was nin10kit --force --mode=sprites --bpp=4 --transparent=ff00ff dither dither.png 
- * Time-stamp: Saturday 04/02/2022, 21:58:17
+ * Time-stamp: Monday 04/04/2022, 19:42:26
  * 
  * Image Information
  * -----------------

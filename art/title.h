@@ -1,7 +1,7 @@
 /*
  * Exported with nin10kit v1.8
  * Invocation command was nin10kit --mode=0 --bpp=4 --transparent=ff00ff title title-bg.png sky.png 
- * Time-stamp: Saturday 04/02/2022, 23:06:51
+ * Time-stamp: Monday 04/04/2022, 19:29:44
  * 
  * Image Information
  * -----------------
@@ -21,10 +21,10 @@ extern const unsigned short title_palette[16];
 
 #define TITLE_PALETTE_TYPE (0 << 7)
 
-extern const unsigned short title_tiles[5712];
-#define TITLE_TILES 357
-#define TITLE_TILES_SIZE 11424
-#define TITLE_TILES_LENGTH 5712
+extern const unsigned short title_tiles[5728];
+#define TITLE_TILES 358
+#define TITLE_TILES_SIZE 11456
+#define TITLE_TILES_LENGTH 5728
 
 extern const unsigned short titlebg[4096];
 #define TITLEBG_MAP_WIDTH 64
