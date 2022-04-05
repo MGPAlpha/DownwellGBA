@@ -15,6 +15,7 @@
 #include "overlay.h"
 
 enum GAMESTATE gameState;
+enum GAMESTATE unpauseState;
 
 int stateTime = 0;
 int vBlankCount = 0;
@@ -25,6 +26,8 @@ GameObject *logoSprite0;
 GameObject *logoSprite1;
 
 void initSurface(void) {
+
+    destroyAllGameObjects();
 
     waitForVBlank();
 
@@ -157,4 +160,51 @@ void updateSurface(void) {
     REG_BG3HOFF = cameraPos.x*5/24-40;
 
     updateSprites();
+
+    if (BUTTON_PRESSED(BUTTON_START)) {
+        pauseFromSurface();
+    } else if (BUTTON_PRESSED(BUTTON_SELECT)) {
+        initWin();
+    }
+}
+
+void pauseFromSurface(void) {
+    waitForVBlank();
+    fillOverlayCenter();
+    printToOverlay("SURFACE", 11, 3, 0);
+    printToOverlay("PRESS", 9, 5, 1);
+    printToOverlay("START", 15, 5, 2);
+    printToOverlay("TO  UNPAUSE", 9, 6, 1);
+    // printToOverlay("SURFACE", 11, 3, 0);
+    gameState = GAME_PAUSE;
+    unpauseState = GAME_SURFACE;
+}
+
+void updatePause(void) {
+    if (BUTTON_PRESSED(BUTTON_START)) {
+        clearOverlayCenter();
+        gameState = unpauseState;
+    }
+}
+
+void initWin(void) {
+    fillOverlayCenter();
+    printToOverlay("AT THIS POINT, THE", 5, 3, 1);
+    printToOverlay("GAME PROPER WOULD", 5, 4, 1);
+    printToOverlay("START. IN LIEU, THIS", 5, 5, 1);
+    printToOverlay("IS THE PLACEHOLDER", 5, 6, 1);
+    printToOverlay("WIN SCREEN.", 5, 7, 1);
+    printToOverlay("CONGRATULATIONS!", 7, 9, 0);
+    printToOverlay("YOU WIN", 11, 10, 2);
+    printToOverlay("PRESS", 9, 12, 1);
+    printToOverlay("START", 15, 12, 2);
+    printToOverlay("TO RETURN TO", 9, 13, 1);
+    printToOverlay("THE SURFACE", 9, 14, 1);
+    gameState = GAME_WIN;
+}
+
+void updateWin(void) {
+    if (BUTTON_PRESSED(BUTTON_START)) {
+        initSurface();
+    }
 }

@@ -31,5 +31,6 @@ void consolidateActiveGameObjects(void);
 
 void updateAllGameObjects(void);
 void drawAllGameObjects(void);
+void destroyAllGameObjects(void);
 
 #endif

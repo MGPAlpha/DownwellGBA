@@ -37,6 +37,7 @@ GameObject *newGameObject(GameObjectType *type) {
     }
     int initStatus = (*type->initialize)(gameObject);
     if (initStatus) {
+        mgba_printf("GameObject Initialization Failed");
         spriteFree(gameObject->sprite);
         return NULL;
     }
@@ -85,4 +86,14 @@ void drawAllGameObjects(void) {
             (*curr->type->draw)(curr);
         }
     }
+}
+
+void destroyAllGameObjects(void) {
+    for (int i = 0; i < nextInactiveIndex; i++) {
+        GameObject *curr = gameObjectRefs[i];
+        if (curr->active) {
+            destroyGameObject(curr);
+        }
+    }
+    consolidateActiveGameObjects();
 }

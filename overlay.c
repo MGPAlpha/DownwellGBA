@@ -46,6 +46,20 @@ void clearOverlayCenter(void) {
     }
 }
 
+void fillOverlayCenter(void) {
+    short fillTile = (32*9+1) | 1<<12;
+    for (int i = 0; i < 32; i++) {
+        DMANow(3, &fillTile, SCREENBLOCK[31].tilemap + 32 * i + 5, DMA_SOURCE_FIXED | 20);
+    }
+}
+
+void fillOverlayRect(int col, int row, int width, int height, short tileId) {
+    short fillTile = tileId | 1<<12;
+    for (int i = row; i < height; i++) {
+        DMANow(3, &fillTile, SCREENBLOCK[31].tilemap + 32 * i + col, DMA_SOURCE_FIXED | width);
+    }
+}
+
 void printToOverlay(char *str, int col, int row, int font) {
     while(*str) {
         SCREENBLOCK[31].tilemap[OFFSET(col, row, 32)] = *str + 3*32 * font - 32 | 1<<12;

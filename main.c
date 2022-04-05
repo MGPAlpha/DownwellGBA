@@ -59,6 +59,12 @@ int main() {
             case GAME_SURFACE:
                 updateSurface();
                 break;
+            case GAME_PAUSE:
+                updatePause();
+                break;
+            case GAME_WIN:
+                updateWin();
+                break;
         }
 
         vBlankCount++;
