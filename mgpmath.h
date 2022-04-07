@@ -29,4 +29,6 @@ int randRange(int min, int max);
 // Returns -1, 0, or 1 based on sign
 int sign(int v);
 
+int FFracSqrt(int x);
+
 #endif
