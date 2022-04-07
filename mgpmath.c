@@ -24,9 +24,9 @@ int FFracSqrt(int x) {
     root = 0; /* Clear root */
     remHi = 0; /* Clear high part of partial remainder */
     remLo = x; /* Get argument into low part of partial remainder */
-    count = 8; /* Load loop counter */
+    count = 30; /* Load loop counter */
     do {
-        remHi = (remHi<<24) | (remLo>>8); remLo <<= 24; /* get 2 bits of arg */
+        remHi = (remHi<<2) | (remLo>>30); remLo <<=2; /* get 2 bits of arg */
         root <<= 1; /* Get ready for the next bit in the root */
         testDiv = (root << 1) + 1; /* Test radical */
         if (remHi >= testDiv) {
@@ -35,4 +35,30 @@ int FFracSqrt(int x) {
         }
     } while (count-- != 0);
     return(root);
+}
+
+unsigned int fixedsqrt(unsigned int x, unsigned int fixedBits) {
+    return usqrt(x)>>(16-fixedBits/2);
+}
+
+unsigned int usqrt(unsigned int x)
+{
+      unsigned int a = 0L;                   /* accumulator      */
+      unsigned int r = 0L;                   /* remainder        */
+      unsigned int e = 0L;                   /* trial product    */
+
+      int i;
+
+      for (i = 0; i < 32; i++)   /* NOTE 1 */
+      {
+            r = (r << 2) + (x>>30); x <<= 2; /* NOTE 2 */
+            a <<= 1;
+            e = (a << 1) + 1;
+            if (r >= e)
+            {
+                  r -= e;
+                  a++;
+            }
+      }
+      return a;
 }

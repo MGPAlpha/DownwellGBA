@@ -30,5 +30,7 @@ int randRange(int min, int max);
 int sign(int v);
 
 int FFracSqrt(int x);
+unsigned int fixedsqrt(unsigned int x, unsigned int fixedBits);
+unsigned int usqrt(unsigned int x);
 
 #endif
