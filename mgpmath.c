@@ -1,6 +1,22 @@
 #include "mgpmath.h"
 #include "stdlib.h"
 
+int Vector2Length(Vector2 v, int fixedBits) {
+    int x2 = (v.x * v.x);
+    int y2 = (v.y * v.y);
+    // mgba_printf("X^2: %x", x2);
+    // mgba_printf("Y^2: %x", y2);
+    return fixedsqrt(x2+y2,2*fixedBits)>>fixedBits;
+}
+
+Vector2 Vector2Normalize(Vector2 v, int fixedBits) {
+    int len = Vector2Length(v,fixedBits);
+    // mgba_printf("vector len: %x", len);
+    v.x = (v.x<<fixedBits)/len;
+    v.y = (v.y<<fixedBits)/len;
+    return v;
+}
+
 Rect resizeRect(Rect r, int magnitudeDifference) {
     r.pos.x <<= magnitudeDifference;
     r.pos.y <<= magnitudeDifference;
@@ -18,29 +34,11 @@ int sign(int v) {
     return (v > 0) ? 1 : (v < 0 ? -1 : 0);
 }
 
-// Modified from Turkowski & Apple Computer (1994) https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.178.3957&rep=rep1&type=pdf#:~:text=Often%2C%20a%20fixed%2Dpoint%20algorithm,and%20evaluating%20in%20floating%2Dpoint.
-int FFracSqrt(int x) {
-    register unsigned int root, remHi, remLo, testDiv, count;
-    root = 0; /* Clear root */
-    remHi = 0; /* Clear high part of partial remainder */
-    remLo = x; /* Get argument into low part of partial remainder */
-    count = 30; /* Load loop counter */
-    do {
-        remHi = (remHi<<2) | (remLo>>30); remLo <<=2; /* get 2 bits of arg */
-        root <<= 1; /* Get ready for the next bit in the root */
-        testDiv = (root << 1) + 1; /* Test radical */
-        if (remHi >= testDiv) {
-            remHi -= testDiv;
-            root++;
-        }
-    } while (count-- != 0);
-    return(root);
-}
-
 unsigned int fixedsqrt(unsigned int x, unsigned int fixedBits) {
     return usqrt(x)>>(16-fixedBits/2);
 }
 
+// Modified from https://stackoverflow.com/questions/1100090/looking-for-an-efficient-integer-square-root-algorithm-for-arm-thumb2
 unsigned int usqrt(unsigned int x)
 {
       unsigned int a = 0L;                   /* accumulator      */

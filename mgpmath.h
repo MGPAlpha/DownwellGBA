@@ -19,7 +19,10 @@ typedef Rect Transform;
 #define V2_SUB(a,b) ((Vector2){(a).x-(b).x,(a).y-(b).y})
 #define V2_MUL(a,b) ((Vector2){(a).x*(b),(a).y*(b)})
 #define V2_DIV(a,b) ((Vector2){(a).x/(b),(a).y/(b)})
-#define V2_NORM(a,len) ((Vector2){(a).x*len/(abs(a.x)+abs(a.y)),(a).y*len/(abs(a.x)+abs(a.y))})
+
+
+int Vector2Length(Vector2 v, int fixedBits);
+Vector2 Vector2Normalize(Vector2 v, int fixedBits);
 
 Rect resizeRect(Rect r, int magnitudeDifference);
 
@@ -29,7 +32,6 @@ int randRange(int min, int max);
 // Returns -1, 0, or 1 based on sign
 int sign(int v);
 
-int FFracSqrt(int x);
 unsigned int fixedsqrt(unsigned int x, unsigned int fixedBits);
 unsigned int usqrt(unsigned int x);
 
