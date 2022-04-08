@@ -51,7 +51,7 @@ void drawLogoSprite(GameObject* this) {
     }
     this->sprite->attr0 = ATTR0_REGULAR | ATTR0_WIDE | (posY) & 0x00ff;
     this->sprite->attr1 = ATTR1_LARGE | (posX) & 0x01ff;
-    this->sprite->attr2 = ATTR2_PRIORITY(2) | ATTR2_TILEID(16+8*data->index,0);
+    this->sprite->attr2 = ATTR2_PRIORITY(3) | ATTR2_TILEID(16+8*data->index,0);
 }
 
 void destroyLogoSprite(GameObject* this) {
