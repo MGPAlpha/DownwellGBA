@@ -3,6 +3,7 @@
 #include "gamestate.h"
 #include "overlay.h"
 #include "palette.h"
+#include "savedata.h"
 
 void drawPauseMenu(Menu *menu, int selectedIndex) {
     fillOverlayCenter();
@@ -70,6 +71,12 @@ MenuItem optionsMenuItems[] = {
         "BACK",
         MENU_SUBMENU_BEHAVIOR,
         &pauseMenu
+    },
+    {
+        MENU_CONST_TEXT,
+        "DELETE SAVE",
+        MENU_SUBMENU_BEHAVIOR,
+        &deleteMenu
     }
 };
 
@@ -77,6 +84,41 @@ Menu optionsMenu = {
     optionsMenuItems,
     sizeof(optionsMenuItems)/sizeof(MenuItem),
     drawOptionsMenu,
+    NULL,
+    NULL
+};
+
+void deleteSaveAndRestart(void) {
+    resetSaveData();
+    initSurface();
+}
+
+void drawDeleteMenu(Menu *menu, int selectedIndex) {
+    fillOverlayCenter();
+    printToOverlay("DELETE ALL", 10, 1, 0);
+    printToOverlay("SAVE DATA?", 10, 2, 0);
+    drawMenu(menu, selectedIndex, 6, 9, 16, 2);
+}
+
+MenuItem deleteMenuItems[] = {
+    {
+        MENU_CONST_TEXT,
+        "GO BACK",
+        MENU_SUBMENU_BEHAVIOR,
+        &optionsMenu
+    },
+    {
+        MENU_CONST_TEXT,
+        "DELETE SAVE DATA",
+        MENU_FUNCTION_BEHAVIOR,
+        deleteSaveAndRestart
+    }
+};
+
+Menu deleteMenu = {
+    deleteMenuItems,
+    sizeof(deleteMenuItems)/sizeof(MenuItem),
+    drawDeleteMenu,
     NULL,
     NULL
 };
