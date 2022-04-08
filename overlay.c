@@ -79,6 +79,9 @@ unsigned int currentMenuIndex = 0;
 void loadMenu(Menu* menu) {
     currentMenu = menu;
     currentMenuIndex = 0;
+    if (currentMenu->onLoad) {
+        (*currentMenu->onLoad)();
+    }
 }
 
 void updateMenu(void) {
@@ -90,17 +93,15 @@ void updateMenu(void) {
         currentMenuIndex++;
         currentMenuIndex %= currentMenu->itemCount;
     } else if (BUTTON_PRESSED(BUTTON_A) || BUTTON_PRESSED(BUTTON_B)) {
-        if (currentMenu->onSelect) {
-            (*currentMenu->onSelect)(currentMenuIndex);
-        } else {
+        
             MenuItem *selectedItem = currentMenu->items + currentMenuIndex;
             if (selectedItem->behaviorMode == MENU_SUBMENU_BEHAVIOR) {
                 if (selectedItem->behavior.submenu) loadMenu(selectedItem->behavior.submenu);
             } else {
                 if (selectedItem->behavior.func) (*selectedItem->behavior.func)();
             }
-        }
     }
+    if (currentMenu->onSelect) (*currentMenu->onSelect)(currentMenuIndex);
 }
 
 void drawMenu(Menu *menu, int selectedIndex, int col, int row, int width, int height) {
@@ -110,6 +111,19 @@ void drawMenu(Menu *menu, int selectedIndex, int col, int row, int width, int he
             
         } else {
             printToOverlay(currItem->itemText.text, col + i, row + i, i == selectedIndex ? 2 : 1);
+        }
+    }
+}
+
+void drawScrollingMenu(Menu *menu, int selectedIndex, int col, int row, int width, int height) {
+    int indexOffset = -(height/2);
+    for (int i = 0; i < height; i++) {
+        int itemIndex = mod((i + indexOffset + selectedIndex), menu->itemCount);
+        MenuItem *currItem = menu->items + itemIndex;
+        if (currItem->textMode == MENU_FUNCTION_TEXT) {
+            
+        } else {
+            printToOverlay(currItem->itemText.text, col + i, row + i, i == height/2 ? 2 : 1);
         }
     }
 }

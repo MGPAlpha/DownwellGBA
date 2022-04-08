@@ -35,4 +35,6 @@ int sign(int v);
 unsigned int fixedsqrt(unsigned int x, unsigned int fixedBits);
 unsigned int usqrt(unsigned int x);
 
+int mod(int a, int b);
+
 #endif

@@ -22,8 +22,11 @@ typedef struct menu {
     int itemCount;
     void (*draw)(struct menu*, int);
     void (*onSelect)(int);
+    void (*onLoad)(void);
 } Menu;
 
 extern Menu pauseMenu;
+extern Menu optionsMenu;
+extern Menu paletteMenu;
 
 #endif
