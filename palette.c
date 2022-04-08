@@ -1,6 +1,7 @@
 #include "palette.h"
 
 #include "HW05Lib.h"
+#include "savedata.h"
 
 int activePalette;
 
@@ -24,8 +25,14 @@ void loadPalette(int index) {
     SPRITEPALETTE[3] = palettes[index].colors[0];
 
     activePalette = index;
+    setSaveDataEntry(1, index);
 }
 
 int getCurrPalette(void) {
     return activePalette;
+}
+
+void initPalette(void) {
+    activePalette = getSaveDataEntry(1);
+    loadPalette(activePalette);
 }

@@ -149,6 +149,9 @@ extern unsigned short buttons;
 #define BUTTON_HELD(key)  (~(BUTTONS) & (key))
 #define BUTTON_PRESSED(key) (!(~(oldButtons)&(key)) && (~buttons & (key)))
 
+// ================================ SAVE DATA =================================
+
+#define GAMEPAK_RAM  ((volatile unsigned char*)0x0E000000)
 
 // =================================== DMA ====================================
 

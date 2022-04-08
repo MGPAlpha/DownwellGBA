@@ -9,4 +9,6 @@ void loadPalette(int index);
 
 int getCurrPalette(void);
 
+void initPalette(void);
+
 #endif

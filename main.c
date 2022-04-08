@@ -3,6 +3,8 @@
 #include "gameobject.h"
 #include "player.h"
 #include "gamestate.h"
+#include "palette.h"
+#include "savedata.h"
 
 #include "art/title.h"
 #include "art/dither.h"
@@ -10,6 +12,8 @@
 
 int main() {
     mgba_open();
+
+    initSaveData();
 
     initSpriteMemory();
     initGameObjects();

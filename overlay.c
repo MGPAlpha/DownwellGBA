@@ -11,7 +11,7 @@ void initOverlay(void) {
 
     REG_BG1CNT = BG_CHARBLOCK(2) | BG_SCREENBLOCK(31) | BG_4BPP | BG_SIZE_SMALL | 0; // UI Overlay
 
-    DMANow(3, overlaytiles_palette, PALETTE+16, OVERLAYTILES_PALETTE_LENGTH);
+    // DMANow(3, overlaytiles_palette, PALETTE+16, OVERLAYTILES_PALETTE_LENGTH);
     DMANow(3, overlaytiles, &CHARBLOCK[2], OVERLAYTILES_LENGTH);
     short blackTile = (32*9+1) | 1<<12;
     DMANow(3, &blackTile, SCREENBLOCK[31].tilemap, DMA_SOURCE_FIXED | 1024);

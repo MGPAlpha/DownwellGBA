@@ -3,6 +3,7 @@
 #include "print.h"
 #include "collision.h"
 #include "stdlib.h"
+#include "palette.h"
 
 #include "art/title.h"
 // #include "art/overlay.h"
@@ -34,6 +35,8 @@ void initSurface(void) {
 
     waitForVBlank();
 
+    initPalette();
+
     hideSprites();
 
     REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | BG3_ENABLE | SPRITE_ENABLE | SPRITE_MODE_2D;
@@ -42,7 +45,7 @@ void initSurface(void) {
     REG_BG2CNT = BG_CHARBLOCK(1) | BG_SCREENBLOCK(30) | BG_4BPP | BG_SIZE_SMALL | 0; // Dither Layer
     REG_BG3CNT = BG_CHARBLOCK(0) | BG_SCREENBLOCK(28) | BG_4BPP | BG_SIZE_SMALL | 3; // Sky
 
-    DMANow(3, title_palette, PALETTE, TITLE_PALETTE_LENGTH);
+    // DMANow(3, title_palette, PALETTE, TITLE_PALETTE_LENGTH);
     PALETTE[17] = 0;
     DMANow(3, &dither[6*16], &CHARBLOCK[1], 16);
     unsigned short tileVal = 1<<12;
@@ -56,7 +59,7 @@ void initSurface(void) {
     initOverlay();
     REG_BG1CNT |= 1; // UI Overlay
 
-    DMANow(3, spritesheet_palette, SPRITEPALETTE, SPRITESHEET_PALETTE_LENGTH);
+    // DMANow(3, spritesheet_palette, SPRITEPALETTE, SPRITESHEET_PALETTE_LENGTH);
     DMANow(3, spritesheet, &CHARBLOCK[4], SPRITESHEET_LENGTH);
 
     activeCollisionMap = titlecollision;
@@ -177,7 +180,7 @@ void updateSurface(void) {
 
     updateSprites();
 
-    if (BUTTON_PRESSED(BUTTON_START)) {
+    if (playerCanMove && BUTTON_PRESSED(BUTTON_START)) {
         pauseFromSurface();
     } else if (!wellDescentTime && playerData && playerData->collider.pos.y > 160) {
         destroyGameObject(playerSingleton);

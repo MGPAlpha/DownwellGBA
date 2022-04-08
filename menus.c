@@ -87,6 +87,7 @@ void paletteMenuLoad(void) {
 
 void returnFromPaletteMenu(void) {
     loadMenu(&pauseMenu);
+    storeSaveData();
 }
 
 void drawPaletteMenu(Menu *menu, int selectedIndex) {
