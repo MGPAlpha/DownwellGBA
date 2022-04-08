@@ -1,6 +1,8 @@
 #include "overlay.h"
 
 #include "HW05Lib.h"
+#include "menus.h"
+#include "stdlib.h"
 
 #include "art/overlaytiles.h"
 
@@ -68,5 +70,52 @@ void printToOverlay(char *str, int col, int row, int font) {
         SCREENBLOCK[31].tilemap[OFFSET(col, row, 32)] = *str + 3*32 * font - 32 | 1<<12;
         str++;
         col++;
+    }
+}
+
+Menu *currentMenu = NULL;
+unsigned int currentMenuIndex = 0;
+
+void loadMenu(Menu* menu) {
+    currentMenu = menu;
+    currentMenuIndex = 0;
+}
+
+void updateMenu(void) {
+    if (BUTTON_PRESSED(BUTTON_LEFT) || BUTTON_PRESSED(BUTTON_UP)) {
+        currentMenuIndex--;
+        currentMenuIndex+=currentMenu->itemCount;
+        currentMenuIndex %= currentMenu->itemCount;
+    } else if (BUTTON_PRESSED(BUTTON_RIGHT) || BUTTON_PRESSED(BUTTON_DOWN)) {
+        currentMenuIndex++;
+        currentMenuIndex %= currentMenu->itemCount;
+    } else if (BUTTON_PRESSED(BUTTON_A) || BUTTON_PRESSED(BUTTON_B)) {
+        if (currentMenu->onSelect) {
+            (*currentMenu->onSelect)(currentMenuIndex);
+        } else {
+            MenuItem *selectedItem = currentMenu->items + currentMenuIndex;
+            if (selectedItem->behaviorMode == MENU_SUBMENU_BEHAVIOR) {
+                if (selectedItem->behavior.submenu) loadMenu(selectedItem->behavior.submenu);
+            } else {
+                if (selectedItem->behavior.func) (*selectedItem->behavior.func)();
+            }
+        }
+    }
+}
+
+void drawMenu(Menu *menu, int selectedIndex, int col, int row, int width, int height) {
+    for (int i = 0; i < height && i < menu->itemCount; i++) {
+        MenuItem *currItem = menu->items + i;
+        if (currItem->textMode == MENU_FUNCTION_TEXT) {
+            
+        } else {
+            printToOverlay(currItem->itemText.text, col + i, row + i, i == selectedIndex ? 2 : 1);
+        }
+    }
+}
+
+void drawCurrentMenu(void) {
+    if (currentMenu) {
+        (*currentMenu->draw)(currentMenu, currentMenuIndex);
     }
 }

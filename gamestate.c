@@ -186,21 +186,23 @@ void updateSurface(void) {
 }
 
 void pauseFromSurface(void) {
-    waitForVBlank();
-    fillOverlayCenter();
-    printToOverlay("SURFACE", 11, 3, 0);
-    printToOverlay("PRESS", 9, 5, 1);
-    printToOverlay("START", 15, 5, 2);
-    printToOverlay("TO  UNPAUSE", 9, 6, 1);
+    loadMenu(&pauseMenu);
     // printToOverlay("SURFACE", 11, 3, 0);
     gameState = GAME_PAUSE;
     unpauseState = GAME_SURFACE;
 }
 
+void unpause(void) {
+    clearOverlayCenter();
+    gameState = unpauseState;
+}
+
 void updatePause(void) {
+    updateMenu();
+    waitForVBlank();
+    if (gameState == GAME_PAUSE) drawCurrentMenu();
     if (BUTTON_PRESSED(BUTTON_START)) {
-        clearOverlayCenter();
-        gameState = unpauseState;
+        unpause();
     }
 }
 

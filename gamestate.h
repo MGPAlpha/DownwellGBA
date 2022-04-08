@@ -13,6 +13,8 @@ void updateSurface(void);
 
 void pauseFromSurface(void);
 
+void unpause(void);
+
 void updatePause(void);
 
 void initWin(void);
