@@ -1,7 +1,7 @@
 #ifndef SAVEDATA_H
 #define SAVEDATA_H
 
-#define SAVE_VERSION 0x01
+#define SAVE_VERSION 0x02
 
 void initSaveData(void);
 

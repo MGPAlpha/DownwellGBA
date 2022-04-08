@@ -46,7 +46,7 @@ void initSurface(void) {
     REG_BG3CNT = BG_CHARBLOCK(0) | BG_SCREENBLOCK(28) | BG_4BPP | BG_SIZE_SMALL | 3; // Sky
 
     // DMANow(3, title_palette, PALETTE, TITLE_PALETTE_LENGTH);
-    PALETTE[17] = 0;
+    // PALETTE[17] = 0;
     DMANow(3, &dither[6*16], &CHARBLOCK[1], 16);
     unsigned short tileVal = 1<<12;
     DMANow(3, &tileVal, &SCREENBLOCK[30], 1024 | DMA_SOURCE_FIXED| DMA_16);
@@ -111,6 +111,10 @@ void updateSurface(void) {
             playerData->collider.pos.y = 136;
             playerData->collider.pos.x = 152;
         }
+    }
+
+    if (BUTTON_PRESSED(BUTTON_R)) {
+        unlockPalette(4);
     }
 
     

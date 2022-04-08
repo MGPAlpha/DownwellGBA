@@ -7,7 +7,7 @@ enum MENU_BEHAVIOR_MODE {MENU_SUBMENU_BEHAVIOR, MENU_FUNCTION_BEHAVIOR};
 typedef struct menu_item {
     enum MENU_TEXT_MODE textMode;
     union {
-        char *text;
+        char text[16];
         void (*func)(char*);
     } itemText;
     enum MENU_BEHAVIOR_MODE behaviorMode;
@@ -28,5 +28,8 @@ typedef struct menu {
 extern Menu pauseMenu;
 extern Menu optionsMenu;
 extern Menu paletteMenu;
+
+
+extern void returnFromPaletteMenu(void);
 
 #endif

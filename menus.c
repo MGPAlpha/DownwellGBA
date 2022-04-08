@@ -87,7 +87,6 @@ void paletteMenuLoad(void) {
 
 void returnFromPaletteMenu(void) {
     loadMenu(&pauseMenu);
-    storeSaveData();
 }
 
 void drawPaletteMenu(Menu *menu, int selectedIndex) {
@@ -96,30 +95,13 @@ void drawPaletteMenu(Menu *menu, int selectedIndex) {
     drawScrollingMenu(menu, selectedIndex, 7, 4, 16, 5);
 }
 
-MenuItem paletteMenuItems[] = {
-    {
-        MENU_CONST_TEXT,
-        "0.DOWNWELL",
-        MENU_FUNCTION_BEHAVIOR,
-        returnFromPaletteMenu
-    },
-    {
-        MENU_CONST_TEXT,
-        "1.MATCHA",
-        MENU_FUNCTION_BEHAVIOR,
-        returnFromPaletteMenu
-    },
-    {
-        MENU_CONST_TEXT,
-        "2.AQUA",
-        MENU_FUNCTION_BEHAVIOR,
-        returnFromPaletteMenu
-    }
+MenuItem paletteMenuItems[38] = {
+    
 };
 
 Menu paletteMenu = {
     paletteMenuItems,
-    sizeof(paletteMenuItems)/sizeof(MenuItem),
+    0,
     drawPaletteMenu,
     loadPalette,
     paletteMenuLoad

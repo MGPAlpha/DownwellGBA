@@ -28,6 +28,7 @@ void initSaveData(void) {
 void resetSaveData(void) {
     saveBuffer[0] = SAVE_VERSION;
     saveBuffer[1] = 0; // Initial Palette
+    saveBuffer[3] = 3; // Number of Palettes Unlocked
     storeSaveData();
 }
 
@@ -38,7 +39,7 @@ unsigned char getSaveDataEntry(int i) {
 void setSaveDataEntry(int i, unsigned char val) {
     if (i != 0) {
         saveBuffer[i] = val;
-        if (i == 1) {
+        if (i < 64) {
             GAMEPAK_RAM[i] = val;
         }
     }
