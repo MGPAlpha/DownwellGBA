@@ -3,9 +3,13 @@
 
 #define NUM_CHEATS 10
 
+void checkToEnableCheats(void);
+
 extern int infiniteAmmoCheat;
 
 void initCheats(void);
+
+int displayCheatsInMenu(void);
 
 typedef struct cheat {
     char name[16];

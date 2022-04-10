@@ -186,6 +186,8 @@ void updateSurface(void) {
 
     updateSprites();
 
+    checkToEnableCheats();
+
     if (playerCanMove && BUTTON_PRESSED(BUTTON_START)) {
         pauseFromSurface();
     } else if (!wellDescentTime && playerData && playerData->collider.pos.y > 160) {

@@ -1,11 +1,47 @@
 #include "cheats.h"
 
 #include "stdlib.h"
+#include "HW05Lib.h"
 
 #include "menus.h"
 #include "savedata.h"
 
 int cheatsEnabled;
+
+short konamiCode[] = {
+    BUTTON_UP,
+    BUTTON_UP,
+    BUTTON_DOWN,
+    BUTTON_DOWN,
+    BUTTON_LEFT,
+    BUTTON_RIGHT,
+    BUTTON_LEFT,
+    BUTTON_RIGHT,
+    BUTTON_B,
+    BUTTON_A,
+    BUTTON_START
+};
+int konamiIndex = 0;
+
+void checkToEnableCheats(void) {
+    if (!cheatsEnabled) {
+        // mgba_printf("Buttons: %x, OldButtons: %x", !buttons, oldButtons);
+        if (~buttons & oldButtons) {
+            if (BUTTON_PRESSED(konamiCode[konamiIndex])) {
+                konamiIndex++;
+                if (konamiIndex >= sizeof(konamiCode)/sizeof(short)) {
+                    cheatsEnabled = 1;
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        }
+    }
+}
+
+int displayCheatsInMenu(void) {
+    return cheatsEnabled;
+}
 
 int infiniteAmmoCheat;
 

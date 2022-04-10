@@ -58,7 +58,8 @@ MenuItem pauseMenuItems[] = {
         MENU_CONST_TEXT,
         "CHEATS",
         MENU_SUBMENU_BEHAVIOR,
-        &cheatsMenu
+        &cheatsMenu,
+        displayCheatsInMenu
     }
 
 };
