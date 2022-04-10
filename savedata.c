@@ -29,6 +29,7 @@ void resetSaveData(void) {
     saveBuffer[0] = SAVE_VERSION;
     saveBuffer[1] = 0; // Initial Palette
     saveBuffer[3] = 3; // Number of Palettes Unlocked
+    saveBuffer[5] = 0; // Cheats Enabled
     storeSaveData();
 }
 

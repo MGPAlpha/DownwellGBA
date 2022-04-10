@@ -5,6 +5,7 @@
 #include "gamestate.h"
 #include "palette.h"
 #include "savedata.h"
+#include "cheats.h"
 
 #include "art/title.h"
 #include "art/dither.h"
@@ -14,6 +15,8 @@ int main() {
     mgba_open();
 
     initSaveData();
+
+    initCheats();
 
     initSpriteMemory();
     initGameObjects();

@@ -8,7 +8,7 @@ typedef struct menu_item {
     enum MENU_TEXT_MODE textMode;
     union {
         char text[20];
-        void (*func)(char*);
+        void (*func)(char*, int index);
     } itemText;
     enum MENU_BEHAVIOR_MODE behaviorMode;
     union {

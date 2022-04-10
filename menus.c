@@ -4,6 +4,7 @@
 #include "overlay.h"
 #include "palette.h"
 #include "savedata.h"
+#include "cheats.h"
 
 void drawPauseMenu(Menu *menu, int selectedIndex) {
     fillOverlayCenter();
@@ -160,31 +161,13 @@ Menu paletteMenu = {
     paletteMenuLoad
 };
 
-void unlockPalettesCheat(void) {
-    unlockAllPalettes();
-    loadMenu(&paletteMenu);
-}
-
 void drawCheatsMenu(Menu *menu, int selectedIndex) {
     fillOverlayCenter();
     printToOverlay("CHEATS", 12, 1, 0);
     drawMenu(menu, selectedIndex, 7, 4, 16, 5);
 }
 
-MenuItem cheatsMenuItems[] = {
-    {
-        MENU_CONST_TEXT,
-        "BACK",
-        MENU_SUBMENU_BEHAVIOR,
-        &optionsMenu
-    },
-    {
-        MENU_CONST_TEXT,
-        "UNLOCK PALETTES",
-        MENU_FUNCTION_BEHAVIOR,
-        unlockPalettesCheat
-    }
-};
+MenuItem cheatsMenuItems[NUM_CHEATS];
 
 Menu cheatsMenu = {
     cheatsMenuItems,
