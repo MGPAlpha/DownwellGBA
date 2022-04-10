@@ -11,6 +11,10 @@ void drawPauseMenu(Menu *menu, int selectedIndex) {
     drawMenu(menu, selectedIndex, 7, 4, 16, 8);
 }
 
+int showOnlyOnSurface(void) {
+    return unpauseState != GAME_SURFACE;
+}
+
 MenuItem pauseMenuItems[] = {
     {
         MENU_CONST_TEXT,
@@ -22,7 +26,8 @@ MenuItem pauseMenuItems[] = {
         MENU_CONST_TEXT,
         "QUICK START",
         MENU_FUNCTION_BEHAVIOR,
-        NULL
+        NULL,
+        showOnlyOnSurface
     },
     {
         MENU_CONST_TEXT,
@@ -47,6 +52,12 @@ MenuItem pauseMenuItems[] = {
         "OPTION",
         MENU_SUBMENU_BEHAVIOR,
         &optionsMenu
+    },
+    {
+        MENU_CONST_TEXT,
+        "CHEATS",
+        MENU_SUBMENU_BEHAVIOR,
+        &cheatsMenu
     }
 
 };
@@ -148,3 +159,38 @@ Menu paletteMenu = {
     loadPalette,
     paletteMenuLoad
 };
+
+void unlockPalettesCheat(void) {
+    unlockAllPalettes();
+    loadMenu(&paletteMenu);
+}
+
+void drawCheatsMenu(Menu *menu, int selectedIndex) {
+    fillOverlayCenter();
+    printToOverlay("CHEATS", 12, 1, 0);
+    drawMenu(menu, selectedIndex, 7, 4, 16, 5);
+}
+
+MenuItem cheatsMenuItems[] = {
+    {
+        MENU_CONST_TEXT,
+        "BACK",
+        MENU_SUBMENU_BEHAVIOR,
+        &optionsMenu
+    },
+    {
+        MENU_CONST_TEXT,
+        "UNLOCK PALETTES",
+        MENU_FUNCTION_BEHAVIOR,
+        unlockPalettesCheat
+    }
+};
+
+Menu cheatsMenu = {
+    cheatsMenuItems,
+    sizeof(cheatsMenuItems)/sizeof(MenuItem),
+    drawCheatsMenu,
+    NULL,
+    NULL
+};
+

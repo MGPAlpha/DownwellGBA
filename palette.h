@@ -14,4 +14,6 @@ void initPalette(void);
 
 void unlockPalette(int index);
 
+void unlockAllPalettes(void);
+
 #endif

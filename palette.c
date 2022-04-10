@@ -57,3 +57,7 @@ void unlockPalette(int index) {
     setSaveDataEntry(3, MAX(index, getSaveDataEntry(3)));
     initPalette();
 }
+
+void unlockAllPalettes(void) {
+    unlockPalette(sizeof(palettes)/sizeof(Palette));
+}

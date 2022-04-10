@@ -113,10 +113,6 @@ void updateSurface(void) {
         }
     }
 
-    if (BUTTON_PRESSED(BUTTON_R)) {
-        unlockPalette(4);
-    }
-
     
 
     int playerCanMove = stateTime > 8*6;

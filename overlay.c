@@ -85,13 +85,22 @@ void loadMenu(Menu* menu) {
 }
 
 void updateMenu(void) {
+    int indexChange = 0;
     if (BUTTON_PRESSED(BUTTON_LEFT) || BUTTON_PRESSED(BUTTON_UP)) {
-        currentMenuIndex--;
-        currentMenuIndex+=currentMenu->itemCount;
-        currentMenuIndex %= currentMenu->itemCount;
-    } else if (BUTTON_PRESSED(BUTTON_RIGHT) || BUTTON_PRESSED(BUTTON_DOWN)) {
-        currentMenuIndex++;
-        currentMenuIndex %= currentMenu->itemCount;
+        indexChange += -1;
+    }
+    if (BUTTON_PRESSED(BUTTON_RIGHT) || BUTTON_PRESSED(BUTTON_DOWN)) {
+        indexChange += 1;
+    }
+    if (indexChange) {
+        int initialIndex = currentMenuIndex;
+        do {
+            currentMenuIndex += indexChange;
+            currentMenuIndex += currentMenu->itemCount;
+            currentMenuIndex %= currentMenu->itemCount;
+        } while (currentMenuIndex != initialIndex
+            && currentMenu->items[currentMenuIndex].shouldAppear
+            && !(*currentMenu->items[currentMenuIndex].shouldAppear)());
     } else if (BUTTON_PRESSED(BUTTON_A) || BUTTON_PRESSED(BUTTON_B)) {
         
             MenuItem *selectedItem = currentMenu->items + currentMenuIndex;
@@ -105,12 +114,16 @@ void updateMenu(void) {
 }
 
 void drawMenu(Menu *menu, int selectedIndex, int col, int row, int width, int height) {
-    for (int i = 0; i < height && i < menu->itemCount; i++) {
+    for (int i = 0, screenIndex = 0; i < height && i < menu->itemCount; i++, screenIndex++) {
         MenuItem *currItem = menu->items + i;
+        if (currItem->shouldAppear && !(*currItem->shouldAppear)()) {
+            screenIndex--;
+            continue;
+        }
         if (currItem->textMode == MENU_FUNCTION_TEXT) {
             
         } else {
-            printToOverlay(currItem->itemText.text, col + i, row + i, i == selectedIndex ? 2 : 1);
+            printToOverlay(currItem->itemText.text, col + screenIndex, row + screenIndex, i == selectedIndex ? 2 : 1);
         }
     }
 }

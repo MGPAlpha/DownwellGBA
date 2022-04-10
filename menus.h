@@ -15,6 +15,7 @@ typedef struct menu_item {
         struct menu *submenu;
         void (*func)(void);
     } behavior;
+    int (*shouldAppear)(void);
 } MenuItem;
 
 typedef struct menu {
@@ -29,6 +30,7 @@ extern Menu pauseMenu;
 extern Menu optionsMenu;
 extern Menu paletteMenu;
 extern Menu deleteMenu;
+extern Menu cheatsMenu;
 
 
 extern void returnFromPaletteMenu(void);

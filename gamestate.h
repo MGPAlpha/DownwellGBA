@@ -3,6 +3,7 @@
 
 enum GAMESTATE {GAME_SURFACE, GAME_PAUSE, GAME_WIN};
 extern enum GAMESTATE gameState;
+extern enum GAMESTATE unpauseState;
 
 extern int stateTime;
 extern int vBlankCount;
