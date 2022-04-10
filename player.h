@@ -17,6 +17,8 @@ typedef struct playerdata {
     int runningJump;
     int canFire;
     int fireTime;
+    int charge;
+    int ammo;
 } PlayerData;
 
 #endif

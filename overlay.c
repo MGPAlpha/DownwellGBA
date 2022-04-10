@@ -36,11 +36,18 @@ void initOverlay(void) {
     SCREENBLOCK[31].tilemap[28+32*2] = (32*10+6) | 1<<12;
     SCREENBLOCK[31].tilemap[29+32*2] = (32*10+7) | 1<<12;
 
+    SCREENBLOCK[31].tilemap[OFFSET(26,2,32)] = OFFSET(0, 10, 32) | 1 << 12;
+    SCREENBLOCK[31].tilemap[OFFSET(27,2,32)] = OFFSET(0, 10, 32) | 1 << 12 | 1<<10;
+    SCREENBLOCK[31].tilemap[OFFSET(26,17,32)] = OFFSET(0, 10, 32) | 1 << 12 | 1<<11;
+    SCREENBLOCK[31].tilemap[OFFSET(27,17,32)] = OFFSET(0, 10, 32) | 1 << 12 | 1<<10 | 1<<11;
+
     printToOverlay("0000", 26, 0, 0);
 
-    printToOverlay("DOWN", 26, 17, 0);
-    printToOverlay("WELL", 26, 18, 1);
-    printToOverlay("GBA", 26, 19, 2);
+    printToOverlay("DOWN", 0, 17, 0);
+    printToOverlay("WELL", 0, 18, 1);
+    printToOverlay("GBA", 0, 19, 2);
+
+    updateAmmoDisplay(0,1);
     
 }
 
@@ -71,6 +78,20 @@ void printToOverlay(char *str, int col, int row, int font) {
         str++;
         col++;
     }
+}
+
+void updateAmmoDisplay(int ammo, int perShot) {
+    for (int i = 0; i < 14; i++) {
+        int tileCol = 16-i;
+        int tileIndex = OFFSET(ammo - 4 * i - 1, 10+perShot,32);
+        if (ammo <= i*4) tileIndex = OFFSET(2,10,32); // Fully Empty tile
+        if (ammo - perShot >= 4*(i+1)) tileIndex = OFFSET(1,10,32); // Filled tile
+        SCREENBLOCK[31].tilemap[OFFSET(26,tileCol,32)] = tileIndex | 1<<12;
+        SCREENBLOCK[31].tilemap[OFFSET(27,tileCol,32)] = tileIndex | 1<<12 | 1<<10;
+    }
+    char ammoText[4];
+    sprintf(ammoText, "%d", ammo);
+    printToOverlay(ammoText, 26, 18, 0);
 }
 
 Menu *currentMenu = NULL;

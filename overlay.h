@@ -13,6 +13,8 @@ void fillOverlayRect(int col, int row, int width, int height, short tileId);
 
 void printToOverlay(char *str, int col, int row, int font);
 
+void updateAmmoDisplay(int ammo, int perShot);
+
 extern unsigned int currentMenuIndex;
 
 void loadMenu(Menu* menu);

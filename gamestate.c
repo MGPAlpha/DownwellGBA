@@ -178,6 +178,10 @@ void updateSurface(void) {
     REG_BG0VOFF = cameraPos.y;
     REG_BG3HOFF = cameraPos.x*5/24-40;
 
+    if (playerData) {
+        updateAmmoDisplay(playerData->ammo, 1);
+    }
+
     updateSprites();
 
     if (playerCanMove && BUTTON_PRESSED(BUTTON_START)) {

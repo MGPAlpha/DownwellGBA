@@ -79,6 +79,8 @@ int initializePlayer(GameObject* this) {
     data->runningJump = 0;
     data->canFire = 0;
     data->fireTime = 0;
+    data->charge = 8;
+    data->ammo = 8;
     this->data = data;
 
     return 0;
@@ -137,7 +139,10 @@ void updatePlayer(GameObject* this) {
         Collision yCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 4);
         if (yCollision.push.y) {
             data->collider.pos.y += yCollision.push.y;
-            if (yCollision.push.y < 0) data->state = PLAYER_IDLE;
+            if (yCollision.push.y < 0) {
+                data->state = PLAYER_IDLE;
+                data->ammo = data->charge;
+            }
         }
     }
 
@@ -147,11 +152,12 @@ void updatePlayer(GameObject* this) {
             data->fireTime = 7;
         }
 
-        if (data->canFire && (BUTTON_HELD(BUTTON_A) || BUTTON_HELD(BUTTON_B)) && data->fireTime >= 7) {
+        if (data->canFire && (BUTTON_HELD(BUTTON_A) || BUTTON_HELD(BUTTON_B)) && data->fireTime >= 7 && data->ammo > 0) {
             data->fireTime = 0;
             data->runningJump = 0;
+            data->ammo -= 1;
             GameObject *newBullet = newGameObject(&bulletType);
-            data->stateTime = 20;
+            data->stateTime = 21;
             if (newBullet->active) {
                 BulletData *bulletData = newBullet->data;
                 bulletData->collider.pos.x = data->collider.pos.x;
