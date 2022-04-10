@@ -15,6 +15,7 @@
 #include "camera.h"
 #include "logosprite.h"
 #include "overlay.h"
+#include "cheats.h"
 
 enum GAMESTATE gameState;
 enum GAMESTATE unpauseState;
@@ -36,6 +37,7 @@ void initSurface(void) {
     waitForVBlank();
 
     initPalette();
+    initCheats();
 
     hideSprites();
 
