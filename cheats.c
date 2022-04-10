@@ -31,6 +31,7 @@ void checkToEnableCheats(void) {
                 konamiIndex++;
                 if (konamiIndex >= sizeof(konamiCode)/sizeof(short)) {
                     cheatsEnabled = 1;
+                    setSaveDataEntry(5, 1);
                 }
             } else {
                 konamiIndex = 0;
@@ -89,9 +90,22 @@ void initCheats(void) {
         MENU_CONST_TEXT,
         "DISABLE CHEATS",
         MENU_FUNCTION_BEHAVIOR,
-        NULL
+        disableCheats
     };
     cheatsMenu.itemCount = i+2;
+}
+
+void disableCheats(void) {
+    cheatsEnabled = 0;
+    setSaveDataEntry(5, 0);
+    for (int i = 0; i < NUM_CHEATS; i++) {
+        Cheat *currCheat = cheats + i;
+        if (currCheat->enabled) {
+            *currCheat->enabled = 0;
+            setSaveDataEntry(i+32, 0);
+        }
+    }
+    loadMenu(&pauseMenu);
 }
 
 void unlockPalettesCheat(void) {

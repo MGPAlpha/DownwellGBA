@@ -9,6 +9,8 @@ extern int infiniteAmmoCheat;
 
 void initCheats(void);
 
+void disableCheats(void);
+
 int displayCheatsInMenu(void);
 
 typedef struct cheat {
