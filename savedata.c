@@ -1,6 +1,7 @@
 #include "savedata.h"
 
 #include "HW05Lib.h"
+#include "cheats.h"
 
 unsigned char saveBuffer[128];
 
@@ -30,6 +31,9 @@ void resetSaveData(void) {
     saveBuffer[1] = 0; // Initial Palette
     saveBuffer[3] = 3; // Number of Palettes Unlocked
     saveBuffer[5] = 0; // Cheats Enabled
+    for (int i = 0; i < NUM_CHEATS; i++) {
+        saveBuffer[32+i] = 0;
+    }
     storeSaveData();
 }
 

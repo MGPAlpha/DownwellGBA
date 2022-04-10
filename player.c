@@ -7,6 +7,7 @@
 #include "gameobject.h"
 #include "stdlib.h"
 #include "gamestate.h"
+#include "cheats.h"
 
 #include "bullet.h"
 
@@ -131,7 +132,7 @@ void updatePlayer(GameObject* this) {
     }
 
     if (data->state == PLAYER_JUMPING) {
-        if (!BUTTON_HELD(BUTTON_A) && !BUTTON_HELD(BUTTON_B) && data->stateTime < 10) data->stateTime = 10;
+        if (!BUTTON_HELD(BUTTON_A) && !BUTTON_HELD(BUTTON_B) && data->stateTime < 12) data->stateTime = 12;
         int jumpDiffIndex = data->stateTime;
         if (data->stateTime >= sizeof(jumpDisplacementFrames)/sizeof(int)) jumpDiffIndex = sizeof(jumpDisplacementFrames)/sizeof(int) - 1;
         int jumpDisplacement = jumpDisplacementFrames[jumpDiffIndex];
@@ -152,10 +153,10 @@ void updatePlayer(GameObject* this) {
             data->fireTime = 7;
         }
 
-        if (data->canFire && (BUTTON_HELD(BUTTON_A) || BUTTON_HELD(BUTTON_B)) && data->fireTime >= 7 && data->ammo > 0) {
+        if (data->canFire && (BUTTON_HELD(BUTTON_A) || BUTTON_HELD(BUTTON_B)) && data->fireTime >= 7 && (data->ammo > 0 || infiniteAmmoCheat)) {
             data->fireTime = 0;
             data->runningJump = 0;
-            data->ammo -= 1;
+            if (!infiniteAmmoCheat) data->ammo -= 1;
             GameObject *newBullet = newGameObject(&bulletType);
             data->stateTime = 21;
             if (newBullet->active) {

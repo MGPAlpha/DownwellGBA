@@ -7,6 +7,23 @@
 
 int cheatsEnabled;
 
+int infiniteAmmoCheat;
+
+void toggleCheat(int index) {
+    index--;
+    if (cheats[index].enabled) {
+        *cheats[index].enabled = !*cheats[index].enabled;
+        setSaveDataEntry(index+32, *cheats[index].enabled);
+    }
+}
+
+void cheatToggleText(char *text, int index) {
+    index--;
+    if (cheats[index].enabled) {
+        sprintf(text, "%s %s", cheats[index].name, *cheats[index].enabled ? "ON" : "OFF");
+    }
+}
+
 void initCheats(void) {
     cheatsEnabled = getSaveDataEntry(5);
     cheatsMenu.items[0] = (MenuItem){
@@ -25,6 +42,11 @@ void initCheats(void) {
             currMenuItem->textMode = MENU_CONST_TEXT;
             sprintf(currMenuItem->itemText.text, "%s", currCheat->name);
             currMenuItem->behavior.func = currCheat->invoke;
+        } else if (currCheat->enabled) {
+            *currCheat->enabled = getSaveDataEntry(i+32);
+            currMenuItem->behavior.func = toggleCheat;
+            currMenuItem->textMode = MENU_FUNCTION_TEXT;
+            currMenuItem->itemText.func = cheatToggleText;
         }
     }
     cheatsMenu.items[i+1] = (MenuItem){
@@ -45,5 +67,10 @@ Cheat cheats[NUM_CHEATS] = {
     {
         "UNLOCK PALETTES",
         unlockPalettesCheat
+    },
+    {
+        "INF AMMO",
+        NULL,
+        &infiniteAmmoCheat
     }
 };

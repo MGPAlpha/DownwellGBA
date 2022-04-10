@@ -13,7 +13,7 @@ typedef struct menu_item {
     enum MENU_BEHAVIOR_MODE behaviorMode;
     union {
         struct menu *submenu;
-        void (*func)(void);
+        void (*func)(int index);
     } behavior;
     int (*shouldAppear)(void);
 } MenuItem;

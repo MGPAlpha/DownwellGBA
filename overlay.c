@@ -128,7 +128,7 @@ void updateMenu(void) {
             if (selectedItem->behaviorMode == MENU_SUBMENU_BEHAVIOR) {
                 if (selectedItem->behavior.submenu) loadMenu(selectedItem->behavior.submenu);
             } else {
-                if (selectedItem->behavior.func) (*selectedItem->behavior.func)();
+                if (selectedItem->behavior.func) (*selectedItem->behavior.func)(currentMenuIndex);
             }
     }
     if (currentMenu->onSelect) (*currentMenu->onSelect)(currentMenuIndex);
@@ -142,7 +142,9 @@ void drawMenu(Menu *menu, int selectedIndex, int col, int row, int width, int he
             continue;
         }
         if (currItem->textMode == MENU_FUNCTION_TEXT) {
-            
+            char textOut[20];
+            (*currItem->itemText.func)(textOut, i);
+            printToOverlay(textOut, col + screenIndex, row + screenIndex, i == selectedIndex ? 2 : 1);
         } else {
             printToOverlay(currItem->itemText.text, col + screenIndex, row + screenIndex, i == selectedIndex ? 2 : 1);
         }
