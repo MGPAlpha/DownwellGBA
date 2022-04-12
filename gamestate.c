@@ -4,6 +4,7 @@
 #include "collision.h"
 #include "stdlib.h"
 #include "palette.h"
+#include "tilemapgen.h"
 
 #include "art/title.h"
 // #include "art/overlay.h"
@@ -279,7 +280,7 @@ int smoothCameraY = 0;
 void initGame(void) {
     destroyAllGameObjects();
 
-    smoothCameraY = 0;
+    smoothCameraY = 16<<8;
 
     GameObject *playerObject = newGameObject(&playerType);
 
@@ -303,29 +304,7 @@ void initGame(void) {
     activeCollisionMap = gameCollision;
     activeCollisionMapWidth = gameCollisionWidth;
 
-    for (int i = 0; i < 23; i++) {
-        for (int j = 0; j < activeCollisionMapWidth; j++) {
-            short largeTileIndex = 0;
-            if (activeCollisionMap[i*activeCollisionMapWidth+j]) {
-                largeTileIndex = (j+1 >= activeCollisionMapWidth || activeCollisionMap[i*activeCollisionMapWidth+j+1] ? 1 : 0) +
-                                (i-1 < 0 || activeCollisionMap[(i-1)*activeCollisionMapWidth+j] ? 2 : 0) +
-                                (j-1 < 0 || activeCollisionMap[i*activeCollisionMapWidth+j-1] ? 4 : 0) +
-                                (i+1 >= 23 || activeCollisionMap[(i+1)*activeCollisionMapWidth+j] ? 8 : 0);
-                largeTileIndex += 16;
-            }
-
-            short tileIndex = largeTileIndex/16*64 + largeTileIndex%16*2 | 1<<12;
-
-            int tilemapOffset = OFFSET(j*2,i*2,32)%(32*32);
-            if (j >= 16) tilemapOffset += 32*32;
-            if (i % 32 >= 16) tilemapOffset += 32*32*2;
-
-            SCREENBLOCK[24].tilemap[tilemapOffset] = tileIndex;
-            SCREENBLOCK[24].tilemap[tilemapOffset+1] = tileIndex+1;
-            SCREENBLOCK[24].tilemap[tilemapOffset+32] = tileIndex+32;
-            SCREENBLOCK[24].tilemap[tilemapOffset+33] = tileIndex+33;
-        }
-    }
+    resetTilemapGen();
 
     REG_BG0HOFF = -32;
     REG_BG0VOFF = 0;
@@ -349,7 +328,7 @@ void updateGame(void) {
 
     if (playerData) {
         cameraYTarget = (playerData->collider.pos.y - SCREENHEIGHT/2 + playerData->collider.size.y/2 + 16) << 8;
-        cameraYTarget = MAX(0,cameraYTarget);
+        cameraYTarget = MAX(16<<8,cameraYTarget);
     }
 
     smoothCameraY = smoothCameraY + (cameraYTarget - smoothCameraY) / 16;
@@ -359,16 +338,19 @@ void updateGame(void) {
     // int cameraFollowedX = playerData->collider.pos.x + (playerData->collider.size.x - SCREENWIDTH) / 2;
     // if (cameraFollowedX < -8) cameraFollowedX = -8;
 
-
     
     cameraPos.x = -32;
     cameraPos.y = smoothCameraY>>8;
+
+    generateTilemapUntil(cameraPos.y / 16 + 11);
 
     waitForVBlank();
 
     drawAllGameObjects();
     REG_BG0HOFF = cameraPos.x;
     REG_BG0VOFF = cameraPos.y;
+
+    
     
     if (playerData) {
         updateAmmoDisplay(playerData->ammo, 1);
