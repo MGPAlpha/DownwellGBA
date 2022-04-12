@@ -10,6 +10,7 @@
 #include "art/dither.h"
 #include "art/spritesheet.h"
 #include "art/titlecollision.h"
+#include "art/terraintiles.h"
 
 #include "player.h"
 #include "camera.h"
@@ -166,7 +167,8 @@ void updateSurface(void) {
         cameraPos.y = pan;
         if (pan > 350) {
             for (int i = 0; i < 60; i++) waitForVBlank();
-            initWin();
+            initGame();
+            return;
         }
     } else {
         cameraPos.y = 0;
@@ -203,6 +205,12 @@ void pauseFromSurface(void) {
     unpauseState = GAME_SURFACE;
 }
 
+void pauseFromGame(void) {
+    loadMenu(&pauseMenu);
+    gameState = GAME_PAUSE;
+    unpauseState = GAME_PLAY;
+}
+
 void unpause(void) {
     clearOverlayCenter();
     gameState = unpauseState;
@@ -236,5 +244,117 @@ void initWin(void) {
 void updateWin(void) {
     if (BUTTON_PRESSED(BUTTON_START)) {
         initSurface();
+    }
+}
+
+char gameCollision[] = {
+    1,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,0,0,0,1,
+    1,1,1,0,0,0,0,0,1,1,1,
+    1,1,1,1,0,0,0,1,1,1,1,
+    1,1,0,0,0,0,0,0,0,1,1,
+    1,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,0,0,0,1,
+    1,0,1,0,0,0,0,0,0,0,1,
+    1,1,1,1,1,1,1,0,0,0,1,
+    1,1,1,1,1,1,1,0,0,0,1,
+    1,1,1,0,0,0,0,0,0,0,1,
+    1,1,1,0,0,0,0,0,0,0,1,
+    1,1,1,0,0,0,0,0,0,0,1,
+    1,1,1,1,1,1,1,1,1,1,1
+};
+int gameCollisionWidth = 11;
+
+void initGame(void) {
+    destroyAllGameObjects();
+
+    GameObject *playerObject = newGameObject(&playerType);
+
+    if (playerObject) {
+        playerSingleton = playerObject;
+        PlayerData *playerData = playerObject->data;
+        playerData->collider.pos.y = 16;
+        playerData->collider.pos.x = 16;
+        // smoothCameraX = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
+    }
+
+    waitForVBlank();
+
+    REG_DISPCTL = MODE0 | BG1_ENABLE | SPRITE_ENABLE | SPRITE_MODE_2D;
+
+    REG_BG0CNT = BG_CHARBLOCK(0) | BG_SCREENBLOCK(24) | BG_4BPP | BG_SIZE_LARGE | 2; // Terrain
+    REG_BG2CNT = BG_CHARBLOCK(1) | BG_SCREENBLOCK(30) | BG_4BPP | BG_SIZE_SMALL | 0; // Dither Layer
+
+    DMANow(3, terraintiles, &CHARBLOCK[0], TERRAINTILES_LENGTH);
+
+    activeCollisionMap = gameCollision;
+    activeCollisionMapWidth = gameCollisionWidth;
+
+    for (int i = 0; i < 15; i++) {
+        for (int j = 0; j < activeCollisionMapWidth; j++) {
+            short largeTileIndex = 0;
+            if (activeCollisionMap[i*activeCollisionMapWidth+j]) {
+                largeTileIndex = (j+1 >= activeCollisionMapWidth || activeCollisionMap[i*activeCollisionMapWidth+j+1] ? 1 : 0) +
+                                (i-1 < 0 || activeCollisionMap[(i-1)*activeCollisionMapWidth+j] ? 2 : 0) +
+                                (j-1 < 0 || activeCollisionMap[i*activeCollisionMapWidth+j-1] ? 4 : 0) +
+                                (i+1 >= 15 || activeCollisionMap[(i+1)*activeCollisionMapWidth+j] ? 8 : 0);
+                largeTileIndex += 16;
+            }
+
+            short tileIndex = largeTileIndex/16*64 + largeTileIndex%16*2 | 1<<12;
+            SCREENBLOCK[24].tilemap[OFFSET(j*2,i*2,32)] = tileIndex;
+            SCREENBLOCK[24].tilemap[OFFSET(j*2+1,i*2,32)] = tileIndex+1;
+            SCREENBLOCK[24].tilemap[OFFSET(j*2,i*2+1,32)] = tileIndex+32;
+            SCREENBLOCK[24].tilemap[OFFSET(j*2+1,i*2+1,32)] = tileIndex+33;
+        }
+    }
+
+    REG_BG0HOFF = 0;
+    REG_BG0VOFF = 0;
+
+    REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | SPRITE_ENABLE | SPRITE_MODE_2D;
+
+    gameState = GAME_PLAY;
+}
+
+void updateGame(void) {
+
+    updateAllGameObjects();
+    
+    consolidateActiveGameObjects();
+    
+
+    int cameraXTarget = 0;
+
+    PlayerData *playerData = playerSingleton ? playerSingleton->data : NULL;
+    
+
+    // int invertedCameraProgress = 256 - cameraShiftProgress;
+
+    // int cameraFollowedX = playerData->collider.pos.x + (playerData->collider.size.x - SCREENWIDTH) / 2;
+    // if (cameraFollowedX < -8) cameraFollowedX = -8;
+
+
+    
+    cameraPos.x = -32;
+    cameraPos.y = 0;
+
+    waitForVBlank();
+
+    drawAllGameObjects();
+    REG_BG0HOFF = cameraPos.x;
+    REG_BG0VOFF = cameraPos.y;
+    
+    if (playerData) {
+        updateAmmoDisplay(playerData->ammo, 1);
+    }
+
+    updateSprites();
+
+    checkToEnableCheats();
+
+    if (BUTTON_PRESSED(BUTTON_START)) {
+        pauseFromGame();
     }
 }

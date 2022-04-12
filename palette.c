@@ -18,6 +18,7 @@ Palette palettes[] = {
 };
 
 void loadPalette(int index) {
+    PALETTE[0] = palettes[index].colors[3];
     PALETTE[1] = palettes[index].colors[3];
     PALETTE[2] = palettes[index].colors[0];
     PALETTE[3] = palettes[index].colors[1];
