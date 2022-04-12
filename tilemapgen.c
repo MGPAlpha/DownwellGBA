@@ -15,7 +15,7 @@ void generateTilemapUntil(int row) {
                 largeTileIndex = (j+1 >= activeCollisionMapWidth || activeCollisionMap[i*activeCollisionMapWidth+j+1] ? 1 : 0) +
                                 (i-1 < 0 || activeCollisionMap[(i-1)*activeCollisionMapWidth+j] ? 2 : 0) +
                                 (j-1 < 0 || activeCollisionMap[i*activeCollisionMapWidth+j-1] ? 4 : 0) +
-                                (i+1 >= 23 || activeCollisionMap[(i+1)*activeCollisionMapWidth+j] ? 8 : 0);
+                                (activeCollisionMap[(i+1)*activeCollisionMapWidth+j] ? 8 : 0);
                 largeTileIndex += 16;
             }
 
