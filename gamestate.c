@@ -337,6 +337,14 @@ void initGame(void) {
 
 void updateGame(void) {
 
+    if (BUTTON_PRESSED(BUTTON_L)) {
+        PlayerData *playerData = playerSingleton->data;
+
+        if (playerData) {
+            spawnEnemy(&blobType, (Vector2){playerData->collider.pos.x + 24, playerData->collider.pos.y});
+        }
+    }
+
     updateAllGameObjects();
     
     consolidateActiveGameObjects();

@@ -7,6 +7,7 @@
 #include "gameobject.h"
 #include "stdlib.h"
 #include "gamestate.h"
+#include "enemy.h"
 
 int bulletTravelFrames[] = {
     8,8,8,8,8,
@@ -18,6 +19,18 @@ int bulletTravelFrames[] = {
     2,2,2,
     1,1,1
 };
+
+void checkBulletCollisionWithEnemy(GameObject *enemy, GameObject *bullet) {
+    BulletData *bulletData = bullet->data;
+    EnemyData *enemyData = enemy->data;
+
+    Collision testCollision = collideRects(bulletData->collider, enemyData->collider);
+
+    if (testCollision.collided) {
+        destroyGameObject(bullet);
+        damageEnemy(enemy, 1);
+    }
+}
 
 int initializeBullet(GameObject* this) {
     BulletData *data = malloc(sizeof(BulletData));
@@ -45,6 +58,7 @@ void updateBullet(GameObject* this) {
         destroyGameObject(this);
         return;
     }
+    doForEachGameObjectOfTypeWith(&enemyType, this, checkBulletCollisionWithEnemy);
 }
 
 void drawBullet(GameObject* this) {

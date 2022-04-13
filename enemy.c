@@ -63,6 +63,7 @@ GameObject *spawnEnemy(EnemyType *type, Vector2 pos) {
     data->collider.pos.y = pos.y<<8;
     data->collider.size.x = type->colliderSize.x<<8;
     data->collider.size.y = type->colliderSize.y<<8;
+    data->health = type->maxHealth;
 }
 
 int getBlobSpriteIndex(GameObject *this) {
@@ -89,7 +90,7 @@ void updateBlob(GameObject *this) {
 
         Vector2 displacement = V2_SUB(playerPos, enemyPos);
         displacement = Vector2Normalize(displacement, 8);
-        displacement = V2_DIV(displacement, 32);
+        displacement = V2_DIV(displacement, 64);
 
         data->velocity.x += displacement.x;
         data->velocity.y += displacement.y;
@@ -102,26 +103,37 @@ void updateBlob(GameObject *this) {
     }
 
 
-    data->collider.pos.x += data->velocity.x;
+    data->collider.pos.x += data->velocity.x + data->frameExtraMovement.x;
     Collision terrainCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 12);
     if (terrainCollision.collided) {
         data->collider.pos.x += terrainCollision.push.x;
         // data->velocity.x *= -1;
     }
+    data->frameExtraMovement.x = 0;
 
-    data->collider.pos.y += data->velocity.y;
+    data->collider.pos.y += data->velocity.y + data->frameExtraMovement.y;
     terrainCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 12);
     if (terrainCollision.collided) {
         data->collider.pos.y += terrainCollision.push.y;
         data->velocity.y *= -1;
     }
-
-    mgba_printf("(%d, %d)", data->collider.pos.x>>8, data->collider.pos.y>>8);
+    data->frameExtraMovement.y = 0;
 }
 
 const EnemyType blobType = {
+    3,
     {-7,-3},
     {18,11},
     updateBlob,
     getBlobSpriteIndex
 };
+
+void damageEnemy(GameObject *this, int damage) {
+    EnemyData *data = this->data;
+    data->health -= damage;
+    data->velocity.y += 2<<8;
+    data->frameExtraMovement.y = 2<<8;
+    if (data->health <= 0) {
+        destroyGameObject(this);
+    }
+}
