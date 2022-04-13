@@ -19,6 +19,8 @@
 #include "overlay.h"
 #include "cheats.h"
 
+#include "enemy.h"
+
 enum GAMESTATE gameState;
 enum GAMESTATE unpauseState;
 
@@ -308,6 +310,8 @@ void initGame(void) {
         playerData->collider.pos.x = 16;
         // smoothCameraX = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
     }
+
+    spawnEnemy(&blobType, (Vector2){64,480});
 
     waitForVBlank();
 
