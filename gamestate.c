@@ -76,7 +76,7 @@ void initSurface(void) {
     if (playerObject) {
         playerSingleton = playerObject;
         PlayerData *playerData = playerObject->data;
-        playerData->collider.pos.y = 136;
+        playerData->collider.pos.y = 133;
         playerData->collider.pos.x = 152;
         smoothCameraX = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
     }
@@ -374,8 +374,6 @@ void updateGame(void) {
     }
 
     updateSprites();
-
-    checkToEnableCheats();
 
     if (BUTTON_PRESSED(BUTTON_START)) {
         pauseFromGame();

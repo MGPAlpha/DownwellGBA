@@ -73,7 +73,7 @@ int initializePlayer(GameObject* this) {
     data->collider.pos.x = 0;
     data->collider.pos.y = 0;
     data->collider.size.x = 6;
-    data->collider.size.y = 8;
+    data->collider.size.y = 11;
     data->state = PLAYER_IDLE;
     data->stateTime = 0;
     data->dir = RIGHT;
@@ -143,6 +143,8 @@ void updatePlayer(GameObject* this) {
             if (yCollision.push.y < 0) {
                 data->state = PLAYER_IDLE;
                 data->ammo = data->charge;
+            } else if (yCollision.push.y > 0) {
+                data->stateTime = 24;
             }
         }
     }
@@ -175,7 +177,7 @@ void updatePlayer(GameObject* this) {
 
 void drawPlayer(GameObject* this) {
     PlayerData *data = this->data;
-    int posY = data->collider.pos.y - cameraPos.y - 7;
+    int posY = data->collider.pos.y - cameraPos.y - 4;
     int posX = (data->collider.pos.x - cameraPos.x - 5);
     if (posY < -16 || posY > 160 || posX < -16 || posX > 240) {
         this->sprite->attr0 = ATTR0_HIDE;
