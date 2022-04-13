@@ -1,7 +1,7 @@
 /*
  * Exported with nin10kit v1.8
  * Invocation command was nin10kit --force --bpp=4 --mode=sprites --transparent=ff00ff spritesheet spritesheet.png 
- * Time-stamp: Monday 04/04/2022, 01:48:36
+ * Time-stamp: Wednesday 04/13/2022, 14:10:43
  * 
  * Image Information
  * -----------------
