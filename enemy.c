@@ -3,12 +3,12 @@
 #include "stdlib.h"
 #include "camera.h"
 #include "spritedata.h"
+#include "player.h"
+#include "collision.h"
 
 int initializeEnemy(GameObject* this) {
     EnemyData *data = malloc(sizeof(EnemyData));
     if (!data) return 1;
-    data->collider.size.y = 11<<8;
-    data->collider.size.x = 17<<8;
     data->dead = 0;
     
     this->data = data;
@@ -17,7 +17,11 @@ int initializeEnemy(GameObject* this) {
 }
 
 void updateEnemy(GameObject* this) {
+    EnemyData *data = this->data;
 
+    if (data->type->update) {
+        (*data->type->update)(this);
+    }
 }
 
 void drawEnemy(GameObject* this) {
@@ -57,6 +61,8 @@ GameObject *spawnEnemy(EnemyType *type, Vector2 pos) {
     data->type = type;
     data->collider.pos.x = pos.x<<8;
     data->collider.pos.y = pos.y<<8;
+    data->collider.size.x = type->colliderSize.x<<8;
+    data->collider.size.y = type->colliderSize.y<<8;
 }
 
 int getBlobSpriteIndex(GameObject *this) {
@@ -64,8 +70,58 @@ int getBlobSpriteIndex(GameObject *this) {
     return ATTR2_TILEID(this->lifetime / 6 % 4 * 4,16);
 }
 
+void updateBlob(GameObject *this) {
+    EnemyData *data = this->data;
+
+    if (playerSingleton && playerSingleton->data) {
+        PlayerData *playerData = playerSingleton->data;
+
+        Vector2 playerPos = playerData->collider.pos;
+        playerPos.x += playerData->collider.size.x/2;
+        playerPos.y += playerData->collider.size.y/2;
+
+        playerPos.x <<= 8;
+        playerPos.y <<= 8;
+
+        Vector2 enemyPos = data->collider.pos;
+        enemyPos.x += data->collider.size.x/2;
+        enemyPos.y += data->collider.size.y/2;
+
+        Vector2 displacement = V2_SUB(playerPos, enemyPos);
+        displacement = Vector2Normalize(displacement, 8);
+        displacement = V2_DIV(displacement, 32);
+
+        data->velocity.x += displacement.x;
+        data->velocity.y += displacement.y;
+
+        if (data->velocity.x > 1<<7) data->velocity.x = 1<<7;
+        if (data->velocity.x < -1<<7) data->velocity.x = -1<<7;
+        if (data->velocity.y > 1<<7) data->velocity.y = 1<<7;
+        if (data->velocity.y < -1<<7) data->velocity.y = -1<<7;
+
+    }
+
+
+    data->collider.pos.x += data->velocity.x;
+    Collision terrainCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 12);
+    if (terrainCollision.collided) {
+        data->collider.pos.x += terrainCollision.push.x;
+        // data->velocity.x *= -1;
+    }
+
+    data->collider.pos.y += data->velocity.y;
+    terrainCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 12);
+    if (terrainCollision.collided) {
+        data->collider.pos.y += terrainCollision.push.y;
+        data->velocity.y *= -1;
+    }
+
+    mgba_printf("(%d, %d)", data->collider.pos.x>>8, data->collider.pos.y>>8);
+}
+
 const EnemyType blobType = {
-    {0,0},
-    NULL,
+    {-7,-3},
+    {18,11},
+    updateBlob,
     getBlobSpriteIndex
 };

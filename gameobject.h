@@ -33,4 +33,6 @@ void updateAllGameObjects(void);
 void drawAllGameObjects(void);
 void destroyAllGameObjects(void);
 
+void doForEachGameObjectOfTypeWith(GameObjectType* type, GameObject *with, void (*func)(GameObject*, GameObject*));
+
 #endif

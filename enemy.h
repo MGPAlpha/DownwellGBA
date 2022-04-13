@@ -7,6 +7,7 @@ const extern GameObjectType enemyType;
 
 typedef struct enemytype {
     Vector2 spriteOffset;
+    Vector2 colliderSize;
     void (*update)(GameObject* this);
     int (*spriteIndex)(GameObject* this);
 } EnemyType;
