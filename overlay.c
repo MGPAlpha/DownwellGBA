@@ -41,6 +41,8 @@ void initOverlay(void) {
     SCREENBLOCK[31].tilemap[OFFSET(26,17,32)] = OFFSET(0, 10, 32) | 1 << 12 | 1<<11;
     SCREENBLOCK[31].tilemap[OFFSET(27,17,32)] = OFFSET(0, 10, 32) | 1 << 12 | 1<<10 | 1<<11;
 
+    updateHealthDisplay(4,12,2);
+
     printToOverlay("0000", 26, 0, 0);
 
     printToOverlay("DOWN", 0, 17, 0);
@@ -92,6 +94,38 @@ void updateAmmoDisplay(int ammo, int perShot) {
     char ammoText[4];
     sprintf(ammoText, "%d", ammo);
     printToOverlay(ammoText, 26, 18, 0);
+}
+
+void updateHealthDisplay(int health, int max, int maxProgress) {
+    SCREENBLOCK[31].tilemap[OFFSET(0,0,32)] = OFFSET(8,9,32) | 1<<12;
+    SCREENBLOCK[31].tilemap[OFFSET(1,0,32)] = OFFSET(9,9,32) | 1<<12;
+    SCREENBLOCK[31].tilemap[OFFSET(2,0,32)] = OFFSET(9,9,32) | 1<<12;
+    SCREENBLOCK[31].tilemap[OFFSET(3,0,32)] = OFFSET(8,9,32) | 1<<10 | 1<<12;
+
+    for (int i = 0; i < 4; i++) {
+        short tileIndex = health * 32 / max - i * 8;
+        if (tileIndex < 0) tileIndex = 0;
+        if (tileIndex > 8) tileIndex = 8;
+        SCREENBLOCK[31].tilemap[OFFSET(i,1,32)] = OFFSET(8+tileIndex,10,32) | 1<<12;
+    }
+
+    for (int i = 0; i < 4; i++) {
+        short tileIndex = 0;
+        if (maxProgress > i) tileIndex += 2;
+        if (i == 1 || i == 2) tileIndex += 1;
+        SCREENBLOCK[31].tilemap[OFFSET(i,2,32)] = OFFSET(8+tileIndex,11,32) | (i==3?1:0)<<10 | 1<<12;
+    }
+
+    char currHealthString[4];
+    sprintf(currHealthString, "%d", health);
+    char maxHealthString[4];
+    sprintf(maxHealthString, "%d", max);
+
+    printToOverlay(currHealthString, 2, 4, 2);
+    printToOverlay(maxHealthString, 2, 6, 0);
+    SCREENBLOCK[31].tilemap[OFFSET(0,4,32)] = OFFSET(11,9,32) | 1<<12;
+    SCREENBLOCK[31].tilemap[OFFSET(2,5,32)] = OFFSET(10,9,32) | 1<<12;
+    SCREENBLOCK[31].tilemap[OFFSET(3,5,32)] = OFFSET(10,9,32) | 1<<10 | 1<<11 | 1<<12;
 }
 
 Menu *currentMenu = NULL;

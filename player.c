@@ -78,6 +78,7 @@ void checkForPlayerEnemyContact(GameObject *enemy, GameObject *player) {
             playerData->state = PLAYER_HOP;
             playerData->stateTime = 6;
             playerData->runningJump = 1;
+            playerData->ammo = playerData->charge;
         }
     }
 }
