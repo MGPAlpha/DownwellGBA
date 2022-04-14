@@ -10,6 +10,7 @@
 #include "cheats.h"
 
 #include "bullet.h"
+#include "enemy.h"
 
 int jumpFrames[] = {
     0,0,0,0,0,0,0,0,0,0,0,0,
@@ -66,6 +67,20 @@ int jumpDisplacementFrames[] = {
     5,
     4
 };
+
+void checkForPlayerEnemyContact(GameObject *enemy, GameObject *player) {
+    PlayerData *playerData = player->data;
+    EnemyData *enemyData = enemy->data;
+    Collision col = collideRects(playerData->resizedCollider, enemyData->collider);
+    if (col.collided) {
+        if (col.push.y < 0 && col.push.y > -5<<8) {
+            destroyGameObject(enemy);
+            playerData->state = PLAYER_HOP;
+            playerData->stateTime = 6;
+            playerData->runningJump = 1;
+        }
+    }
+}
 
 int initializePlayer(GameObject* this) {
     PlayerData *data = malloc(sizeof(PlayerData));
@@ -131,8 +146,8 @@ void updatePlayer(GameObject* this) {
         }
     }
 
-    if (data->state == PLAYER_JUMPING) {
-        if (!BUTTON_HELD(BUTTON_A) && !BUTTON_HELD(BUTTON_B) && data->stateTime < 12) data->stateTime = 12;
+    if (data->state == PLAYER_JUMPING || data->state == PLAYER_HOP) {
+        if (data->state == PLAYER_JUMPING && !BUTTON_HELD(BUTTON_A) && !BUTTON_HELD(BUTTON_B) && data->stateTime < 12) data->stateTime = 12;
         int jumpDiffIndex = data->stateTime;
         if (data->stateTime >= sizeof(jumpDisplacementFrames)/sizeof(int)) jumpDiffIndex = sizeof(jumpDisplacementFrames)/sizeof(int) - 1;
         int jumpDisplacement = jumpDisplacementFrames[jumpDiffIndex];
@@ -149,7 +164,7 @@ void updatePlayer(GameObject* this) {
         }
     }
 
-    if (data->state == PLAYER_JUMPING) {
+    if (data->state == PLAYER_JUMPING || data->state == PLAYER_HOP) {
         if (!data->canFire && !BUTTON_HELD(BUTTON_A) && !BUTTON_HELD(BUTTON_B)) {
             data->canFire = 1;
             data->fireTime = 7;
@@ -172,6 +187,16 @@ void updatePlayer(GameObject* this) {
         data->fireTime++;
     }
 
+    Transform resizedCollider = data->collider;
+    resizedCollider.pos.x <<= 8;
+    resizedCollider.pos.y <<= 8;
+    resizedCollider.size.x <<= 8;
+    resizedCollider.size.y <<= 8;
+    
+    data->resizedCollider = resizedCollider;
+
+    doForEachGameObjectOfTypeWith(&enemyType, this, checkForPlayerEnemyContact);
+
     data->stateTime++;
 }
 
@@ -189,7 +214,7 @@ void drawPlayer(GameObject* this) {
         this->sprite->attr2 = ATTR2_TILEID(vBlankCount / 16 % 4 * 2,0) | ATTR2_PRIORITY(2);
     } else if (data->state == PLAYER_WALKING) {
         this->sprite->attr2 = ATTR2_TILEID(vBlankCount / 4 % 8 * 2,2) | ATTR2_PRIORITY(2);
-    } else if (data->state == PLAYER_JUMPING) {
+    } else if (data->state == PLAYER_JUMPING || data->state == PLAYER_HOP) {
         if (data->canFire && data->fireTime <= 5) {
             this->sprite->attr2 = ATTR2_TILEID(0,8) | ATTR2_PRIORITY(2);
         } else if (data->runningJump) {
