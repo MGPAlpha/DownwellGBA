@@ -337,6 +337,10 @@ int smoothCameraY = 0;
 void initGame(void) {
     destroyAllGameObjects();
 
+    playerHealth = 4;
+    playerMaxHealth = 4;
+    playerMaxHealthProgress = 0;
+
     enemySpawnIndex = 0;
 
     smoothCameraY = 16<<8;
@@ -361,6 +365,8 @@ void initGame(void) {
     REG_BG2CNT = BG_CHARBLOCK(1) | BG_SCREENBLOCK(30) | BG_4BPP | BG_SIZE_SMALL | 0; // Dither Layer
 
     DMANow(3, terraintiles, &CHARBLOCK[0], TERRAINTILES_LENGTH);
+
+    clearOverlayCenter();
 
     activeCollisionMap = gameCollision;
     activeCollisionMapWidth = gameCollisionWidth;

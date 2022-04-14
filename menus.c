@@ -13,7 +13,15 @@ void drawPauseMenu(Menu *menu, int selectedIndex) {
 }
 
 int showOnlyOnSurface(void) {
-    return unpauseState != GAME_SURFACE;
+    return unpauseState == GAME_SURFACE;
+}
+
+int showOnlyInGame(void) {
+    return unpauseState == GAME_PLAY;
+}
+
+void quickStart(void) {
+
 }
 
 MenuItem pauseMenuItems[] = {
@@ -27,8 +35,15 @@ MenuItem pauseMenuItems[] = {
         MENU_CONST_TEXT,
         "QUICK START",
         MENU_FUNCTION_BEHAVIOR,
-        NULL,
+        initGame,
         showOnlyOnSurface
+    },
+    {
+        MENU_CONST_TEXT,
+        "RETRY",
+        MENU_FUNCTION_BEHAVIOR,
+        initGame,
+        showOnlyInGame
     },
     {
         MENU_CONST_TEXT,
