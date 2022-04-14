@@ -350,8 +350,12 @@ void initGame(void) {
     if (playerObject) {
         playerSingleton = playerObject;
         PlayerData *playerData = playerObject->data;
-        playerData->collider.pos.y = 16;
-        playerData->collider.pos.x = 16;
+        playerData->collider.pos.y = 0;
+        playerData->collider.pos.x = 32;
+        playerData->runningJump = 1;
+        playerData->state = PLAYER_JUMPING;
+        playerData->stateTime = 64;
+
         // smoothCameraX = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
     }
 
