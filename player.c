@@ -68,6 +68,10 @@ int jumpDisplacementFrames[] = {
     4
 };
 
+int playerHealth = 4;
+int playerMaxHealth = 4;
+int playerMaxHealthProgress = 0;
+
 void checkForPlayerEnemyContact(GameObject *enemy, GameObject *player) {
     PlayerData *playerData = player->data;
     EnemyData *enemyData = enemy->data;
@@ -79,6 +83,10 @@ void checkForPlayerEnemyContact(GameObject *enemy, GameObject *player) {
             playerData->stateTime = 6;
             playerData->runningJump = 1;
             playerData->ammo = playerData->charge;
+            playerData->canFire = 0;
+        } else if (playerData->iFrames < 1) {
+            playerHealth--;
+            playerData->iFrames = 60;
         }
     }
 }
@@ -98,6 +106,7 @@ int initializePlayer(GameObject* this) {
     data->fireTime = 0;
     data->charge = 8;
     data->ammo = 8;
+    data->iFrames = 0;
     this->data = data;
 
     return 0;
@@ -199,13 +208,14 @@ void updatePlayer(GameObject* this) {
     doForEachGameObjectOfTypeWith(&enemyType, this, checkForPlayerEnemyContact);
 
     data->stateTime++;
+    if (data->iFrames > 0) data->iFrames--;
 }
 
 void drawPlayer(GameObject* this) {
     PlayerData *data = this->data;
     int posY = data->collider.pos.y - cameraPos.y - 4;
     int posX = (data->collider.pos.x - cameraPos.x - 5);
-    if (posY < -16 || posY > 160 || posX < -16 || posX > 240) {
+    if ((data->iFrames > 0 && data->iFrames % 2) || posY < -16 || posY > 160 || posX < -16 || posX > 240) {
         this->sprite->attr0 = ATTR0_HIDE;
         return;
     }

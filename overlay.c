@@ -41,7 +41,7 @@ void initOverlay(void) {
     SCREENBLOCK[31].tilemap[OFFSET(26,17,32)] = OFFSET(0, 10, 32) | 1 << 12 | 1<<11;
     SCREENBLOCK[31].tilemap[OFFSET(27,17,32)] = OFFSET(0, 10, 32) | 1 << 12 | 1<<10 | 1<<11;
 
-    updateHealthDisplay(4,12,2);
+    updateHealthDisplay(4,4,0);
 
     printToOverlay("0000", 26, 0, 0);
 

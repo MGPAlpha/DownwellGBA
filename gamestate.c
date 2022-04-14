@@ -189,6 +189,8 @@ void updateSurface(void) {
         updateAmmoDisplay(playerData->ammo, 1);
     }
 
+    updateHealthDisplay(playerHealth,playerMaxHealth,playerMaxHealthProgress);
+
     updateSprites();
 
     checkToEnableCheats();
@@ -250,6 +252,20 @@ void updateWin(void) {
     }
 }
 
+struct enemyspawn {
+    EnemyType *type;
+    Vector2 pos;
+} enemySpawns[] = {
+    &blobType, {3<<4, (295-270)<<4},
+    &blobType, {8<<4, (304-270)<<4},
+    &blobType, {7<<4, (309-270)<<4},
+    &blobType, {3<<4, (315-270)<<4},
+    &blobType, {5<<4, (320-270)<<4},
+    &blobType, {2<<4, (328-270)<<4},
+    &blobType, {8<<4, (328-270)<<4}
+};
+int enemySpawnIndex = 0;
+
 char gameCollision[] = {
     1,0,0,0,0,0,0,0,0,0,1,
     1,0,0,0,0,0,0,0,0,0,1,
@@ -289,7 +305,29 @@ char gameCollision[] = {
     1,1,1,1,1,1,1,0,0,0,1,
     1,1,1,0,0,0,0,0,0,0,1,
     1,1,1,0,0,0,0,0,0,0,1,
-    1,1,1,0,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,0,1,1,1,1,1,1,1,
+    1,0,0,0,0,0,0,0,0,1,1,
+    1,0,0,0,0,0,0,0,0,1,1,
+    1,0,0,0,0,0,0,0,0,1,1,
+    1,0,0,0,0,0,0,0,0,1,1,
+    1,1,1,1,0,0,0,1,1,1,1,
+    1,1,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,1,1,1,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,1,1,
+    1,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,0,0,0,1,
+    1,1,1,1,1,1,0,0,0,0,1,
+    1,1,1,1,1,1,0,0,0,0,1,
+    1,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,0,1,1,1,0,0,0,1,
     1,1,1,1,1,1,1,1,1,1,1
 };
 int gameCollisionWidth = 11;
@@ -298,6 +336,8 @@ int smoothCameraY = 0;
 
 void initGame(void) {
     destroyAllGameObjects();
+
+    enemySpawnIndex = 0;
 
     smoothCameraY = 16<<8;
 
@@ -311,7 +351,7 @@ void initGame(void) {
         // smoothCameraX = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
     }
 
-    spawnEnemy(&blobType, (Vector2){64,480});
+    // spawnEnemy(&blobType, (Vector2){64,480});
 
     waitForVBlank();
 
@@ -337,6 +377,7 @@ void initGame(void) {
 
 void updateGame(void) {
 
+
     if (BUTTON_PRESSED(BUTTON_L)) {
         PlayerData *playerData = playerSingleton->data;
 
@@ -354,6 +395,12 @@ void updateGame(void) {
 
     PlayerData *playerData = playerSingleton ? playerSingleton->data : NULL;
     
+    while (enemySpawnIndex < sizeof (enemySpawns) / sizeof (struct enemyspawn) && enemySpawns[enemySpawnIndex].pos.y < playerData->collider.pos.y + 160) {
+        spawnEnemy(enemySpawns[enemySpawnIndex].type, enemySpawns[enemySpawnIndex].pos);
+        enemySpawnIndex++;
+    }
+
+    mgba_printf("%d", enemySpawns[enemySpawnIndex].pos.y);
 
     if (playerData) {
         cameraYTarget = (playerData->collider.pos.y - SCREENHEIGHT/2 + playerData->collider.size.y/2 + 16) << 8;
@@ -384,6 +431,8 @@ void updateGame(void) {
     if (playerData) {
         updateAmmoDisplay(playerData->ammo, 1);
     }
+    updateHealthDisplay(playerHealth,playerMaxHealth,playerMaxHealthProgress);
+
 
     updateSprites();
 
