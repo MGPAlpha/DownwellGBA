@@ -3,7 +3,8 @@ PRODUCT_NAME       = Project
 # You probably won't need to touch anything below here!!!
 # The one exception is the cleanup stuff.
 
-SOURCES            = $(wildcard *.c) $(wildcard art/*.c)
+SOURCES            = $(wildcard *.c) $(wildcard art/*.c) $(wildcard music/*.c)
+AUDIOSOURCES       = $(wildcard *.wav) $(wildcard music/*.wav)
 DKPATH             = /opt/devkitpro
 FIND               = find
 COPY               = cp -r
@@ -71,7 +72,7 @@ $(COBJECTS) : %.o : %.c
 
 # -- Build .wav files into .c and .h files
 $(AUDIOOBJECTS) : %.c : %.wav
-	wav2c $< $@ $*
+	wav2c $< $@ $(notdir $*)
 
 $(AUDIOHEADERS) : %.h : %.c
 

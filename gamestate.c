@@ -1,5 +1,6 @@
 #include "gamestate.h"
 #include "HW05Lib.h"
+#include "sound.h"
 #include "print.h"
 #include "collision.h"
 #include "stdlib.h"
@@ -12,6 +13,8 @@
 #include "art/spritesheet.h"
 #include "art/titlecollision.h"
 #include "art/terraintiles.h"
+
+#include "music/cavernmusic.h"
 
 #include "player.h"
 #include "camera.h"
@@ -405,6 +408,10 @@ void updateGame(void) {
 
     PlayerData *playerData = playerSingleton ? playerSingleton->data : NULL;
     
+    if (playerData && !soundA.isPlaying && (playerData->state == PLAYER_WALKING || playerData->state == PLAYER_IDLE)) {
+        playSoundA(cavernmusic_data, cavernmusic_length, 1);
+    }
+
     while (enemySpawnIndex < sizeof (enemySpawns) / sizeof (struct enemyspawn) && enemySpawns[enemySpawnIndex].pos.y < playerData->collider.pos.y + 160) {
         spawnEnemy(enemySpawns[enemySpawnIndex].type, enemySpawns[enemySpawnIndex].pos);
         enemySpawnIndex++;

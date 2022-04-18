@@ -6,6 +6,7 @@
 #include "palette.h"
 #include "savedata.h"
 #include "cheats.h"
+#include "sound.h"
 
 #include "art/title.h"
 #include "art/dither.h"
@@ -13,6 +14,9 @@
 
 int main() {
     mgba_open();
+
+    setupSounds();
+    setupInterrupts();
 
     initSaveData();
 
