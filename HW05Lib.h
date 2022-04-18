@@ -198,158 +198,56 @@ extern DMA *dma;
 // DMA Functions
 void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned int cnt);
 
-// =================================== SOUND ====================================
+// =================================== TIMERS ====================================
 
-#define PROCESSOR_CYCLES_PER_SECOND (16777216)
-#define VBLANK_FREQ (59.727)
+// Controllers
+#define REG_TM0CNT *(volatile unsigned short*)0x4000102
+#define REG_TM1CNT *(volatile unsigned short*)0x4000106
+#define REG_TM2CNT *(volatile unsigned short*)0x400010A
+#define REG_TM3CNT *(volatile unsigned short*)0x400010E
 
-// register definitions
-#define REG_SOUNDCNT_L        *(volatile u16*)0x04000080
-#define REG_SOUNDCNT_H        *(volatile u16*)0x04000082
-#define REG_SOUNDCNT_X        *(volatile u16*)0x04000084
-#define REG_SOUNDBIAS         *(volatile u16*)0x04000086
+// Timer values
+#define REG_TM0D       *(volatile unsigned short*)0x4000100
+#define REG_TM1D       *(volatile unsigned short*)0x4000104
+#define REG_TM2D       *(volatile unsigned short*)0x4000108
+#define REG_TM3D       *(volatile unsigned short*)0x400010C
 
+// Timer flags
+#define TIMER_ON      (1<<7)
+#define TIMER_OFF     (0<<7)
+#define TM_IRQ        (1<<6)
+#define TM_CASCADE    (1<<2)
+#define TM_FREQ_1     0
+#define TM_FREQ_64    1
+#define TM_FREQ_256   2
+#define TM_FREQ_1024  3
 
-// flags
-#define SND_ENABLED           (1<<7)
-#define SND_OUTPUT_RATIO_25   0
-#define SND_OUTPUT_RATIO_50   (1<<0)
-#define SND_OUTPUT_RATIO_100  (1<<1)
+// =================================== INTERRUPTS ====================================
 
-// ============================== ANALOG SOUND ================================
+// Controller
+#define REG_IME *(unsigned short*)0x4000208
+// Enabler
+#define REG_IE *(unsigned short*)0x4000200
+// Flag
+#define REG_IF *(volatile unsigned short*)0x4000202
 
-#define REG_SND1SWEEP     *(volatile u16*)0x04000060
-#define REG_SND1CNT       *(volatile u16*)0x04000062
-#define REG_SND1FREQ      *(volatile u16*)0x04000064
+// Interrupt handler function pointer
+typedef void (*ihp)(void);
+// Interrupt handler register
+#define REG_INTERRUPT *((ihp*)0x03007FFC)
+// Display status register
+#define REG_DISPSTAT *(unsigned short*)0x4000004
 
-#define REG_SND2CNT       *(volatile u16*)0x04000068
-#define REG_SND2FREQ      *(volatile u16*)0x0400006C
+// Interrupt constants for turning them on
+#define INT_VBLANK_ENABLE 1 << 3
 
-#define REG_SND3SEL       *(volatile u16*)0x04000070
-#define REG_SND3CNT       *(volatile u16*)0x04000072
-#define REG_SND3FREQ      *(volatile u16*)0x04000074
-
-#define REG_SND4CNT       *(volatile u16*)0x04000078
-#define REG_SND4FREQ      *(volatile u16*)0x0400007C
-
-// Channel 3 Wave Pattern RAM (2 banks!!)
-#define REG_SND3_WAV      *(volatile u16*)0x04000090
-
-#define DMG_SND1_LEFT         (1 << 8)
-#define DMG_SND2_LEFT         (1 << 9)
-#define DMG_SND3_LEFT         (1 << 10)
-#define DMG_SND4_LEFT         (1 << 11)
-
-#define DMG_SND1_RIGHT        (1 << 12)
-#define DMG_SND2_RIGHT        (1 << 13)
-#define DMG_SND3_RIGHT        (1 << 14)
-#define DMG_SND4_RIGHT        (1 << 15)
-
-// n: [0-7]
-#define DMG_VOL_LEFT(n)       (((n) & 7) << 0)
-#define DMG_VOL_RIGHT(n)      (((n) & 7) << 4)
-
-// n: [0-15]
-#define DMG_ENV_VOL(n)        (((n) & 15) << 12)
-
-// n: [0-7]
-#define DMG_STEP_TIME(n)      (((n) & 7) << 8)
-
-#define DMG_DIRECTION_DECR    (0 << 11)
-#define DMG_DIRECTION_INCR    (1 << 11) 
-
-#define DMG_DUTY_12           (0 << 6)
-#define DMG_DUTY_25           (1 << 6)
-#define DMG_DUTY_50           (2 << 6)
-#define DMG_DUTY_75           (3 << 6)
-
-// n: [0-2]
-#define DMG_MASTER_VOL(n)     ((n) % 3)
-
-#define SND_RESET             (1<<15)
-
-#define DMG_FREQ_TIMED        (1<<14)
-#define DMG_SWEEP_NUM(n)      ((n) & 7)
-#define DMG_SWEEP_UP          (0 << 3)
-#define DMG_SWEEP_DOWN        (1 << 3)
-#define DMG_SWEEP_STEPTIME(n) (((n) & 7) << 4)
-
-enum {
-  REST      = 0,
-  NOTE_C2   =44,
-  NOTE_CS2  =157,
-  NOTE_D2	=263,
-  NOTE_DS2  =363,
-  NOTE_E2   =457,
-  NOTE_F2   =547,
-  NOTE_FS2  =631,
-  NOTE_G2   =711,
-  NOTE_GS2  =786,
-  NOTE_A2   =856,
-  NOTE_AS2  =923,
-  NOTE_B2   =986,
-  NOTE_C3   =1046,
-  NOTE_CS3  =1102,
-  NOTE_D3   =1155,
-  NOTE_DS3  =1205,
-  NOTE_E3   =1253,
-  NOTE_F3   =1297,
-  NOTE_FS3  =1339,
-  NOTE_G3   =1379,
-  NOTE_GS3  =1417,
-  NOTE_A3   =1452,
-  NOTE_AS3  =1486,
-  NOTE_B3   =1517,
-  NOTE_C4   =1547,
-  NOTE_CS4  =1575,
-  NOTE_D4   =1602,
-  NOTE_DS4  =1627,
-  NOTE_E4   =1650,
-  NOTE_F4   =1673,
-  NOTE_FS4  =1694,
-  NOTE_G4   =1714,
-  NOTE_GS4  =1732,
-  NOTE_A4   =1750,
-  NOTE_AS4  =1767,
-  NOTE_B4   =1783,
-  NOTE_C5   =1798,
-  NOTE_CS5  =1812,
-  NOTE_D5   =1825,
-  NOTE_DS5  =1837,
-  NOTE_E5   =1849,
-  NOTE_F5   =1860,
-  NOTE_FS5  =1871,
-  NOTE_G5   =1881,
-  NOTE_GS5  =1890,
-  NOTE_A5   =1899,
-  NOTE_AS5  =1907,
-  NOTE_B5   =1915,
-  NOTE_C6   =1923,
-  NOTE_CS6  =1930,
-  NOTE_D6   =1936,
-  NOTE_DS6  =1943,
-  NOTE_E6   =1949,
-  NOTE_F6   =1954,
-  NOTE_FS6  =1959,
-  NOTE_G6   =1964,
-  NOTE_GS6  =1969,
-  NOTE_A6   =1974,
-  NOTE_AS6  =1978,
-  NOTE_B6   =1982,
-  NOTE_C7   =1985,
-  NOTE_CS7  =1989,
-  NOTE_D7   =1992,
-  NOTE_DS7  =1995,
-  NOTE_E7   =1998,
-  NOTE_F7   =2001,
-  NOTE_FS7  =2004,
-  NOTE_G7   =2006,
-  NOTE_GS7  =2009,
-  NOTE_A7   =2011,
-  NOTE_AS7  =2013,
-  NOTE_B7   =2015,
-  NOTE_C8   =2017
-} NOTES;
+// Interrupt constants for checking which type of interrupt happened 
+#define INT_VBLANK 1 << 0   
+#define INT_TM0 1<<3    
+#define INT_TM1 1<<4    
+#define INT_TM2 1<<5    
+#define INT_TM3 1<<6    
+#define INT_BUTTON 1 << 12
 
 // ============================== MISCELLANEOUS ===============================
 
