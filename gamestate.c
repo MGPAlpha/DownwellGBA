@@ -413,11 +413,12 @@ void updateGame(void) {
     }
 
     while (enemySpawnIndex < sizeof (enemySpawns) / sizeof (struct enemyspawn) && enemySpawns[enemySpawnIndex].pos.y < playerData->collider.pos.y + 160) {
-        spawnEnemy(enemySpawns[enemySpawnIndex].type, enemySpawns[enemySpawnIndex].pos);
+        GameObject *newEnemy = spawnEnemy(enemySpawns[enemySpawnIndex].type, enemySpawns[enemySpawnIndex].pos);
+        if (!newEnemy) mgba_printf("failed to spawn enemy %d", enemySpawnIndex);
         enemySpawnIndex++;
     }
 
-    mgba_printf("%d", enemySpawns[enemySpawnIndex].pos.y);
+    // mgba_printf("%d", enemySpawns[enemySpawnIndex].pos.y);
 
     if (playerData) {
         cameraYTarget = (playerData->collider.pos.y - SCREENHEIGHT/2 + playerData->collider.size.y/2 + 16) << 8;

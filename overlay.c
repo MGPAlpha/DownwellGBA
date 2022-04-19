@@ -121,6 +121,10 @@ void updateHealthDisplay(int health, int max, int maxProgress) {
     char maxHealthString[4];
     sprintf(maxHealthString, "%d", max);
 
+    SCREENBLOCK[31].tilemap[OFFSET(2,4,32)] = OFFSET(1,9,32) | 1<<12;
+    SCREENBLOCK[31].tilemap[OFFSET(3,4,32)] = OFFSET(1,9,32) | 1<<12;
+    SCREENBLOCK[31].tilemap[OFFSET(2,6,32)] = OFFSET(1,9,32) | 1<<12;
+    SCREENBLOCK[31].tilemap[OFFSET(3,6,32)] = OFFSET(1,9,32) | 1<<12;
     printToOverlay(currHealthString, 2, 4, 2);
     printToOverlay(maxHealthString, 2, 6, 0);
     SCREENBLOCK[31].tilemap[OFFSET(0,4,32)] = OFFSET(11,9,32) | 1<<12;
