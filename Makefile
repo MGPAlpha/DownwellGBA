@@ -4,7 +4,7 @@ PRODUCT_NAME       = Project
 # The one exception is the cleanup stuff.
 
 SOURCES            = $(wildcard *.c) $(wildcard art/*.c) $(wildcard music/*.c)
-AUDIOSOURCES       = $(wildcard *.wav) $(wildcard music/*.wav)
+AUDIOSOURCES       = $(wildcard *.wav) $(wildcard music/*.wav) $(wildcard sfx/*.wav)
 DKPATH             = /opt/devkitpro
 FIND               = find
 COPY               = cp -r

@@ -63,7 +63,12 @@ GameObject *spawnEnemy(EnemyType *type, Vector2 pos) {
     data->collider.pos.y = pos.y<<8;
     data->collider.size.x = type->colliderSize.x<<8;
     data->collider.size.y = type->colliderSize.y<<8;
+    data->velocity.x = 0;
+    data->velocity.y = 0;
+    data->frameExtraMovement.x = 0;
+    data->frameExtraMovement.y = 0;
     data->health = type->maxHealth;
+    data->dead = 0;
 }
 
 int getBlobSpriteIndex(GameObject *this) {

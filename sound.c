@@ -58,6 +58,14 @@ void playSoundB( const signed char* sound, int length, int loops) {
     soundB.isPlaying = 1;
     soundB.duration = (VBLANK_FREQ * length) / SOUND_FREQ;
     soundB.vBlankCount = 0;
+    soundB.priority = 0;
+}
+
+void playSoundBPriority( const signed char* sound, int length, int loops, int priority) {
+    if (!soundB.isPlaying | soundB.priority <= priority) {
+        playSoundB(sound, length, loops);
+        soundB.priority = priority;
+    }
 }
 
 void setupInterrupts() {
@@ -79,7 +87,7 @@ void interruptHandler() {
         if (soundA.isPlaying) {
 
             soundA.vBlankCount = soundA.vBlankCount + 1;
-            if (soundA.vBlankCount > soundA.duration) {
+            if (soundA.vBlankCount >= soundA.duration) {
                 if (soundA.loops) {
                     playSoundA(soundA.data, soundA.length, soundA.loops);
                 } else {
@@ -93,7 +101,7 @@ void interruptHandler() {
         if (soundB.isPlaying) {
 
             soundB.vBlankCount = soundB.vBlankCount + 1;
-            if (soundB.vBlankCount > soundB.duration) {
+            if (soundB.vBlankCount >= soundB.duration) {
                 if (soundB.loops) {
                     playSoundB(soundB.data, soundB.length, soundB.loops);
                 } else {

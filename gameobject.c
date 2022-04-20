@@ -98,11 +98,14 @@ void destroyAllGameObjects(void) {
     consolidateActiveGameObjects();
 }
 
-void doForEachGameObjectOfTypeWith(GameObjectType* type, void *with, void (*func)(GameObject*, void*)) {
+unsigned int doForEachGameObjectOfTypeWith(GameObjectType* type, void *with, unsigned int (*func)(GameObject*, void*)) {
+    unsigned int outCode = 0;
     for (int i = 0; i < nextInactiveIndex; i++) {
         GameObject *curr = gameObjectRefs[i];
         if (curr->active && curr->type == type) {
-            (*func)(curr, with);
+            unsigned int newOut = (*func)(curr, with);
+            if (newOut > outCode) outCode = newOut;
         }
     }
+    return outCode;
 }

@@ -15,6 +15,7 @@
 #include "art/terraintiles.h"
 
 #include "music/cavernmusic.h"
+#include "sfx/logosound.h"
 
 #include "player.h"
 #include "camera.h"
@@ -143,6 +144,7 @@ void updateSurface(void) {
             if (!logoData0->animationStart && playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
                 logoData0->animationStart = logoSprite0->lifetime;
                 logoData1->animationStart = logoSprite1->lifetime;
+                playSoundA(logosound_data, logosound_length, 0);
             }
         }
 
@@ -418,8 +420,6 @@ void updateGame(void) {
         enemySpawnIndex++;
     }
 
-    // mgba_printf("%d", enemySpawns[enemySpawnIndex].pos.y);
-
     if (playerData) {
         cameraYTarget = (playerData->collider.pos.y - SCREENHEIGHT/2 + playerData->collider.size.y/2 + 16) << 8;
         cameraYTarget = MAX(16<<8,cameraYTarget);
@@ -432,9 +432,6 @@ void updateGame(void) {
     // int cameraFollowedX = playerData->collider.pos.x + (playerData->collider.size.x - SCREENWIDTH) / 2;
     // if (cameraFollowedX < -8) cameraFollowedX = -8;
 
-    
-    cameraPos.x = -32;
-    cameraPos.y = smoothCameraY>>8;
 
     generateTilemapUntil(cameraPos.y / 16 + 11);
 
