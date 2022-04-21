@@ -433,6 +433,9 @@ void updateGame(void) {
     // if (cameraFollowedX < -8) cameraFollowedX = -8;
 
 
+    cameraPos.x = -32;
+    cameraPos.y = smoothCameraY>>8;
+
     generateTilemapUntil(cameraPos.y / 16 + 11);
 
     waitForVBlank();
