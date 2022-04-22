@@ -2,6 +2,7 @@
 #define COLLISION_H
 
 #include "HW05Lib.h"
+#include "mgpmath.h"
 
 extern char *activeCollisionMap;
 extern char activeCollisionMapWidth;

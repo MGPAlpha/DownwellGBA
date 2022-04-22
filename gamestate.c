@@ -5,7 +5,7 @@
 #include "collision.h"
 #include "stdlib.h"
 #include "palette.h"
-#include "tilemapgen.h"
+#include "levelgen.h"
 
 #include "art/title.h"
 // #include "art/overlay.h"
@@ -257,86 +257,6 @@ void updateWin(void) {
     }
 }
 
-struct enemyspawn {
-    EnemyType *type;
-    Vector2 pos;
-} enemySpawns[] = {
-    &blobType, {3<<4, (295-270)<<4},
-    &blobType, {8<<4, (304-270)<<4},
-    &blobType, {7<<4, (309-270)<<4},
-    &blobType, {3<<4, (315-270)<<4},
-    &blobType, {5<<4, (320-270)<<4},
-    &blobType, {2<<4, (328-270)<<4},
-    &blobType, {8<<4, (328-270)<<4}
-};
-int enemySpawnIndex = 0;
-
-char gameCollision[] = {
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,1,1,0,0,0,0,0,1,1,1,
-    1,1,1,1,0,0,0,1,1,1,1,
-    1,1,0,0,0,0,0,0,0,1,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,1,0,0,0,0,0,0,0,1,
-    1,1,1,1,1,1,1,0,0,0,1,
-    1,1,1,1,1,1,1,0,0,0,1,
-    1,1,1,0,0,0,0,0,0,0,1,
-    1,1,1,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,1,1,1,1,1,1,1,
-    1,0,0,0,0,0,0,0,0,1,1,
-    1,0,0,0,0,0,0,0,0,1,1,
-    1,0,0,0,0,0,0,0,0,1,1,
-    1,0,0,0,0,0,0,0,0,1,1,
-    1,1,1,1,0,0,0,1,1,1,1,
-    1,1,0,0,0,0,0,0,0,1,1,
-    1,1,0,0,0,0,0,0,0,1,1,
-    1,1,0,0,0,0,0,0,0,1,1,
-    1,1,0,0,0,0,0,0,0,1,1,
-    1,1,0,0,1,1,1,0,0,1,1,
-    1,1,0,0,0,0,0,0,0,1,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,1,1,1,1,1,0,0,0,0,1,
-    1,1,1,1,1,1,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,1,1,1,0,0,0,1,
-    1,1,1,1,1,1,1,1,1,1,1
-};
-int gameCollisionWidth = 11;
-
 int smoothCameraY = 0;
 
 void initGame(void) {
@@ -346,9 +266,9 @@ void initGame(void) {
     playerMaxHealth = 4;
     playerMaxHealthProgress = 0;
 
-    enemySpawnIndex = 0;
-
     smoothCameraY = 16<<8;
+
+    generateLevel(&startSegmentPool, &cavernSegmentPool);
 
     GameObject *playerObject = newGameObject(&playerType);
 
@@ -377,10 +297,7 @@ void initGame(void) {
 
     clearOverlayCenter();
 
-    activeCollisionMap = gameCollision;
-    activeCollisionMapWidth = gameCollisionWidth;
-
-    resetTilemapGen();
+    generateTilemapUntil(24);
 
     REG_BG0HOFF = -32;
     REG_BG0VOFF = 0;
@@ -393,13 +310,13 @@ void initGame(void) {
 void updateGame(void) {
 
 
-    if (BUTTON_PRESSED(BUTTON_L)) {
-        PlayerData *playerData = playerSingleton->data;
+    // if (BUTTON_PRESSED(BUTTON_L)) {
+    //     PlayerData *playerData = playerSingleton->data;
 
-        if (playerData) {
-            spawnEnemy(&blobType, (Vector2){playerData->collider.pos.x + 24, playerData->collider.pos.y});
-        }
-    }
+    //     if (playerData) {
+    //         spawnEnemy(&blobType, (Vector2){playerData->collider.pos.x + 24, playerData->collider.pos.y});
+    //     }
+    // }
 
     updateAllGameObjects();
     
@@ -414,11 +331,7 @@ void updateGame(void) {
         playSoundA(cavernmusic_data, cavernmusic_length, 1);
     }
 
-    while (enemySpawnIndex < sizeof (enemySpawns) / sizeof (struct enemyspawn) && enemySpawns[enemySpawnIndex].pos.y < playerData->collider.pos.y + 160) {
-        GameObject *newEnemy = spawnEnemy(enemySpawns[enemySpawnIndex].type, enemySpawns[enemySpawnIndex].pos);
-        if (!newEnemy) mgba_printf("failed to spawn enemy %d", enemySpawnIndex);
-        enemySpawnIndex++;
-    }
+    spawnNecessaryEnemies(playerData);
 
     if (playerData) {
         cameraYTarget = (playerData->collider.pos.y - SCREENHEIGHT/2 + playerData->collider.size.y/2 + 16) << 8;
