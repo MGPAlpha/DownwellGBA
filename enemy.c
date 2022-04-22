@@ -22,6 +22,10 @@ void updateEnemy(GameObject* this) {
     if (data->type->update) {
         (*data->type->update)(this);
     }
+
+    PlayerData *playerData = playerSingleton->data;
+    int playerDist = playerData->resizedCollider.pos.y - data->collider.pos.y;
+    if (playerDist > data->type->maxPlayerRange<<8) destroyGameObject(this);
 }
 
 void drawEnemy(GameObject* this) {
@@ -130,7 +134,8 @@ const EnemyType blobType = {
     {-7,-3},
     {18,11},
     updateBlob,
-    getBlobSpriteIndex
+    getBlobSpriteIndex,
+    800
 };
 
 void damageEnemy(GameObject *this, int damage) {

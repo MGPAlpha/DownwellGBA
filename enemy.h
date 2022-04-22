@@ -11,6 +11,7 @@ typedef struct enemytype {
     Vector2 colliderSize;
     void (*update)(GameObject* this);
     int (*spriteIndex)(GameObject* this);
+    int maxPlayerRange;
 } EnemyType;
 
 typedef struct enemydata {
