@@ -27,5 +27,6 @@ typedef struct segmentpool {
 
 extern const SegmentPool startSegmentPool;
 extern const SegmentPool cavernSegmentPool;
+extern const SegmentPool endSegmentPool;
 
 #endif

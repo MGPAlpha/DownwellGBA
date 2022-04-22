@@ -268,7 +268,7 @@ void initGame(void) {
 
     smoothCameraY = 16<<8;
 
-    generateLevel(&startSegmentPool, &cavernSegmentPool);
+    generateLevel(&startSegmentPool, &cavernSegmentPool, &endSegmentPool);
 
     GameObject *playerObject = newGameObject(&playerType);
 
@@ -336,6 +336,7 @@ void updateGame(void) {
     if (playerData) {
         cameraYTarget = (playerData->collider.pos.y - SCREENHEIGHT/2 + playerData->collider.size.y/2 + 16) << 8;
         cameraYTarget = MAX(16<<8,cameraYTarget);
+        cameraYTarget = MIN((currentLevelLength-11)<<12,cameraYTarget);
     }
 
     smoothCameraY = smoothCameraY + (cameraYTarget - smoothCameraY) / 16;

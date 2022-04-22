@@ -5,7 +5,9 @@
 
 #include "player.h"
 
-void generateLevel(SegmentPool *startPool, SegmentPool *mainPool);
+extern int currentLevelLength;
+
+void generateLevel(SegmentPool *startPool, SegmentPool *mainPool, SegmentPool *endPool);
 
 void generateTilemapUntil(int row);
 

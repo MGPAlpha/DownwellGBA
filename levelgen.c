@@ -22,7 +22,7 @@ void addSegmentToLevel(LevelSegment *seg) {
     currentLevelLength += seg->terrainDataLines;
 }
 
-void generateLevel(SegmentPool *startPool, SegmentPool *mainPool) {
+void generateLevel(SegmentPool *startPool, SegmentPool *mainPool, SegmentPool *endPool) {
     currentLevelLength = 0;
     furthestGenerated = 0;
     levelEnemyCount = 0;
@@ -35,16 +35,21 @@ void generateLevel(SegmentPool *startPool, SegmentPool *mainPool) {
     LevelSegment *startSeg = startPool->pool + startSegIndex;
     addSegmentToLevel(startSeg);
 
+    int endSegIndex = randRange(0, endPool->poolSize);
+    LevelSegment *endSeg = endPool->pool + endSegIndex;
+
     int consecutiveBadSegments = 0;
     while (currentLevelLength < MAX_LEVEL_LENGTH && consecutiveBadSegments < 3) {
         LevelSegment *newSeg = mainPool->pool + randRange(0, mainPool->poolSize);
-        if (newSeg->terrainDataLines > MAX_LEVEL_LENGTH - currentLevelLength) {
+        if (newSeg->terrainDataLines > MAX_LEVEL_LENGTH - endSeg->terrainDataLines - currentLevelLength) {
             consecutiveBadSegments++;
         } else {
             consecutiveBadSegments = 0;
             addSegmentToLevel(newSeg);
         }
     }
+
+    addSegmentToLevel(endSeg);
 }
 
 void generateTilemapUntil(int row) {

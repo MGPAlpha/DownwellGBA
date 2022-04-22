@@ -37,6 +37,20 @@ const char levelStart1Terrain[] = {
     1,0,0,0,0,0,0,0,0,0,1,1
 };
 
+const char levelEnd1Terrain[] = {
+    1,0,0,0,0,0,0,0,0,0,1,1,
+    1,0,0,0,0,0,0,0,0,0,1,1,
+    1,0,0,0,0,0,0,0,0,0,1,1,
+    1,0,0,0,0,0,0,0,0,0,1,1,
+    1,1,1,0,0,0,0,0,1,1,1,1,
+    1,1,1,1,0,0,0,1,1,1,1,1,
+    1,1,1,1,0,0,0,1,1,1,1,1,
+    1,1,1,1,0,0,0,1,1,1,1,1,
+    1,1,1,1,0,0,0,1,1,1,1,1,
+    1,1,1,1,0,0,0,1,1,1,1,1,
+    1,1,1,1,0,0,0,1,1,1,1,1
+};
+
 const char levelCavern1Terrain[] = {
     1,0,0,0,0,0,0,0,0,0,1,1,
     1,0,0,0,0,0,0,0,0,0,1,1,
@@ -106,3 +120,9 @@ const LevelSegment cavernSegments[] = {
 };
 
 const SegmentPool cavernSegmentPool = {cavernSegments, sizeof cavernSegments / sizeof(LevelSegment)};
+
+const LevelSegment endSegments[] = {
+    CREATE_LEVEL_SEGMENT(emptyEnemies, levelEnd1Terrain)
+};
+
+const SegmentPool endSegmentPool = {endSegments, sizeof endSegments / sizeof(LevelSegment)};
