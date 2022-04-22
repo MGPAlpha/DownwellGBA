@@ -259,12 +259,8 @@ void updateWin(void) {
 
 int smoothCameraY = 0;
 
-void initGame(void) {
+int nextLevel(void) {
     destroyAllGameObjects();
-
-    playerHealth = 4;
-    playerMaxHealth = 4;
-    playerMaxHealthProgress = 0;
 
     smoothCameraY = 16<<8;
 
@@ -276,7 +272,7 @@ void initGame(void) {
         playerSingleton = playerObject;
         PlayerData *playerData = playerObject->data;
         playerData->collider.pos.y = 0;
-        playerData->collider.pos.x = 32;
+        playerData->collider.pos.x = 85;
         playerData->runningJump = 1;
         playerData->state = PLAYER_JUMPING;
         playerData->stateTime = 64;
@@ -305,6 +301,16 @@ void initGame(void) {
     REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | SPRITE_ENABLE | SPRITE_MODE_2D;
 
     gameState = GAME_PLAY;
+}
+
+void initGame(void) {
+    
+
+    playerHealth = 4;
+    playerMaxHealth = 4;
+    playerMaxHealthProgress = 0;
+
+    nextLevel();
 }
 
 void updateGame(void) {
@@ -351,6 +357,11 @@ void updateGame(void) {
     cameraPos.y = smoothCameraY>>8;
 
     generateTilemapUntil(cameraPos.y / 16 + 11);
+
+    if (playerData->collider.pos.y > (currentLevelLength-1)<<4) {
+        nextLevel();
+        return;
+    }
 
     waitForVBlank();
 
