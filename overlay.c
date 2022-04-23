@@ -69,7 +69,7 @@ void fillOverlayCenter(void) {
 
 void fillOverlayRect(int col, int row, int width, int height, short tileId) {
     short fillTile = tileId | 1<<12;
-    for (int i = row; i < height; i++) {
+    for (int i = row; i < row + height; i++) {
         DMANow(3, &fillTile, SCREENBLOCK[31].tilemap + 32 * i + col, DMA_SOURCE_FIXED | width);
     }
 }

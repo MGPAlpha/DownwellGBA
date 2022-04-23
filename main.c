@@ -76,6 +76,9 @@ int main() {
             case GAME_WIN:
                 updateWin();
                 break;
+            case GAME_LOSE:
+                updateLose();
+                break;
             case GAME_PLAY:
                 updateGame();
                 break;

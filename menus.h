@@ -31,6 +31,7 @@ extern Menu optionsMenu;
 extern Menu paletteMenu;
 extern Menu deleteMenu;
 extern Menu cheatsMenu;
+extern Menu loseMenu;
 
 
 extern void returnFromPaletteMenu(void);

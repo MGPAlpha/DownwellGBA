@@ -42,6 +42,12 @@ void initSurface(void) {
 
     destroyAllGameObjects();
 
+    stopSound();
+
+    playerHealth = 4;
+    playerMaxHealth = 4;
+    playerMaxHealthProgress = 0;
+
     waitForVBlank();
 
     initPalette();
@@ -304,7 +310,8 @@ int nextLevel(void) {
 }
 
 void initGame(void) {
-    
+
+    stopSound();    
 
     playerHealth = 4;
     playerMaxHealth = 4;
@@ -382,4 +389,19 @@ void updateGame(void) {
     if (BUTTON_PRESSED(BUTTON_START)) {
         pauseFromGame();
     }
+
+    if (playerHealth <= 0) {
+        initLose();
+    }
+}
+
+void initLose(void) {
+    loadMenu(&loseMenu);
+    gameState = GAME_LOSE;
+}
+
+void updateLose(void) {
+    updateMenu();
+    waitForVBlank();
+    if (gameState == GAME_LOSE) drawCurrentMenu();
 }

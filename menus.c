@@ -193,3 +193,31 @@ Menu cheatsMenu = {
     NULL
 };
 
+void drawLoseMenu(Menu *menu, int selectedIndex) {
+    fillOverlayRect(5, 8, 20, 12, 32*9+1);
+    printToOverlay("GAME OVER", 11, 9, 0);
+    drawMenu(menu, selectedIndex, 11, 11, 16, 5);
+}
+
+MenuItem loseMenuItems[] = {
+    {
+        MENU_CONST_TEXT,
+        "RETRY",
+        MENU_FUNCTION_BEHAVIOR,
+        initGame
+    },
+    {
+        MENU_CONST_TEXT,
+        "SURFACE",
+        MENU_FUNCTION_BEHAVIOR,
+        initSurface
+    }
+};
+
+Menu loseMenu = {
+    loseMenuItems,
+    sizeof(loseMenuItems)/sizeof(MenuItem),
+    drawLoseMenu,
+    NULL,
+    NULL
+};
