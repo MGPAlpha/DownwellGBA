@@ -311,6 +311,8 @@ int nextLevel(void) {
 
 void initGame(void) {
 
+    srand(vBlankCount);
+
     stopSound();    
 
     playerHealth = 4;

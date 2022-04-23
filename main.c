@@ -1,3 +1,27 @@
+/*
+    State of the Game
+
+    Art:
+        All necessary art is pretty much there.
+        A few mechanics with sprites are yet to be implemented, but the art for them is already in og-art/
+    Sound:
+        Looping music is in place. A bullet sound effect is played whenever the player shoots.
+        A priority system is in place so a few more sound effects can be added, and can be played on condition that a more important one isn't already being played.
+        Plan to add sfx for taking damage and stomping enemies.
+    Changing Tiles/Map/Palette at Runtime:
+        All three of these are implemented.
+        The dithered fade-in effect between the instructions and the surface is achieved by changing the data for a tile.
+        The overlay, menus, and game terrain are dynamically generated background maps.
+        The palette system in the pause menu allows dynamically changing to one of several premade color palettes.
+    Timer or Interrupt:
+        I don't have a non-sound timer or interrupt implemented yet.
+        I plan to add a run timer to the left side of the overlay to fulfill this requirement.
+    Additional Mechanics:
+        Before the final submission, I plan to add collectible gems that drop when you kill an enemy, and collecting those will unlock new palettes.
+        I also may add some more level segments to be used by the level generator.
+        I may add the bat enemy from the original game.
+ */
+
 #include "HW05Lib.h"
 #include "print.h"
 #include "gameobject.h"
