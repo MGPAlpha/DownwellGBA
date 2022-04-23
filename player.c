@@ -8,9 +8,12 @@
 #include "stdlib.h"
 #include "gamestate.h"
 #include "cheats.h"
+#include "sound.h"
 
 #include "bullet.h"
 #include "enemy.h"
+
+#include "sfx/machinegunbulletd60.h"
 
 int jumpFrames[] = {
     0,0,0,0,0,0,0,0,0,0,0,0,
@@ -192,6 +195,7 @@ void updatePlayer(GameObject* this) {
                 bulletData->collider.pos.y = data->collider.pos.y;
                 bulletData->collider = resizeRect(bulletData->collider, BULLET_SIZE_FACTOR);
             }
+            playSoundB(machinegunbulletd60_data, machinegunbulletd60_length, 0);
         }
 
         data->fireTime++;
