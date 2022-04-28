@@ -81,7 +81,7 @@ void checkForPlayerEnemyContact(GameObject *enemy, GameObject *player) {
     Collision col = collideRects(playerData->resizedCollider, enemyData->collider);
     if (col.collided) {
         if (col.push.y < 0 && col.push.y > -5<<8) {
-            destroyGameObject(enemy);
+            killEnemy(enemy);
             playerData->state = PLAYER_HOP;
             playerData->stateTime = 6;
             playerData->runningJump = 1;

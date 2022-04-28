@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include "camera.h"
+#include "collision.h"
 
 int initializeGem(GameObject* this) {
     GemData *data = malloc(sizeof(GemData));
@@ -22,6 +23,21 @@ int initializeGem(GameObject* this) {
 
 void updateGem(GameObject* this) {
     GemData *data = this->data;
+    data->velocity.y += 1<<3;
+
+    data->collider.pos.x += data->velocity.x;
+    Collision xColl = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 12);
+    if (xColl.collided) {
+        data->collider.pos.x += xColl.push.x;
+        data->velocity.x = -data->velocity.x;
+    }
+    data->collider.pos.y += data->velocity.y;
+    Collision yColl = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 12);
+    if (yColl.collided) {
+        data->collider.pos.y += yColl.push.y;
+        if (data->velocity.y >= 0) data->velocity.y = -1<<8;
+        else data->velocity.y = -data->velocity.y;
+    }
 }
 
 void drawGem(GameObject* this) {
@@ -70,10 +86,11 @@ GameObject *spawnGem(Vector2 pos) {
 void randomizeGem(GameObject *this) {
     GemData *data = this->data;
     Vector2 vel;
-    vel.x = rand() % 1<<8;
-    vel.y = rand() % 1<<8;
+    vel.x = randRange(-1<<8, 1<<8);
+    vel.y = randRange(-1<<8, 1<<8);
+    mgba_printf("Vel: %d,%d", vel.x, vel.y);
     vel = Vector2Normalize(vel, 8);
-    vel = V2_MUL(vel, 1);
+    // vel = V2_MUL(vel, 1);
     data->velocity = vel;
     data->rotationDirection = (rand() % 2) ? GEM_CCW : GEM_CW;
     data->type = (rand() % 4) ? GEM_SMALL : GEM_LARGE;

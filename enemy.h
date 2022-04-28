@@ -29,4 +29,6 @@ GameObject *spawnEnemy(EnemyType *type, Vector2 pos);
 
 void damageEnemy(GameObject *this, int damage);
 
+void killEnemy(GameObject *this);
+
 #endif

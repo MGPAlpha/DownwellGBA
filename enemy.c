@@ -150,7 +150,11 @@ void damageEnemy(GameObject *this, int damage) {
 
 void killEnemy(GameObject *this) {
     EnemyData *data = this->data;
-    GameObject *newGem = spawnGem(data->collider.pos);
-    if (newGem) randomizeGem(newGem);
+    Vector2 gemSpawn = V2_ADD(data->collider.pos, V2_DIV(data->collider.size,2));
+    int gemCount = randRange(2,4);
+    for (int i = 0; i < gemCount; i++){
+        GameObject *newGem = spawnGem(gemSpawn);
+        if (newGem) randomizeGem(newGem);
+    }
     destroyGameObject(this);
 }
