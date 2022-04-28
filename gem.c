@@ -38,6 +38,11 @@ void updateGem(GameObject* this) {
         if (data->velocity.y >= 0) data->velocity.y = -1<<8;
         else data->velocity.y = -data->velocity.y;
     }
+
+    if (this->lifetime > 5*60) {
+        destroyGameObject(this);
+        return;
+    }
 }
 
 void drawGem(GameObject* this) {
@@ -52,7 +57,7 @@ void drawGem(GameObject* this) {
     aniFrame = mod(aniFrame, 4);
     int tileId = data->type == GEM_SMALL ? OFFSET(8,12,32) : OFFSET(0,12,32);
     tileId += aniFrame * (data->type == GEM_SMALL ? 1 : 2);
-    if (posY < -16 || posY > 160 || posX < -16 || posX > 240) {
+    if (this->lifetime > 60*4 && this->lifetime % 2 || posY < -16 || posY > 160 || posX < -16 || posX > 240) {
         this->sprite->attr0 = ATTR0_HIDE;
         return;
     }
