@@ -31,6 +31,7 @@
 #include "savedata.h"
 #include "cheats.h"
 #include "sound.h"
+#include "gem.h"
 
 #include "art/title.h"
 #include "art/dither.h"
@@ -48,6 +49,7 @@ int main() {
 
     initSpriteMemory();
     initGameObjects();
+    initGemData();
 
     waitForVBlank();
 

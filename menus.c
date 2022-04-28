@@ -5,11 +5,18 @@
 #include "palette.h"
 #include "savedata.h"
 #include "cheats.h"
+#include "gem.h"
+#include "unlocks.h"
 
 void drawPauseMenu(Menu *menu, int selectedIndex) {
     fillOverlayCenter();
     printToOverlay("PAUSED", 12, 1, 0);
     drawMenu(menu, selectedIndex, 7, 4, 16, 8);
+
+    int nextUnlockIndex = getNextUnlockIndex(lifetimeGems);
+    int gemMax = unlocks[nextUnlockIndex].quota;
+    int prevGemMax = nextUnlockIndex > 0 ? unlocks[nextUnlockIndex-1].quota : 0;
+    drawGemProgress(lifetimeGems, prevGemMax, gemMax, 13);
 }
 
 int showOnlyOnSurface(void) {
