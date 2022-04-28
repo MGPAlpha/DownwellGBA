@@ -144,6 +144,13 @@ void damageEnemy(GameObject *this, int damage) {
     data->velocity.y += 2<<8;
     data->frameExtraMovement.y = 2<<8;
     if (data->health <= 0) {
-        destroyGameObject(this);
+        killEnemy(this);
     }
+}
+
+void killEnemy(GameObject *this) {
+    EnemyData *data = this->data;
+    GameObject *newGem = spawnGem(data->collider.pos);
+    if (newGem) randomizeGem(newGem);
+    destroyGameObject(this);
 }
