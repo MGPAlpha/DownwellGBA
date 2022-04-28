@@ -13,6 +13,7 @@ typedef struct gemdata {
     Rect collider;
     Vector2 velocity;
     enum GEMSTATE state;
+    int stateTime;
     enum GEMTYPE type;
     enum GEMROTATION rotationDirection;
 } GemData;
