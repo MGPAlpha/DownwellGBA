@@ -132,6 +132,12 @@ void updateHealthDisplay(int health, int max, int maxProgress) {
     SCREENBLOCK[31].tilemap[OFFSET(3,5,32)] = OFFSET(10,9,32) | 1<<10 | 1<<11 | 1<<12;
 }
 
+void updateGemsDisplay(int gems) {
+    char gemsText[5];
+    sprintf(gemsText, "%04d", gems);
+    printToOverlay(gemsText, 26, 0, 0);
+}
+
 Menu *currentMenu = NULL;
 unsigned int currentMenuIndex = 0;
 

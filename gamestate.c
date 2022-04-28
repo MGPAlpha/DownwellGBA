@@ -22,6 +22,7 @@
 #include "logosprite.h"
 #include "overlay.h"
 #include "cheats.h"
+#include "gem.h"
 
 #include "enemy.h"
 
@@ -319,6 +320,9 @@ void initGame(void) {
     playerMaxHealth = 4;
     playerMaxHealthProgress = 0;
 
+    gemsHeld = 0;
+    totalGemsThisRun = 0;
+
     nextLevel();
 }
 
@@ -384,6 +388,7 @@ void updateGame(void) {
         updateAmmoDisplay(playerData->ammo, 1);
     }
     updateHealthDisplay(playerHealth,playerMaxHealth,playerMaxHealthProgress);
+    updateGemsDisplay(gemsHeld);
 
 
     updateSprites();

@@ -5,6 +5,9 @@
 #include "collision.h"
 #include "player.h"
 
+int gemsHeld = 0;
+int totalGemsThisRun = 0;
+
 int initializeGem(GameObject* this) {
     GemData *data = malloc(sizeof(GemData));
     if (!data) return 1;
@@ -77,9 +80,6 @@ void updateGem(GameObject* this) {
                 accel = V2_DIV(accel, 3);
                 int accelRamp = data->stateTime;
                 if (accelRamp) accel = V2_MUL(accel, accelRamp);
-                // accel = V2_DIV(accel, (playerDistance * playerDistance) >> 16);
-                // data->velocity.x += accel.x;
-                // data->velocity.y += accel.y;
 
                 data->collider.pos.x += data->velocity.x + accel.x;
                 data->collider.pos.y += data->velocity.y + accel.y;
@@ -87,6 +87,7 @@ void updateGem(GameObject* this) {
                 Collision collisionWithPlayer = collideRects(playerData->resizedCollider, data->collider);
                 if (collisionWithPlayer.collided) {
                     destroyGameObject(this);
+                    collectGems(data->type == GEM_LARGE ? 10 : 2);
                     return;
                 }
             }
@@ -151,4 +152,9 @@ void randomizeGem(GameObject *this) {
     data->velocity = vel;
     data->rotationDirection = (rand() % 2) ? GEM_CCW : GEM_CW;
     data->type = (rand() % 4) ? GEM_SMALL : GEM_LARGE;
+}
+
+void collectGems(int gems) {
+    gemsHeld += gems;
+    totalGemsThisRun += gems;
 }

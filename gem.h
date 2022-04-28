@@ -18,4 +18,9 @@ typedef struct gemdata {
     enum GEMROTATION rotationDirection;
 } GemData;
 
+extern int gemsHeld;
+extern int totalGemsThisRun;
+
+void collectGems(int gems);
+
 #endif

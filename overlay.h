@@ -15,6 +15,10 @@ void printToOverlay(char *str, int col, int row, int font);
 
 void updateAmmoDisplay(int ammo, int perShot);
 
+void updateHealthDisplay(int health, int max, int maxProgress);
+
+void updateGemsDisplay(int gems);
+
 extern unsigned int currentMenuIndex;
 
 void loadMenu(Menu* menu);
