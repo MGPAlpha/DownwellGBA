@@ -121,6 +121,7 @@ void drawFullscreenImage4(const unsigned short *image);
 
 // Miscellaneous Drawing Functions
 void waitForVBlank();
+void waitNVBlanks(int n);
 void flipPage();
 
 

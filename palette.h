@@ -6,6 +6,8 @@ typedef struct palette {
     unsigned short colors[4];
 } Palette;
 
+extern const Palette palettes[];
+
 void loadPalette(int index);
 
 int getCurrPalette(void);

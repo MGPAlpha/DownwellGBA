@@ -20,6 +20,9 @@ typedef struct gemdata {
 
 extern int gemsHeld;
 extern int totalGemsThisRun;
+extern int lifetimeGems;
+
+void initGemData(void);
 
 void collectGems(int gems);
 

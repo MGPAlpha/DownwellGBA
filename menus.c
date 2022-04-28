@@ -194,9 +194,8 @@ Menu cheatsMenu = {
 };
 
 void drawLoseMenu(Menu *menu, int selectedIndex) {
-    fillOverlayRect(5, 8, 20, 12, 32*9+1);
-    printToOverlay("GAME OVER", 11, 9, 0);
-    drawMenu(menu, selectedIndex, 11, 11, 16, 5);
+    fillOverlayRect(5, 15, 20, 2, 32*9+1);
+    drawMenu(menu, selectedIndex, 11, 15, 16, 5);
 }
 
 MenuItem loseMenuItems[] = {

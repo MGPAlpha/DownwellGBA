@@ -4,9 +4,18 @@
 #include "camera.h"
 #include "collision.h"
 #include "player.h"
+#include "savedata.h"
 
 int gemsHeld = 0;
 int totalGemsThisRun = 0;
+
+int lifetimeGems = 0;
+
+void initGemData(void) {
+    gemsHeld = 0;
+    totalGemsThisRun = 0;
+    lifetimeGems = getSaveInt(8);
+}
 
 int initializeGem(GameObject* this) {
     GemData *data = malloc(sizeof(GemData));
@@ -55,7 +64,7 @@ void updateGem(GameObject* this) {
                 gemCenter.x >>= 8;
                 gemCenter.y >>= 8;
                 Vector2 playerDisp = V2_SUB(playerCenter, gemCenter);
-                if (Vector2Length(playerDisp, 0) < 16) {
+                if (Vector2Length(playerDisp, 0) < 18) {
                     data->state = GEM_ATTRACT;
                     data->stateTime = 0;
                 }

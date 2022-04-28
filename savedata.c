@@ -29,8 +29,9 @@ void initSaveData(void) {
 void resetSaveData(void) {
     saveBuffer[0] = SAVE_VERSION;
     saveBuffer[1] = 0; // Initial Palette
-    saveBuffer[3] = 3; // Number of Palettes Unlocked
+    saveBuffer[3] = 1; // Number of Palettes Unlocked
     saveBuffer[5] = 0; // Cheats Enabled
+    setSaveInt(8, 0);
     for (int i = 0; i < NUM_CHEATS; i++) {
         saveBuffer[32+i] = 0;
     }
@@ -48,4 +49,19 @@ void setSaveDataEntry(int i, unsigned char val) {
             GAMEPAK_RAM[i] = val;
         }
     }
+}
+
+void setSaveInt(int index, int val) {
+    for (int i = 0; i < sizeof(int); i++) {
+        mgba_printf("save byte %d", i);
+        setSaveDataEntry(index+i, *(((char*)(&val))+i));
+    }
+}
+
+int getSaveInt(int index) {
+    int val;
+    for (int i = 0; i < sizeof(int); i++) {
+        *((char*)(&val)+i) = getSaveDataEntry(index+i);
+    }
+    return val;
 }

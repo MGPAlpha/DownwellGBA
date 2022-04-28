@@ -19,6 +19,8 @@ void updateHealthDisplay(int health, int max, int maxProgress);
 
 void updateGemsDisplay(int gems);
 
+void drawGemProgress(int val, int prevMax, int max, int row);
+
 extern unsigned int currentMenuIndex;
 
 void loadMenu(Menu* menu);

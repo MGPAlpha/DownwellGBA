@@ -10,7 +10,7 @@ int activePalette;
 
 #define COLOR256(r,g,b) (COLOR((r>>3),(g>>3),(b>>3)))
 
-Palette palettes[] = {
+const Palette palettes[] = {
     {"DOWNWELL", {COLOR(30,30,30),COLOR(30,0,0), COLOR(0,15,30), COLOR(1,1,1)}},
     {"MATCHA", {COLOR(30,30,30),COLOR(16,22,0), COLOR(0,15,30), COLOR(1,1,1)}},
     {"AQUA", {COLOR(30,30,30),COLOR(0,15,30), COLOR(30,0,0), COLOR(1,1,1)}},
@@ -55,10 +55,10 @@ void initPalette(void) {
 }
 
 void unlockPalette(int index) {
-    setSaveDataEntry(3, MAX(index, getSaveDataEntry(3)));
+    setSaveDataEntry(3, MAX(index+1, getSaveDataEntry(3)));
     initPalette();
 }
 
 void unlockAllPalettes(void) {
-    unlockPalette(sizeof(palettes)/sizeof(Palette));
+    unlockPalette(sizeof(palettes)/sizeof(Palette)-1);
 }

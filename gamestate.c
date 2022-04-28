@@ -6,6 +6,7 @@
 #include "stdlib.h"
 #include "palette.h"
 #include "levelgen.h"
+#include "unlocks.h"
 
 #include "art/title.h"
 // #include "art/overlay.h"
@@ -226,11 +227,13 @@ void pauseFromGame(void) {
     loadMenu(&pauseMenu);
     gameState = GAME_PAUSE;
     unpauseState = GAME_PLAY;
+    pauseSound();
 }
 
 void unpause(void) {
     clearOverlayCenter();
     gameState = unpauseState;
+    if (gameState == GAME_PLAY) unpauseSound();
 }
 
 void updatePause(void) {
@@ -320,8 +323,9 @@ void initGame(void) {
     playerMaxHealth = 4;
     playerMaxHealthProgress = 0;
 
-    gemsHeld = 0;
-    totalGemsThisRun = 0;
+    initGemData();
+
+    mgba_printf("%d",lifetimeGems);
 
     nextLevel();
 }
@@ -405,10 +409,78 @@ void updateGame(void) {
 void initLose(void) {
     loadMenu(&loseMenu);
     gameState = GAME_LOSE;
+    waitForVBlank();
+    fillOverlayRect(5, 3, 20, 14, 32*9+1);
+    printToOverlay("GAME OVER", 11, 4, 0);
+    
+    waitNVBlanks(60);
+
+    printToOverlay("LEVEL", 8, 6, 2);
+    printToOverlay(": %d", 14, 6, 0);
+    waitNVBlanks(10);
+
+    printToOverlay("GEMS", 8, 7, 2);
+    printToOverlay(": %d", 14, 7, 0);
+    waitNVBlanks(10);
+    
+    printToOverlay("KILLS", 8, 8, 2);
+    printToOverlay(": %d", 14, 8, 0);
+    waitNVBlanks(10);
+
+    printToOverlay("TIME", 8, 9, 2);
+    printToOverlay(": %d", 14, 9, 0);
+    
+    waitNVBlanks(30);
+
+    int nextUnlockIndex = getNextUnlockIndex(lifetimeGems);
+
+    int gemMax = unlocks[nextUnlockIndex].quota;
+    int prevGemMax = nextUnlockIndex > 0 ? unlocks[nextUnlockIndex-1].quota : 0; 
+    int newLifetimeGems = lifetimeGems + totalGemsThisRun;
+    int gemAccumulator = lifetimeGems;
+
+    drawGemProgress(gemAccumulator, prevGemMax, gemMax, 11);
+
+    waitNVBlanks(30);
+
+    while (newLifetimeGems >= gemMax) {
+        for (int i = 1; i <= 60; i++) {
+            waitForVBlank();
+            int gemProgress = gemAccumulator + (gemMax - gemAccumulator) * i / 60;
+            drawGemProgress(gemProgress, prevGemMax, gemMax, 11);
+        }
+        waitNVBlanks(25);
+        unlockPalette(unlocks[nextUnlockIndex].index);
+
+        fillOverlayRect(5,11,20,3, OFFSET(1,9,32));
+        printToOverlay("PALETTE UNLOCKED", 7, 11, 2);
+        char *paletteName = palettes[unlocks[nextUnlockIndex].index].name;
+        printToOverlay(paletteName, 15-strlen(paletteName)/2, 13, 0);
+        waitNVBlanks(120);
+
+        gemAccumulator = gemMax;
+        nextUnlockIndex++;
+        prevGemMax = gemMax;
+        if (nextUnlockIndex >= unlockSize) break;
+        gemMax = unlocks[MIN(nextUnlockIndex, 2)].quota;
+    }
+
+    for (int i = 1; i <= 60; i++) {
+            waitForVBlank();
+            int gemProgress = gemAccumulator + (newLifetimeGems - gemAccumulator) * i / 60;
+            drawGemProgress(gemProgress, prevGemMax, gemMax, 11);
+    }
+
+    lifetimeGems = newLifetimeGems;
+    setSaveInt(8, lifetimeGems);
+
+    waitNVBlanks(60);
 }
 
 void updateLose(void) {
     updateMenu();
     waitForVBlank();
-    if (gameState == GAME_LOSE) drawCurrentMenu();
+    if (gameState == GAME_LOSE) {
+        drawCurrentMenu();
+    }
 }

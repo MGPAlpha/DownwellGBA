@@ -114,6 +114,12 @@ void waitForVBlank() {
 	while(SCANLINECOUNTER < 160);
 }
 
+void waitNVBlanks(int n) {
+    for (int i = 0; i < n; i++) {
+        waitForVBlank();
+    }
+}
+
 // Flips the page
 void flipPage() {
     if (REG_DISPCTL & DISP_BACKBUFFER) {

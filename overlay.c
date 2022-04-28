@@ -138,6 +138,29 @@ void updateGemsDisplay(int gems) {
     printToOverlay(gemsText, 26, 0, 0);
 }
 
+void drawProgressBar(int val, int max, int col, int row, int width) {
+    int filledWidth = val * (width*8)/ max;
+    for (int i = 0; i < width; i++) {
+        int tileCol = filledWidth - 8 * i;
+        tileCol = MAX(0,tileCol);
+        tileCol = MIN(9,tileCol);
+        int tileId = OFFSET(8,13,32) + tileCol;
+        if (i == 0) tileId += 32;
+        else if (i == width - 1) tileId += 64;
+        SCREENBLOCK[31].tilemap[OFFSET(col + i, row, 32)] = tileId | 1<<12;
+    }
+}
+
+void drawGemProgress(int val, int prevMax, int max, int row) {
+    fillOverlayRect(5, row, 20, 4, OFFSET(1,9,32));
+    SCREENBLOCK[31].tilemap[OFFSET(10, row, 32)] = OFFSET(8,12,32) | 1<<12;
+    printToOverlay("PROGRESS", 11, row, 2);
+    char gemsText[15];
+    sprintf(gemsText, "%d/%d", val, max);
+    printToOverlay(gemsText, 15-strlen(gemsText)/2, row+1, 0);
+    drawProgressBar(val - prevMax, max-prevMax, 9, row+2, 12);
+}
+
 Menu *currentMenu = NULL;
 unsigned int currentMenuIndex = 0;
 
