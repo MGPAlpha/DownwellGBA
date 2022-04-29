@@ -15,7 +15,7 @@
         The palette system in the pause menu allows dynamically changing to one of several premade color palettes.
     Timer or Interrupt:
         I don't have a non-sound timer or interrupt implemented yet.
-        I plan to add a run timer to the left side of the overlay to fulfill this requirement.
+        [Done] I plan to add a run timer to the left side of the overlay to fulfill this requirement.
     Additional Mechanics:
         [Done] Before the final submission, I plan to add collectible gems that drop when you kill an enemy, and collecting those will unlock new palettes.
         I also may add some more level segments to be used by the level generator.
