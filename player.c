@@ -232,7 +232,7 @@ void drawPlayer(GameObject* this) {
     PlayerData *data = this->data;
     int posY = data->collider.pos.y - cameraPos.y - 4;
     int posX = (data->collider.pos.x - cameraPos.x - 5);
-    if ((data->iFrames > 0 && data->iFrames % 2 && playerHealth > 0) || posY < -16 || posY > 160 || posX < -16 || posX > 240) {
+    if ((data->iFrames > 0 && data->iFrames % 2) || posY < -16 || posY > 160 || posX < -16 || posX > 240) {
         this->sprite->attr0 = ATTR0_HIDE;
         return;
     }
@@ -252,6 +252,8 @@ void drawPlayer(GameObject* this) {
             if (data->stateTime >= sizeof(jumpFrames)/sizeof(int)) jumpAniFrame = sizeof(jumpFrames)/sizeof(int) - 1;
             this->sprite->attr2 = ATTR2_TILEID(jumpFrames[jumpAniFrame] * 2,4) | ATTR2_PRIORITY(2);
         }
+    } else if (data->state == PLAYER_DEAD) {
+        this->sprite->attr2 = ATTR2_TILEID(data->stateTime < 60 ? 2 : 4,8) | ATTR2_PRIORITY(2);
     }
 }
 

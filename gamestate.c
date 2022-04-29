@@ -389,8 +389,10 @@ void updateGame(void) {
     // if (cameraFollowedX < -8) cameraFollowedX = -8;
 
 
-    cameraPos.x = -32;
-    cameraPos.y = smoothCameraY>>8;
+    if (playerData->state != PLAYER_DEAD) {
+        cameraPos.x = -32;
+        cameraPos.y = smoothCameraY>>8;
+    }
 
     generateTilemapUntil(cameraPos.y / 16 + 11);
 
@@ -422,7 +424,7 @@ void updateGame(void) {
         pauseFromGame();
     }
 
-    if (playerData->state == PLAYER_DEAD && playerData->stateTime > 180) {
+    if (playerData->state == PLAYER_DEAD && playerData->stateTime > 135) {
         // playSoundBPriority(playerkilledc50_data, playerkilledc50_length, 0, 200);
 
         // waitNVBlanks(60);
