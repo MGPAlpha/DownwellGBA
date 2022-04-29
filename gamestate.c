@@ -123,16 +123,6 @@ void initSurface(void) {
 
 void updateSurface(void) {
 
-    if (BUTTON_PRESSED(BUTTON_L)) {
-        GameObject *playerObject = newGameObject(&playerType);
-
-        if (playerObject) {
-            PlayerData *playerData = playerObject->data;
-            playerData->collider.pos.y = 136;
-            playerData->collider.pos.x = 152;
-        }
-    }
-
     
 
     int playerCanMove = stateTime > 8*6;
