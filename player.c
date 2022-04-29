@@ -13,9 +13,10 @@
 #include "bullet.h"
 #include "enemy.h"
 
-#include "sfx/machinegunbulletd60.h"
+#include "sfx/machinegunbulletc8a.h"
 #include "sfx/playerdamagedd66.h"
 #include "sfx/playerkilledc50.h"
+#include "sfx/stompc96.h"
 
 int jumpFrames[] = {
     0,0,0,0,0,0,0,0,0,0,0,0,
@@ -89,9 +90,10 @@ void checkForPlayerEnemyContact(GameObject *enemy, GameObject *player) {
             playerData->runningJump = 1;
             playerData->ammo = playerData->charge;
             playerData->canFire = 0;
+            playSoundBPriority(stompc96_data, stompc96_length, 0, 5);
         } else if (playerData->iFrames < 1) {
             playerHealth--;
-            playSoundBPriority(playerdamagedd66_data, playerdamagedd66_length, 0, 5);
+            playSoundBPriority(playerdamagedd66_data, playerdamagedd66_length, 0, 10);
             playerData->iFrames = 60;
         }
     }
@@ -199,7 +201,7 @@ void updatePlayer(GameObject* this) {
                 bulletData->collider.pos.y = data->collider.pos.y;
                 bulletData->collider = resizeRect(bulletData->collider, BULLET_SIZE_FACTOR);
             }
-            playSoundBPriority(machinegunbulletd60_data, machinegunbulletd60_length, 0, 0);
+            playSoundBPriority(machinegunbulletc8a_data, machinegunbulletc8a_length, 0, 0);
         }
 
         data->fireTime++;
