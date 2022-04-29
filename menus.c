@@ -172,7 +172,7 @@ void drawPaletteMenu(Menu *menu, int selectedIndex) {
     drawScrollingMenu(menu, selectedIndex, 7, 4, 16, 5);
 }
 
-MenuItem paletteMenuItems[38] = {
+MenuItem paletteMenuItems[50] = {
     
 };
 
