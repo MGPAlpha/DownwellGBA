@@ -220,6 +220,7 @@ void updatePlayer(GameObject* this) {
     if (data->state != PLAYER_DEAD && playerHealth <= 0) {
         data->state = PLAYER_DEAD;
         data->stateTime = 5;
+        stopSound();
         playSoundBPriority(playerkilledc50_data, playerkilledc50_length, 0, 200);
         REG_TM2CNT = 0;
     }

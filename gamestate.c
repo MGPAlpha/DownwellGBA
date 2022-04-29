@@ -320,13 +320,6 @@ int nextLevel(void) {
     gameState = GAME_PLAY;
     level++;
 
-    REG_TM3CNT = 0;
-    REG_TM3D = 0;
-    REG_TM3CNT = TIMER_ON | TM_IRQ | TM_CASCADE;
-
-    REG_TM2CNT = 0;
-    REG_TM2D = 65536-16384;
-    REG_TM2CNT = TIMER_ON | TM_IRQ | TM_FREQ_1024;
 
 }
 
@@ -347,6 +340,14 @@ void initGame(void) {
     level = 0;
 
     nextLevel();
+
+    REG_TM3CNT = 0;
+    REG_TM3D = 0;
+    REG_TM3CNT = TIMER_ON | TM_IRQ | TM_CASCADE;
+
+    REG_TM2CNT = 0;
+    REG_TM2D = 65536-16384;
+    REG_TM2CNT = TIMER_ON | TM_IRQ | TM_FREQ_1024;
 }
 
 void updateGame(void) {
@@ -396,7 +397,7 @@ void updateGame(void) {
 
     generateTilemapUntil(cameraPos.y / 16 + 11);
 
-    if (playerData->collider.pos.y > (currentLevelLength-1)<<4) {
+    if (playerData->state != PLAYER_DEAD && playerData->collider.pos.y > (currentLevelLength-1)<<4) {
         nextLevel();
         return;
     }
@@ -420,7 +421,7 @@ void updateGame(void) {
 
     updateSprites();
 
-    if (BUTTON_PRESSED(BUTTON_START)) {
+    if (playerData->state != PLAYER_DEAD && BUTTON_PRESSED(BUTTON_START)) {
         pauseFromGame();
     }
 
@@ -435,7 +436,6 @@ void updateGame(void) {
 
 void initLose(void) {
     REG_TM2CNT = 0;
-    stopSound();
     loadMenu(&loseMenu);
     gameState = GAME_LOSE;
     waitForVBlank();
