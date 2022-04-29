@@ -4,7 +4,9 @@
 #include "HW05Lib.h"
 
 #include "menus.h"
+#include "player.h"
 #include "savedata.h"
+#include "overlay.h"
 
 int cheatsEnabled;
 
@@ -88,7 +90,7 @@ void initCheats(void) {
     }
     cheatsMenu.items[i+1] = (MenuItem){
         MENU_CONST_TEXT,
-        "DISABLE CHEATS",
+        "CHEATS OFF",
         MENU_FUNCTION_BEHAVIOR,
         disableCheats
     };
@@ -113,14 +115,23 @@ void unlockPalettesCheat(void) {
     loadMenu(&paletteMenu);
 }
 
+void hpCheat(void) {
+    playerHealth++;
+    updateHealthDisplay(playerHealth, playerMaxHealth, 0);
+}
+
 Cheat cheats[NUM_CHEATS] = {
     {
-        "UNLOCK PALETTES",
-        unlockPalettesCheat
+        "HP +1",
+        hpCheat
     },
     {
         "INF AMMO",
         NULL,
         &infiniteAmmoCheat
+    },
+    {
+        "ALL PALETTES",
+        unlockPalettesCheat
     }
 };

@@ -411,6 +411,8 @@ void updateGame(void) {
 
     updateSprites();
 
+    checkToEnableCheats();
+
     if (playerData->state != PLAYER_DEAD && BUTTON_PRESSED(BUTTON_START)) {
         pauseFromGame();
     }
