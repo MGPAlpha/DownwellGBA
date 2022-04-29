@@ -6,7 +6,7 @@
         {
             "label": "build run",
             "type": "shell",
-            "command": " mgba-qt ./Project.gba",
+            "command": " mgba-qt ./DownwellGBA.gba",
             // add the mGBA.exe exact path to the above line,
             // before "./Project.gba"!
             // make sure there is a space between the exact path and "./Project.gba".

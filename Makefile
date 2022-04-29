@@ -1,4 +1,4 @@
-PRODUCT_NAME       = Project
+PRODUCT_NAME       = DownwellGBA
 
 # You probably won't need to touch anything below here!!!
 # The one exception is the cleanup stuff.
@@ -79,7 +79,9 @@ $(AUDIOHEADERS) : %.h : %.c
 
 clean:
 	$(RM) $(ROM_NAME) $(ELF_NAME) $(BIN_NAME)
-	$(RM) $(AUDIOOBJECTS) $(AUDIOHEADERS)
 	$(RM) **/*.[ois] *.[ois]
+
+audioclean:
+	$(RM) $(AUDIOOBJECTS) $(AUDIOHEADERS)
 
 audio: $(AUDIOOBJECTS)
