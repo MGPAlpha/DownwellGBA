@@ -1,7 +1,7 @@
 /*
  * Exported with nin10kit v1.8
  * Invocation command was nin10kit --mode=0 --bpp=4 --transparent=ff00ff instructions instructions.png 
- * Time-stamp: Saturday 04/02/2022, 23:14:18
+ * Time-stamp: Friday 04/29/2022, 00:23:05
  * 
  * Image Information
  * -----------------
@@ -20,10 +20,10 @@ extern const unsigned short instructions_palette[16];
 
 #define INSTRUCTIONS_PALETTE_TYPE (0 << 7)
 
-extern const unsigned short instructions_tiles[1248];
-#define INSTRUCTIONS_TILES 78
-#define INSTRUCTIONS_TILES_SIZE 2496
-#define INSTRUCTIONS_TILES_LENGTH 1248
+extern const unsigned short instructions_tiles[1392];
+#define INSTRUCTIONS_TILES 87
+#define INSTRUCTIONS_TILES_SIZE 2784
+#define INSTRUCTIONS_TILES_LENGTH 1392
 
 extern const unsigned short instructions[1024];
 #define INSTRUCTIONS_MAP_WIDTH 32
