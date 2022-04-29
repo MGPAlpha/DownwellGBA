@@ -221,6 +221,7 @@ void pauseFromSurface(void) {
     // printToOverlay("SURFACE", 11, 3, 0);
     gameState = GAME_PAUSE;
     unpauseState = GAME_SURFACE;
+    pauseSound();
 }
 
 void pauseFromGame(void) {
@@ -233,7 +234,7 @@ void pauseFromGame(void) {
 void unpause(void) {
     clearOverlayCenter();
     gameState = unpauseState;
-    if (gameState == GAME_PLAY) unpauseSound();
+    /*if (gameState == GAME_PLAY) */unpauseSound();
 }
 
 void updatePause(void) {
@@ -407,6 +408,7 @@ void updateGame(void) {
 }
 
 void initLose(void) {
+    stopSound();
     loadMenu(&loseMenu);
     gameState = GAME_LOSE;
     waitForVBlank();
