@@ -151,6 +151,23 @@ void drawProgressBar(int val, int max, int col, int row, int width) {
     }
 }
 
+void drawTimeDisplay(void) {
+    fillOverlayRect(0,10,4,3, OFFSET(1,9,32));
+    short seconds = REG_TM3D;
+    mgba_printf("%x", REG_TM2D&~(~0<<14));
+    short centis = (REG_TM2D&~(~0<<14));
+    centis = centis*100/(1<<14);
+    char minutesString[5];
+    snprintf(minutesString, 5, "%2d", seconds / 60);
+    printToOverlay(minutesString, 1, 10, 0);
+    char secondsString[5];
+    snprintf(secondsString, 5, ":%02d", seconds % 60);
+    printToOverlay(secondsString, 0, 11, 0);
+    char centisString[5];
+    snprintf(centisString, 5, ".%02d", centis);
+    printToOverlay(centisString, 0, 12, 0);
+}
+
 void drawGemProgress(int val, int prevMax, int max, int row) {
     fillOverlayRect(5, row, 20, 4, OFFSET(1,9,32));
     SCREENBLOCK[31].tilemap[OFFSET(10, row, 32)] = OFFSET(8,12,32) | 1<<12;

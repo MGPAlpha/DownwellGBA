@@ -21,6 +21,8 @@ void updateGemsDisplay(int gems);
 
 void drawGemProgress(int val, int prevMax, int max, int row);
 
+void drawTimeDisplay(void);
+
 extern unsigned int currentMenuIndex;
 
 void loadMenu(Menu* menu);

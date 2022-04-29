@@ -228,6 +228,7 @@ void pauseFromGame(void) {
     loadMenu(&pauseMenu);
     gameState = GAME_PAUSE;
     unpauseState = GAME_PLAY;
+    REG_TM2CNT = 0;
     pauseSound();
 }
 
@@ -235,6 +236,7 @@ void unpause(void) {
     clearOverlayCenter();
     gameState = unpauseState;
     /*if (gameState == GAME_PLAY) */unpauseSound();
+    REG_TM2CNT = TIMER_ON | TM_IRQ | TM_FREQ_1024;
 }
 
 void updatePause(void) {
@@ -315,6 +317,15 @@ int nextLevel(void) {
 
     gameState = GAME_PLAY;
     level++;
+
+    REG_TM3CNT = 0;
+    REG_TM3D = 0;
+    REG_TM3CNT = TIMER_ON | TM_IRQ | TM_CASCADE;
+
+    REG_TM2CNT = 0;
+    REG_TM2D = 65536-16384;
+    REG_TM2CNT = TIMER_ON | TM_IRQ | TM_FREQ_1024;
+
 }
 
 void initGame(void) {
@@ -399,6 +410,8 @@ void updateGame(void) {
     }
     updateHealthDisplay(playerHealth,playerMaxHealth,playerMaxHealthProgress);
     updateGemsDisplay(gemsHeld);
+    drawTimeDisplay();
+
 
 
     updateSprites();
