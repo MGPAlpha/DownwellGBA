@@ -14,6 +14,7 @@
 #include "art/spritesheet.h"
 #include "art/titlecollision.h"
 #include "art/terraintiles.h"
+#include "art/instructions.h"
 
 #include "music/cavernmusic.h"
 #include "sfx/logosound.h"
@@ -516,5 +517,25 @@ void updateLose(void) {
     waitForVBlank();
     if (gameState == GAME_LOSE) {
         drawCurrentMenu();
+    }
+}
+
+void initInstructions(void) {
+    gameState = GAME_INSTRUCTIONS;
+    waitForVBlank();
+    DMANow(3, instructions_palette, PALETTE, INSTRUCTIONS_PALETTE_LENGTH);
+    DMANow(3, instructions_tiles, &CHARBLOCK[1], INSTRUCTIONS_TILES_LENGTH);
+    DMANow(3, instructions, &SCREENBLOCK[29], INSTRUCTIONS_MAP_LENGTH);
+
+    REG_BG2CNT = BG_4BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(29) | BG_SIZE_SMALL;
+    REG_DISPCTL |= BG2_ENABLE;
+}
+
+void updateInstructions(void) {
+    if (oldButtons & ~buttons) {
+        gameState = GAME_PAUSE;
+        waitForVBlank();
+        REG_DISPCTL = REG_DISPCTL & ~BG2_ENABLE;
+        initPalette();
     }
 }

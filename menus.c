@@ -54,10 +54,16 @@ MenuItem pauseMenuItems[] = {
     },
     {
         MENU_CONST_TEXT,
-        "STYLE SELECT",
+        "INSTRUCTIONS",
         MENU_FUNCTION_BEHAVIOR,
-        NULL
+        initInstructions
     },
+    // {
+    //     MENU_CONST_TEXT,
+    //     "STYLE SELECT",
+    //     MENU_FUNCTION_BEHAVIOR,
+    //     NULL
+    // },
     {
         MENU_CONST_TEXT,
         "PALETTE",

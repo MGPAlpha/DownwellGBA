@@ -108,6 +108,9 @@ int main() {
             case GAME_PLAY:
                 updateGame();
                 break;
+            case GAME_INSTRUCTIONS:
+                updateInstructions();
+                break;
         }
 
         vBlankCount++;

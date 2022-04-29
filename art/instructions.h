@@ -1,7 +1,7 @@
 /*
  * Exported with nin10kit v1.8
  * Invocation command was nin10kit --mode=0 --bpp=4 --transparent=ff00ff instructions instructions.png 
- * Time-stamp: Friday 04/29/2022, 00:23:05
+ * Time-stamp: Friday 04/29/2022, 02:41:37
  * 
  * Image Information
  * -----------------
