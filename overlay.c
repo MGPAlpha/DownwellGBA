@@ -154,7 +154,6 @@ void drawProgressBar(int val, int max, int col, int row, int width) {
 void drawTimeDisplay(void) {
     fillOverlayRect(0,10,4,3, OFFSET(1,9,32));
     short seconds = REG_TM3D;
-    mgba_printf("%x", REG_TM2D&~(~0<<14));
     short centis = (REG_TM2D&~(~0<<14));
     centis = centis*100/(1<<14);
     char minutesString[5];

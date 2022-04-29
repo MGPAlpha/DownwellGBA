@@ -426,6 +426,7 @@ void updateGame(void) {
 }
 
 void initLose(void) {
+    REG_TM2CNT = 0;
     stopSound();
     loadMenu(&loseMenu);
     gameState = GAME_LOSE;
@@ -435,26 +436,33 @@ void initLose(void) {
     
     waitNVBlanks(60);
 
-    printToOverlay("LEVEL", 8, 6, 2);
+    printToOverlay("LEVEL", 7, 6, 2);
     char levelText[4];
     sprintf(levelText, ": %d", level);
-    printToOverlay(levelText, 14, 6, 0);
+    printToOverlay(levelText, 13, 6, 0);
     waitNVBlanks(10);
 
-    printToOverlay("GEMS", 8, 7, 2);
+    printToOverlay("GEMS", 7, 7, 2);
     char gemsText[10];
     sprintf(gemsText, ": %d", totalGemsThisRun);
-    printToOverlay(gemsText, 14, 7, 0);
+    printToOverlay(gemsText, 13, 7, 0);
     waitNVBlanks(10);
     
-    printToOverlay("KILLS", 8, 8, 2);
+    printToOverlay("KILLS", 7, 8, 2);
     char killsText[10];
     sprintf(killsText, ": %d", enemiesKilled);
-    printToOverlay(killsText, 14, 8, 0);
+    printToOverlay(killsText, 13, 8, 0);
     waitNVBlanks(10);
 
-    printToOverlay("TIME", 8, 9, 2);
-    printToOverlay(": %d", 14, 9, 0);
+    printToOverlay("TIME", 7, 9, 2);
+    short seconds = REG_TM3D;
+    short minutes = seconds / 60;
+    seconds %= 60;
+    short centis = (REG_TM2D&~(~0<<14));
+    centis = centis*100/(1<<14);
+    char timeText[15];
+    snprintf(timeText, 15, ": %02d:%02d.%02d", minutes, seconds, centis);
+    printToOverlay(timeText, 13, 9, 0);
     
     waitNVBlanks(30);
 
