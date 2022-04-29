@@ -31,4 +31,6 @@ void damageEnemy(GameObject *this, int damage);
 
 void killEnemy(GameObject *this);
 
+extern int enemiesKilled;
+
 #endif

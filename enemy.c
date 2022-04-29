@@ -6,6 +6,8 @@
 #include "player.h"
 #include "collision.h"
 
+int enemiesKilled = 0;
+
 int initializeEnemy(GameObject* this) {
     EnemyData *data = malloc(sizeof(EnemyData));
     if (!data) return 1;
@@ -156,5 +158,6 @@ void killEnemy(GameObject *this) {
         GameObject *newGem = spawnGem(gemSpawn);
         if (newGem) randomizeGem(newGem);
     }
+    enemiesKilled++;
     destroyGameObject(this);
 }

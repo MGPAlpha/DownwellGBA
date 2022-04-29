@@ -270,6 +270,8 @@ void updateWin(void) {
 
 int smoothCameraY = 0;
 
+int level = 0;
+
 int nextLevel(void) {
     destroyAllGameObjects();
 
@@ -312,6 +314,7 @@ int nextLevel(void) {
     REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | SPRITE_ENABLE | SPRITE_MODE_2D;
 
     gameState = GAME_PLAY;
+    level++;
 }
 
 void initGame(void) {
@@ -326,7 +329,9 @@ void initGame(void) {
 
     initGemData();
 
-    mgba_printf("%d",lifetimeGems);
+    enemiesKilled = 0;
+
+    level = 0;
 
     nextLevel();
 }
@@ -418,15 +423,21 @@ void initLose(void) {
     waitNVBlanks(60);
 
     printToOverlay("LEVEL", 8, 6, 2);
-    printToOverlay(": %d", 14, 6, 0);
+    char levelText[4];
+    sprintf(levelText, ": %d", level);
+    printToOverlay(levelText, 14, 6, 0);
     waitNVBlanks(10);
 
     printToOverlay("GEMS", 8, 7, 2);
-    printToOverlay(": %d", 14, 7, 0);
+    char gemsText[10];
+    sprintf(gemsText, ": %d", totalGemsThisRun);
+    printToOverlay(gemsText, 14, 7, 0);
     waitNVBlanks(10);
     
     printToOverlay("KILLS", 8, 8, 2);
-    printToOverlay(": %d", 14, 8, 0);
+    char killsText[10];
+    sprintf(killsText, ": %d", enemiesKilled);
+    printToOverlay(killsText, 14, 8, 0);
     waitNVBlanks(10);
 
     printToOverlay("TIME", 8, 9, 2);
