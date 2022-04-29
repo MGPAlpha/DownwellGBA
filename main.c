@@ -7,7 +7,7 @@
     Sound:
         Looping music is in place. A bullet sound effect is played whenever the player shoots.
         A priority system is in place so a few more sound effects can be added, and can be played on condition that a more important one isn't already being played.
-        Plan to add sfx for taking damage and stomping enemies.
+        Plan to add sfx for [Done] taking damage and stomping enemies.
     Changing Tiles/Map/Palette at Runtime:
         All three of these are implemented.
         The dithered fade-in effect between the instructions and the surface is achieved by changing the data for a tile.

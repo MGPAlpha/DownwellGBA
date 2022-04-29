@@ -15,6 +15,7 @@
 
 #include "sfx/machinegunbulletd60.h"
 #include "sfx/playerdamagedd66.h"
+#include "sfx/playerkilledc50.h"
 
 int jumpFrames[] = {
     0,0,0,0,0,0,0,0,0,0,0,0,
@@ -120,7 +121,7 @@ int initializePlayer(GameObject* this) {
 void updatePlayer(GameObject* this) {
     PlayerData *data = this->data;
     playerSingleton = this;
-    if (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT)) {
+    if (data->state != PLAYER_DEAD && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
         if (BUTTON_HELD(BUTTON_LEFT)) {
             data->collider.pos.x -= 2;
             data->dir = LEFT;
@@ -161,8 +162,9 @@ void updatePlayer(GameObject* this) {
         }
     }
 
-    if (data->state == PLAYER_JUMPING || data->state == PLAYER_HOP) {
+    if (data->state == PLAYER_JUMPING || data->state == PLAYER_HOP || data->state == PLAYER_DEAD) {
         if (data->state == PLAYER_JUMPING && !BUTTON_HELD(BUTTON_A) && !BUTTON_HELD(BUTTON_B) && data->stateTime < 12) data->stateTime = 12;
+        // playSoundBPriority(playerkilledc50_data, playerkilledc50_length, 0, 200);
         int jumpDiffIndex = data->stateTime;
         if (data->stateTime >= sizeof(jumpDisplacementFrames)/sizeof(int)) jumpDiffIndex = sizeof(jumpDisplacementFrames)/sizeof(int) - 1;
         int jumpDisplacement = jumpDisplacementFrames[jumpDiffIndex];
@@ -170,7 +172,7 @@ void updatePlayer(GameObject* this) {
         Collision yCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 4);
         if (yCollision.push.y) {
             data->collider.pos.y += yCollision.push.y;
-            if (yCollision.push.y < 0) {
+            if (yCollision.push.y < 0 && data->state != PLAYER_DEAD) {
                 data->state = PLAYER_IDLE;
                 data->ammo = data->charge;
             } else if (yCollision.push.y > 0) {
@@ -211,7 +213,16 @@ void updatePlayer(GameObject* this) {
     
     data->resizedCollider = resizedCollider;
 
-    doForEachGameObjectOfTypeWith(&enemyType, this, checkForPlayerEnemyContact);
+    if (data->state != PLAYER_DEAD) doForEachGameObjectOfTypeWith(&enemyType, this, checkForPlayerEnemyContact);
+
+    if (data->state != PLAYER_DEAD && playerHealth <= 0) {
+        data->state = PLAYER_DEAD;
+        data->stateTime = 5;
+        playSoundBPriority(playerkilledc50_data, playerkilledc50_length, 0, 200);
+        REG_TM2CNT = 0;
+    }
+
+    if (data->state == PLAYER_DEAD) waitForVBlank();
 
     data->stateTime++;
     if (data->iFrames > 0) data->iFrames--;
@@ -221,7 +232,7 @@ void drawPlayer(GameObject* this) {
     PlayerData *data = this->data;
     int posY = data->collider.pos.y - cameraPos.y - 4;
     int posX = (data->collider.pos.x - cameraPos.x - 5);
-    if ((data->iFrames > 0 && data->iFrames % 2) || posY < -16 || posY > 160 || posX < -16 || posX > 240) {
+    if ((data->iFrames > 0 && data->iFrames % 2 && playerHealth > 0) || posY < -16 || posY > 160 || posX < -16 || posX > 240) {
         this->sprite->attr0 = ATTR0_HIDE;
         return;
     }

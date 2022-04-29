@@ -18,6 +18,7 @@
 
 #include "music/cavernmusic.h"
 #include "sfx/logosound.h"
+#include "sfx/playerkilledc50.h"
 
 #include "player.h"
 #include "camera.h"
@@ -421,7 +422,11 @@ void updateGame(void) {
         pauseFromGame();
     }
 
-    if (playerHealth <= 0) {
+    if (playerData->state == PLAYER_DEAD && playerData->stateTime > 180) {
+        // playSoundBPriority(playerkilledc50_data, playerkilledc50_length, 0, 200);
+
+        // waitNVBlanks(60);
+        
         initLose();
     }
 }
