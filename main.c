@@ -37,8 +37,12 @@
 #include "art/dither.h"
 #include "art/instructions.h"
 
+__attribute__((aligned (4))) const char saveType[] __attribute__((used)) = "SRAM_Vnnn\0\0"; 
+
 int main() {
     mgba_open();
+
+    mgba_printf(saveType);
 
     setupSounds();
     setupInterrupts();
