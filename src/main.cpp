@@ -22,6 +22,8 @@
         I may add the bat enemy from the original game.
  */
 
+extern "C" {
+
 #include "HW05Lib.h"
 #include "print.h"
 #include "gameobject.h"
@@ -36,6 +38,8 @@
 #include "art/title.h"
 #include "art/dither.h"
 #include "art/instructions.h"
+
+}
 
 __attribute__((aligned (4))) const char saveType[] __attribute__((used)) = "SRAM_Vnnn\0\0"; 
 
