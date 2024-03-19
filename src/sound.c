@@ -1,6 +1,9 @@
 #include "HW05Lib.h"
 #include "sound.h"
 
+SOUND soundA;
+SOUND soundB;
+
 void setupSounds() {
 
     REG_SOUNDCNT_X = SND_ENABLED;

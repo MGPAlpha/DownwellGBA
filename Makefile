@@ -1,57 +1,61 @@
-PRODUCT_NAME       = DownwellGBA
+ifeq ($(strip $(DEVKITARM)),)
+$(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM)
+endif
 
-# You probably won't need to touch anything below here!!!
-# The one exception is the cleanup stuff.
+PRODUCT_NAME = DownwellGBA
 
-SOURCES            = $(wildcard *.c) $(wildcard art/*.c) $(wildcard music/*.c)
-AUDIOSOURCES       = $(wildcard *.wav) $(wildcard music/*.wav) $(wildcard sfx/*.wav)
-DKPATH             = /opt/devkitpro
-FIND               = find
-COPY               = cp -r
+SRC_DIR := src
+OBJ_DIR := obj
+BIN_DIR := bin
+LIB_DIR := lib
 
-# --- File Names
-ELF_NAME           = $(PRODUCT_NAME).elf
-ROM_NAME           = $(PRODUCT_NAME).gba
-BIN_NAME           = $(PRODUCT_NAME)
+LIB := 
+# EXE := $(BIN_DIR)/pico2gba
+# CLI := $(BIN_DIR)/pico2gbacli
+# CORE := $(BIN_DIR)/libpico2gba.a
+CSRC := $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/**/*.c)
+CPPSRC := $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/**/*.cpp)
+COBJ := $(CSRC:src/%.c=obj/%.o)
+CPPOBJ := $(CPPSRC:src/%.cpp=obj/%.o)
+
+OBJ := $(COBJ) $(CPPOBJ)
+
+
+# $(info $(OBJ))
+
+ELF_NAME           = $(BIN_DIR)/$(PRODUCT_NAME).elf
+ROM_NAME           = $(BIN_DIR)/$(PRODUCT_NAME).gba
+# BIN_NAME           = $(PRODUCT_NAME)
 
 #MODEL              = -mthumb-interwork -mthumb
 MODEL              = -mthumb-interwork -marm -mlong-calls #This makes interrupts work
 SPECS              = -specs=gba.specs
 
 # --- Archiver
-AS                 = $(DKPATH)/devkitARM/bin/arm-none-eabi-as
+AS                 = $(DEVKITARM)/bin/arm-none-eabi-as
 ASFLAGS            = -mthumb-interwork
 
 # --- Compiler
-CC                 = $(DKPATH)/devkitARM/bin/arm-none-eabi-gcc
-CFLAGS             = $(MODEL) -O2 -Wall -pedantic -Wextra -std=c99 -save-temps -D_ROM=$(ROM_NAME)
+CC                 = $(DEVKITARM)/bin/arm-none-eabi-gcc
+CFLAGS             = $(MODEL) -O3 -Wall -pedantic -Wextra -std=c99 -D_ROM=$(ROM_NAME) -I$(DEVKITPRO)/libgba/include
+
+# --- C++ Compiler
+CPP                = $(DEVKITARM)/bin/arm-none-eabi-g++
+CPPFLAGS           = $(MODEL) -O3 -Wall -pedantic -Wextra -D_ROM=$(ROM_NAME) -I$(DEVKITPRO)/libgba/include
 
 # --- Linker
-LD                 = $(DKPATH)/devkitARM/bin/arm-none-eabi-gcc
-LDFLAGS            = $(SPECS) $(MODEL) -lm
-
+LD                 = $(DEVKITARM)/bin/arm-none-eabi-g++
+LDFLAGS            = $(SPECS) $(MODEL) -lm -lstdc++ -L$(DEVKITPRO)/libgba/lib -lgba
 # --- Object/Executable Packager
-OBJCOPY            = $(DKPATH)/devkitARM/bin/arm-none-eabi-objcopy
+OBJCOPY            = $(DEVKITARM)/bin/arm-none-eabi-objcopy
 OBJCOPYFLAGS       = -O binary
 
 # --- ROM Fixer
-GBAFIX             = $(DKPATH)/tools/bin/gbafix
+GBAFIX             = gbafix
 
-# --- Delete
-RM                 = rm -f
+.PHONY: all clean
 
-ASMOBJECTS = $(ASMSOURCES:.asm=.o)
-AUDIOOBJECTS = $(AUDIOSOURCES:.wav=.c)
-AUDIOHEADERS = $(AUDIOSOURCES:.wav=.h)
-COBJECTS = $(SOURCES:.c=.o) $(AUDIOSOURCES:.wav=.o)
-OBJECTS = $(COBJECTS) $(ASMOBJECTS)
-
-
-# --- Main build target
-
-all : audio build
-
-build : $(ROM_NAME)
+all: $(ROM_NAME)
 
 # --- Build .elf file into .gba ROM file
 $(ROM_NAME) : $(ELF_NAME)
@@ -59,29 +63,22 @@ $(ROM_NAME) : $(ELF_NAME)
 	$(GBAFIX) $(ROM_NAME)
 
 # --- Build .o files into .elf file
-$(ELF_NAME) : $(OBJECTS)
+$(ELF_NAME) : $(OBJ) | $(BIN_DIR)
 	$(LD) $^ $(LDFLAGS) -o $@
 
-# -- Build .asm files into .o files
-$(ASMOBJECTS) : %.o : %.asm
-	$(AS) $(ASFLAGS) $< -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+		@mkdir -p $(dir $@)
+		$(CC) $(CFLAGS) -c $< -o $@
 
-# -- Build .c files into .o files
-$(COBJECTS) : %.o : %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+		@mkdir -p $(dir $@)
+		$(CPP) $(CPPFLAGS) -c $< -o $@
 
-# -- Build .wav files into .c and .h files
-$(AUDIOOBJECTS) : %.c : %.wav
-	wav2c $< $@ $(notdir $*)
-
-$(AUDIOHEADERS) : %.h : %.c
-
-
+$(BIN_DIR) $(OBJ_DIR):
+		mkdir -p $@
+		
 clean:
-	$(RM) $(ROM_NAME) $(ELF_NAME) $(BIN_NAME)
-	$(RM) **/*.[ois] *.[ois]
+		@$(RM) -rv $(BIN_DIR) $(OBJ_DIR)
 
-audioclean:
-	$(RM) $(AUDIOOBJECTS) $(AUDIOHEADERS)
 
-audio: $(AUDIOOBJECTS)
+-include $(OBJ:.o=.d)

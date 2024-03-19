@@ -59,5 +59,5 @@ typedef struct{
     int vBlankCount;
 } SOUND;
 
-SOUND soundA;
-SOUND soundB;
+extern SOUND soundA;
+extern SOUND soundB;
