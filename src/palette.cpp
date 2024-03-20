@@ -1,10 +1,15 @@
-#include "palette.h"
+#include "palette.hpp"
 
-#include "stdio.h"
+#include <cstdio>
+
+#include "menus.hpp"
+
+extern "C" {
 
 #include "HW05Lib.h"
 #include "savedata.h"
-#include "menus.h"
+
+}
 
 int activePalette;
 
@@ -82,7 +87,7 @@ void initPalette(void) {
     for (int i = 0; i < numUnlockedPalettes; i++) {
         MenuItem *currItem = paletteMenu.items + i;
         currItem->behaviorMode = MENU_FUNCTION_BEHAVIOR;
-        currItem->behavior.func = returnFromPaletteMenu;
+        currItem->func = [](int index){returnFromPaletteMenu();};
         currItem->textMode = MENU_CONST_TEXT;
         sprintf(currItem->itemText.text, "%d,%s", i, palettes[i].name);
     }

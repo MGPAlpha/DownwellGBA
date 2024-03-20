@@ -9,8 +9,8 @@ typedef struct enemytype {
     int maxHealth;
     Vector2 spriteOffset;
     Vector2 colliderSize;
-    void (*update)(GameObject* this);
-    int (*spriteIndex)(GameObject* this);
+    void (*update)(GameObject* self);
+    int (*spriteIndex)(GameObject* self);
     int maxPlayerRange;
 } EnemyType;
 
@@ -27,9 +27,9 @@ const extern EnemyType blobType;
 
 GameObject *spawnEnemy(EnemyType *type, Vector2 pos);
 
-void damageEnemy(GameObject *this, int damage);
+void damageEnemy(GameObject *self, int damage);
 
-void killEnemy(GameObject *this);
+void killEnemy(GameObject *self);
 
 extern int enemiesKilled;
 

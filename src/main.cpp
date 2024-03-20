@@ -15,12 +15,17 @@
         The palette system in the pause menu allows dynamically changing to one of several premade color palettes.
     Timer or Interrupt:
         I don't have a non-sound timer or interrupt implemented yet.
-        [Done] I plan to add a run timer to the left side of the overlay to fulfill this requirement.
+        [Done] I plan to add a run timer to the left side of the overlay to fulfill self requirement.
     Additional Mechanics:
         [Done] Before the final submission, I plan to add collectible gems that drop when you kill an enemy, and collecting those will unlock new palettes.
         I also may add some more level segments to be used by the level generator.
         I may add the bat enemy from the original game.
  */
+
+#include "gamestate.hpp"
+
+#include "palette.hpp"
+#include "cheats.hpp"
 
 extern "C" {
 
@@ -28,10 +33,7 @@ extern "C" {
 #include "print.h"
 #include "gameobject.h"
 #include "player.h"
-#include "gamestate.h"
-#include "palette.h"
 #include "savedata.h"
-#include "cheats.h"
 #include "sound.h"
 #include "gem.h"
 

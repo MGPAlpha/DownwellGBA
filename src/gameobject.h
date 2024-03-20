@@ -23,7 +23,7 @@ typedef struct gameobject {
 
 void initGameObjects(void);
 
-GameObject *newGameObject(GameObjectType *type);
+GameObject *newGameObject(const GameObjectType *type);
 
 void destroyGameObject(GameObject *gameObject);
 

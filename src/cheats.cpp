@@ -1,12 +1,20 @@
-#include "cheats.h"
+#include "cheats.hpp"
 
-#include "stdlib.h"
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
+
+#include "menus.hpp"
+#include "palette.hpp"
+#include "overlay.hpp"
+
+extern "C" {
+
 #include "HW05Lib.h"
-
-#include "menus.h"
 #include "player.h"
 #include "savedata.h"
-#include "overlay.h"
+
+}
 
 int cheatsEnabled;
 
@@ -80,10 +88,10 @@ void initCheats(void) {
         if (currCheat->invoke) {
             currMenuItem->textMode = MENU_CONST_TEXT;
             sprintf(currMenuItem->itemText.text, "%s", currCheat->name);
-            currMenuItem->behavior.func = currCheat->invoke;
+            currMenuItem->func = [=](int index){currCheat->invoke();};
         } else if (currCheat->enabled) {
             *currCheat->enabled = getSaveDataEntry(i+32);
-            currMenuItem->behavior.func = toggleCheat;
+            currMenuItem->func = toggleCheat;
             currMenuItem->textMode = MENU_FUNCTION_TEXT;
             currMenuItem->itemText.func = cheatToggleText;
         }
@@ -92,7 +100,8 @@ void initCheats(void) {
         MENU_CONST_TEXT,
         "CHEATS OFF",
         MENU_FUNCTION_BEHAVIOR,
-        disableCheats
+        NULL,
+        [](int index){disableCheats();}
     };
     cheatsMenu.itemCount = i+2;
 }

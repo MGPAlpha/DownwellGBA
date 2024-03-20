@@ -1,5 +1,7 @@
-#ifndef MENUS_H
-#define MENUS_H
+#ifndef MENUS_HPP
+#define MENUS_HPP
+
+#include <functional>
 
 enum MENU_TEXT_MODE {MENU_CONST_TEXT, MENU_FUNCTION_TEXT};
 enum MENU_BEHAVIOR_MODE {MENU_SUBMENU_BEHAVIOR, MENU_FUNCTION_BEHAVIOR};
@@ -11,10 +13,8 @@ typedef struct menu_item {
         void (*func)(char*, int index);
     } itemText;
     enum MENU_BEHAVIOR_MODE behaviorMode;
-    union {
-        struct menu *submenu;
-        void (*func)(int index);
-    } behavior;
+    struct menu *submenu;
+    std::function<void(int)> func;
     int (*shouldAppear)(void);
 } MenuItem;
 

@@ -7,7 +7,7 @@
 
 extern int currentLevelLength;
 
-void generateLevel(SegmentPool *startPool, SegmentPool *mainPool, SegmentPool *endPool);
+void generateLevel(const SegmentPool *startPool, const SegmentPool *mainPool, const SegmentPool *endPool);
 
 void generateTilemapUntil(int row);
 

@@ -17,7 +17,7 @@ void initGemData(void) {
     lifetimeGems = getSaveInt(8);
 }
 
-int initializeGem(GameObject* this) {
+int initializeGem(GameObject* self) {
     GemData *data = malloc(sizeof(GemData));
     if (!data) return 1;
     data->collider.pos.x = 0;
@@ -30,13 +30,13 @@ int initializeGem(GameObject* this) {
     data->stateTime = 0;
     data->type = GEM_SMALL;
     data->rotationDirection = GEM_CCW;
-    this->data = data;
+    self->data = data;
 
     return 0;
 }
 
-void updateGem(GameObject* this) {
-    GemData *data = this->data;
+void updateGem(GameObject* self) {
+    GemData *data = self->data;
     
     switch (data->state) {
 
@@ -71,8 +71,8 @@ void updateGem(GameObject* this) {
 
             }
 
-            if (this->lifetime > 5*60) {
-                destroyGameObject(this);
+            if (self->lifetime > 5*60) {
+                destroyGameObject(self);
                 return;
             }
             break;
@@ -95,7 +95,7 @@ void updateGem(GameObject* this) {
 
                 Collision collisionWithPlayer = collideRects(playerData->resizedCollider, data->collider);
                 if (collisionWithPlayer.collided) {
-                    destroyGameObject(this);
+                    destroyGameObject(self);
                     collectGems(data->type == GEM_LARGE ? 10 : 2);
                     return;
                 }
@@ -106,30 +106,30 @@ void updateGem(GameObject* this) {
     }
 }
 
-void drawGem(GameObject* this) {
-    GemData *data = this->data;
+void drawGem(GameObject* self) {
+    GemData *data = self->data;
     int spOffset = data->type == GEM_SMALL ? 2 : 6;
     int posY = (data->collider.pos.y>>8) - cameraPos.y - spOffset;
     int posX = (data->collider.pos.x>>8) - cameraPos.x - spOffset;
-    int aniFrame = this->lifetime/4;
+    int aniFrame = self->lifetime/4;
     if (data->rotationDirection == GEM_CW) {
         aniFrame = -aniFrame;
     }
     aniFrame = mod(aniFrame, 4);
     int tileId = data->type == GEM_SMALL ? OFFSET(8,12,32) : OFFSET(0,12,32);
     tileId += aniFrame * (data->type == GEM_SMALL ? 1 : 2);
-    if (this->lifetime > 60*4 && this->lifetime % 2 || posY < -16 || posY > 160 || posX < -16 || posX > 240) {
-        this->sprite->attr0 = ATTR0_HIDE;
+    if (self->lifetime > 60*4 && self->lifetime % 2 || posY < -16 || posY > 160 || posX < -16 || posX > 240) {
+        self->sprite->attr0 = ATTR0_HIDE;
         return;
     }
-    this->sprite->attr0 = ATTR0_REGULAR | ATTR0_SQUARE | posY & 0x00ff;
-    this->sprite->attr1 = (data->type == GEM_SMALL ? ATTR1_TINY : ATTR1_SMALL) | posX & 0x01ff;
-    this->sprite->attr2 = tileId | ATTR2_PRIORITY(2);
+    self->sprite->attr0 = ATTR0_REGULAR | ATTR0_SQUARE | posY & 0x00ff;
+    self->sprite->attr1 = (data->type == GEM_SMALL ? ATTR1_TINY : ATTR1_SMALL) | posX & 0x01ff;
+    self->sprite->attr2 = tileId | ATTR2_PRIORITY(2);
 }
 
-void destroyGem(GameObject* this) {
-    if (this->data) {
-        free(this->data);
+void destroyGem(GameObject* self) {
+    if (self->data) {
+        free(self->data);
     }
 }
 
@@ -149,8 +149,8 @@ GameObject *spawnGem(Vector2 pos) {
     return newGem;
 }
 
-void randomizeGem(GameObject *this) {
-    GemData *data = this->data;
+void randomizeGem(GameObject *self) {
+    GemData *data = self->data;
     Vector2 vel;
     vel.x = randRange(-1<<8, 1<<8);
     vel.y = randRange(-1<<7, 1<<8);

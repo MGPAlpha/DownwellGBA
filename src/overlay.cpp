@@ -1,10 +1,18 @@
-#include "overlay.h"
+#include "overlay.hpp"
+
+#include <cstdio>
+#include <cstring>
+
+#include "menus.hpp"
+
+extern "C" {
 
 #include "HW05Lib.h"
-#include "menus.h"
 #include "stdlib.h"
 
 #include "art/overlaytiles.h"
+
+}
 
 void initOverlay(void) {
 
@@ -209,9 +217,9 @@ void updateMenu(void) {
         
             MenuItem *selectedItem = currentMenu->items + currentMenuIndex;
             if (selectedItem->behaviorMode == MENU_SUBMENU_BEHAVIOR) {
-                if (selectedItem->behavior.submenu) loadMenu(selectedItem->behavior.submenu);
+                if (selectedItem->submenu) loadMenu(selectedItem->submenu);
             } else {
-                if (selectedItem->behavior.func) (*selectedItem->behavior.func)(currentMenuIndex);
+                if (selectedItem->func) selectedItem->func(currentMenuIndex);
             }
     }
     if (currentMenu->onSelect) (*currentMenu->onSelect)(currentMenuIndex);

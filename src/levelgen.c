@@ -22,7 +22,7 @@ void addSegmentToLevel(LevelSegment *seg) {
     currentLevelLength += seg->terrainDataLines;
 }
 
-void generateLevel(SegmentPool *startPool, SegmentPool *mainPool, SegmentPool *endPool) {
+void generateLevel(const SegmentPool *startPool, const SegmentPool *mainPool, const SegmentPool *endPool) {
     currentLevelLength = 0;
     furthestGenerated = 0;
     levelEnemyCount = 0;

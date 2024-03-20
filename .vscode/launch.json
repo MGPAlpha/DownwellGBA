@@ -1,0 +1,42 @@
+{
+    "configurations": [
+    {
+        "name": "(gdb) Launch",
+        "type": "cppdbg",
+        "request": "launch",
+        "targetArchitecture": "arm",
+        "program": "${workspaceFolder}/bin/DownwellGBA.elf",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${fileDirname}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "miDebuggerServerAddress": "localhost:2345",
+        "windows": {
+            "miDebuggerPath": "${env:DEVKITARM}/bin/arm-none-eabi-gdb.exe",
+            "setupCommands": [
+                {
+                    "text": "shell start /b \"\" \"${env:ProgramFiles}/mGBA/mGBA.exe\" -g \"${workspaceFolder}/bin/DownwellGBA.elf\""
+                }
+            ]
+        },
+        "linux": {
+            "miDebuggerPath": "${env:DEVKITARM}/bin/arm-none-eabi-gdb",
+            "setupCommands": [
+                {
+                    "text": "shell \"mgba-qt\" -g \"${workspaceFolder}/bin/DownwellGBA.elf\" &"
+                }
+            ]
+        },
+        "osx": {
+            "miDebuggerPath": "${env:DEVKITARM}/bin/arm-none-eabi-gdb",
+            "setupCommands": [
+                {
+                    "text": "shell open -a mGBA --args -g \"${workspaceFolder}/bin/DownwellGBA.elf\""
+                }
+            ]
+        }
+    }
+    ]
+}

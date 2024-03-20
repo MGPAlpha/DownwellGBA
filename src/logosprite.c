@@ -7,34 +7,34 @@
 #include "camera.h"
 #include "gameobject.h"
 #include "stdlib.h"
-#include "gamestate.h"
+#include "gamestate.hpp"
 
-int initializeLogoSprite(GameObject* this) {
+int initializeLogoSprite(GameObject* self) {
     LogoSpriteData *data = malloc(sizeof(LogoSpriteData));
     if (!data) return 1;
     data->animationStart = 0;
-    this->data = data;
+    self->data = data;
 
     return 0;
 }
 
-void updateLogoSprite(GameObject* this) {
-    LogoSpriteData *data = this->data;
+void updateLogoSprite(GameObject* self) {
+    LogoSpriteData *data = self->data;
     
 }
 
-void drawLogoSprite(GameObject* this) {
-    LogoSpriteData *data = this->data;
+void drawLogoSprite(GameObject* self) {
+    LogoSpriteData *data = self->data;
     
 
     if (!data->animationStart) {
-        this->sprite->attr0 = ATTR0_HIDE;
+        self->sprite->attr0 = ATTR0_HIDE;
         return;
     }
 
-    int frameNum = (this->lifetime - data->animationStart) / 6;
+    int frameNum = (self->lifetime - data->animationStart) / 6;
     frameNum = MIN(frameNum, 7);
-    int yOffset = (this->lifetime - data->animationStart) / 20;
+    int yOffset = (self->lifetime - data->animationStart) / 20;
     yOffset = MIN(yOffset, 4);
     yOffset *= -1;
 
@@ -46,17 +46,17 @@ void drawLogoSprite(GameObject* this) {
     int posY = data->pos.y - cameraPos.y + yOffset;
     int posX = data->pos.x - cameraPos.x;
     if (posY < -32 || posY > 160 || posX < -64 || posY > 240) {
-        this->sprite->attr0 = ATTR0_HIDE;
+        self->sprite->attr0 = ATTR0_HIDE;
         return;
     }
-    this->sprite->attr0 = ATTR0_REGULAR | ATTR0_WIDE | (posY) & 0x00ff;
-    this->sprite->attr1 = ATTR1_LARGE | (posX) & 0x01ff;
-    this->sprite->attr2 = ATTR2_PRIORITY(3) | ATTR2_TILEID(16+8*data->index,0);
+    self->sprite->attr0 = ATTR0_REGULAR | ATTR0_WIDE | (posY) & 0x00ff;
+    self->sprite->attr1 = ATTR1_LARGE | (posX) & 0x01ff;
+    self->sprite->attr2 = ATTR2_PRIORITY(3) | ATTR2_TILEID(16+8*data->index,0);
 }
 
-void destroyLogoSprite(GameObject* this) {
-    if (this->data) {
-        free(this->data);
+void destroyLogoSprite(GameObject* self) {
+    if (self->data) {
+        free(self->data);
     }
 }
 

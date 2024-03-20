@@ -1,7 +1,7 @@
-#ifndef OVERLAY_H
-#define OVERLAY_H
+#ifndef OVERLAY_HPP
+#define OVERLAY_HPP
 
-#include "menus.h"
+#include "menus.hpp"
 
 void initOverlay(void);
 
@@ -30,6 +30,8 @@ void loadMenu(Menu* menu);
 void updateMenu(void);
 
 void drawMenu(Menu *menu, int selectedIndex, int col, int row, int width, int height);
+
+void drawScrollingMenu(Menu *menu, int selectedIndex, int col, int row, int width, int height);
 
 void drawCurrentMenu(void);
 

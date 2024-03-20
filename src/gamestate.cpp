@@ -1,10 +1,21 @@
-#include "gamestate.h"
+#include "gamestate.hpp"
+
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+
+#include "cheats.hpp"
+#include "palette.hpp"
+#include "overlay.hpp"
+
+extern "C" {
+    
 #include "HW05Lib.h"
 #include "sound.h"
 #include "print.h"
 #include "collision.h"
-#include "stdlib.h"
-#include "palette.h"
+
+
 #include "levelgen.h"
 #include "unlocks.h"
 
@@ -19,15 +30,17 @@
 #include "music/cavernmusic.h"
 #include "sfx/logosound.h"
 #include "sfx/playerkilledc50.h"
+#include "savedata.h"
 
 #include "player.h"
 #include "camera.h"
 #include "logosprite.h"
-#include "overlay.h"
-#include "cheats.h"
 #include "gem.h"
 
 #include "enemy.h"
+
+}
+
 
 enum GAMESTATE gameState;
 enum GAMESTATE unpauseState;
@@ -82,7 +95,7 @@ void initSurface(void) {
     // DMANow(3, spritesheet_palette, SPRITEPALETTE, SPRITESHEET_PALETTE_LENGTH);
     DMANow(3, spritesheet, &CHARBLOCK[4], SPRITESHEET_LENGTH);
 
-    activeCollisionMap = titlecollision;
+    activeCollisionMap = (char*)titlecollision;
     activeCollisionMapWidth = TITLECOLLISION_WIDTH;
 
     wellDescentTime = 0;
@@ -91,7 +104,7 @@ void initSurface(void) {
 
     if (playerObject) {
         playerSingleton = playerObject;
-        PlayerData *playerData = playerObject->data;
+        PlayerData *playerData = (PlayerData*)playerObject->data;
         playerData->collider.pos.y = 133;
         playerData->collider.pos.x = 152;
         smoothCameraX = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
@@ -99,14 +112,14 @@ void initSurface(void) {
 
     logoSprite0 = newGameObject(&logoSpriteType);
     if (logoSprite0) {
-        LogoSpriteData *logoData = logoSprite0->data;
+        LogoSpriteData *logoData = (LogoSpriteData*)logoSprite0->data;
         logoData->pos.x = 288;
         logoData->pos.y = 60;
         logoData->index = 0;
     }
     logoSprite1 = newGameObject(&logoSpriteType);
     if (logoSprite1) {
-        LogoSpriteData *logoData = logoSprite1->data;
+        LogoSpriteData *logoData = (LogoSpriteData*)logoSprite1->data;
         logoData->pos.x = 354;
         logoData->pos.y = 60;
         logoData->index = 1;
@@ -135,12 +148,12 @@ void updateSurface(void) {
 
     int cameraXTarget = 0;
 
-    PlayerData *playerData = playerSingleton ? playerSingleton->data : NULL;
+    PlayerData *playerData = playerSingleton ? (PlayerData*)playerSingleton->data : NULL;
     if (!playerSingleton || playerData->collider.pos.x >= 260) {
         cameraXTarget = 233 << 8;
         if (logoSprite0 && logoSprite1){
-            LogoSpriteData *logoData0 = logoSprite0->data;
-            LogoSpriteData *logoData1 = logoSprite1->data;
+            LogoSpriteData *logoData0 = (LogoSpriteData*)logoSprite0->data;
+            LogoSpriteData *logoData1 = (LogoSpriteData*)logoSprite1->data;
             if (!logoData0->animationStart && playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
                 logoData0->animationStart = logoSprite0->lifetime;
                 logoData1->animationStart = logoSprite1->lifetime;
@@ -175,6 +188,7 @@ void updateSurface(void) {
         cameraPos.y = pan;
         if (pan > 350) {
             for (int i = 0; i < 60; i++) waitForVBlank();
+            mgba_printf("calling initGame");
             initGame();
             return;
         }
@@ -242,9 +256,9 @@ void updatePause(void) {
 
 void initWin(void) {
     fillOverlayCenter();
-    printToOverlay("AT THIS POINT, THE", 5, 3, 1);
+    printToOverlay("AT self POINT, THE", 5, 3, 1);
     printToOverlay("GAME PROPER WOULD", 5, 4, 1);
-    printToOverlay("START. IN LIEU, THIS", 5, 5, 1);
+    printToOverlay("START. IN LIEU, self", 5, 5, 1);
     printToOverlay("IS THE PLACEHOLDER", 5, 6, 1);
     printToOverlay("WIN SCREEN.", 5, 7, 1);
     printToOverlay("CONGRATULATIONS!", 7, 9, 0);
@@ -266,18 +280,22 @@ int smoothCameraY = 0;
 
 int level = 0;
 
-int nextLevel(void) {
+void nextLevel(void) {
     destroyAllGameObjects();
+
+    mgba_printf("go's destroyed");
 
     smoothCameraY = 16<<8;
 
     generateLevel(&startSegmentPool, &cavernSegmentPool, &endSegmentPool);
 
+    mgba_printf("level generated");
+
     GameObject *playerObject = newGameObject(&playerType);
 
     if (playerObject) {
         playerSingleton = playerObject;
-        PlayerData *playerData = playerObject->data;
+        PlayerData *playerData = (PlayerData*)playerObject->data;
         playerData->collider.pos.y = 0;
         playerData->collider.pos.x = 85;
         playerData->runningJump = 1;
@@ -286,6 +304,8 @@ int nextLevel(void) {
 
         // smoothCameraX = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
     }
+
+    mgba_printf("new player generated");
 
     // spawnEnemy(&blobType, (Vector2){64,480});
 
@@ -298,26 +318,39 @@ int nextLevel(void) {
 
     DMANow(3, terraintiles, &CHARBLOCK[0], TERRAINTILES_LENGTH);
 
+    mgba_printf("terrain tiles loaded");
+
     clearOverlayCenter();
 
+    mgba_printf("overlay cleared");
+
     generateTilemapUntil(24);
+
+    mgba_printf("tilemap generated");
 
     REG_BG0HOFF = -32;
     REG_BG0VOFF = 0;
 
     REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | SPRITE_ENABLE | SPRITE_MODE_2D;
 
+    mgba_printf("Game_state before: %d", gameState);
     gameState = GAME_PLAY;
+    mgba_printf("Game_state after: %d", gameState);
+
     level++;
 
+    mgba_printf("reached end of nextLevel");
 
 }
 
 void initGame(void) {
 
+    mgba_printf("initGame called");
+
     srand(vBlankCount);
 
     stopSound();    
+
 
     playerHealth = 4;
     playerMaxHealth = 4;
@@ -329,7 +362,12 @@ void initGame(void) {
 
     level = 0;
 
+    mgba_printf("game data reset");
+
+    mgba_printf("Calling nextLevel");
     nextLevel();
+
+    mgba_printf("next level triggered");
 
     REG_TM3CNT = 0;
     REG_TM3D = 0;
@@ -358,7 +396,7 @@ void updateGame(void) {
 
     int cameraYTarget = 0;
 
-    PlayerData *playerData = playerSingleton ? playerSingleton->data : NULL;
+    PlayerData *playerData = playerSingleton ? (PlayerData*)playerSingleton->data : NULL;
     
     if (playerData && !soundA.isPlaying && (playerData->state == PLAYER_WALKING || playerData->state == PLAYER_IDLE)) {
         playSoundA(cavernmusic_data, cavernmusic_length, 1);

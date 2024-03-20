@@ -1,5 +1,5 @@
-#ifndef PALETTE_H
-#define PALETTE_H
+#ifndef PALETTE_HPP
+#define PALETTE_HPP
 
 typedef struct palette {
     char* name;

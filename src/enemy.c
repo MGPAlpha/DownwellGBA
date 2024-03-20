@@ -8,48 +8,48 @@
 
 int enemiesKilled = 0;
 
-int initializeEnemy(GameObject* this) {
+int initializeEnemy(GameObject* self) {
     EnemyData *data = malloc(sizeof(EnemyData));
     if (!data) return 1;
     data->dead = 0;
     
-    this->data = data;
+    self->data = data;
 
     return 0;
 }
 
-void updateEnemy(GameObject* this) {
-    EnemyData *data = this->data;
+void updateEnemy(GameObject* self) {
+    EnemyData *data = self->data;
 
     if (data->type->update) {
-        (*data->type->update)(this);
+        (*data->type->update)(self);
     }
 
     PlayerData *playerData = playerSingleton->data;
     int playerDist = playerData->resizedCollider.pos.y - data->collider.pos.y;
-    if (playerDist > data->type->maxPlayerRange<<8) destroyGameObject(this);
+    if (playerDist > data->type->maxPlayerRange<<8) destroyGameObject(self);
 }
 
-void drawEnemy(GameObject* this) {
-    EnemyData *data = this->data;
-    OBJ_ATTR *sprite = this->sprite;
+void drawEnemy(GameObject* self) {
+    EnemyData *data = self->data;
+    OBJ_ATTR *sprite = self->sprite;
     int posX = (data->collider.pos.x >> 8) + data->type->spriteOffset.x - cameraPos.x;
     int posY = (data->collider.pos.y >> 8) + data->type->spriteOffset.y - cameraPos.y;
 
     if (posY < -16 || posY > 160 || posX < -32 || posX > 240) {
-        this->sprite->attr0 = ATTR0_HIDE;
+        self->sprite->attr0 = ATTR0_HIDE;
         return;
     }
 
     sprite->attr0 = ATTR0_REGULAR | ATTR0_WIDE | posY & 0x00ff;
     sprite->attr1 = ATTR1_MEDIUM | posX & 0x01ff;
-    sprite->attr2 = (data->type->spriteIndex)(this) | ATTR2_PRIORITY(3);
+    sprite->attr2 = (data->type->spriteIndex)(self) | ATTR2_PRIORITY(3);
 
 }
 
-void destroyEnemy(GameObject* this) {
-    if (this->data) {
-        free(this->data);
+void destroyEnemy(GameObject* self) {
+    if (self->data) {
+        free(self->data);
     }
 }
 
@@ -77,13 +77,13 @@ GameObject *spawnEnemy(EnemyType *type, Vector2 pos) {
     data->dead = 0;
 }
 
-int getBlobSpriteIndex(GameObject *this) {
-    EnemyData *data = this->data;
-    return ATTR2_TILEID(this->lifetime / 6 % 4 * 4,16);
+int getBlobSpriteIndex(GameObject *self) {
+    EnemyData *data = self->data;
+    return ATTR2_TILEID(self->lifetime / 6 % 4 * 4,16);
 }
 
-void updateBlob(GameObject *this) {
-    EnemyData *data = this->data;
+void updateBlob(GameObject *self) {
+    EnemyData *data = self->data;
 
     if (playerSingleton && playerSingleton->data) {
         PlayerData *playerData = playerSingleton->data;
@@ -140,18 +140,18 @@ const EnemyType blobType = {
     800
 };
 
-void damageEnemy(GameObject *this, int damage) {
-    EnemyData *data = this->data;
+void damageEnemy(GameObject *self, int damage) {
+    EnemyData *data = self->data;
     data->health -= damage;
     data->velocity.y += 2<<8;
     data->frameExtraMovement.y = 2<<8;
     if (data->health <= 0) {
-        killEnemy(this);
+        killEnemy(self);
     }
 }
 
-void killEnemy(GameObject *this) {
-    EnemyData *data = this->data;
+void killEnemy(GameObject *self) {
+    EnemyData *data = self->data;
     Vector2 gemSpawn = V2_ADD(data->collider.pos, V2_DIV(data->collider.size,2));
     int gemCount = randRange(2,4);
     for (int i = 0; i < gemCount; i++){
@@ -159,5 +159,5 @@ void killEnemy(GameObject *this) {
         if (newGem) randomizeGem(newGem);
     }
     enemiesKilled++;
-    destroyGameObject(this);
+    destroyGameObject(self);
 }

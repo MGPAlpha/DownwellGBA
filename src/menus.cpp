@@ -1,12 +1,20 @@
-#include "menus.h"
-#include "stdlib.h"
-#include "gamestate.h"
-#include "overlay.h"
-#include "palette.h"
-#include "savedata.h"
-#include "cheats.h"
-#include "gem.h"
-#include "unlocks.h"
+#include "menus.hpp"
+
+#include "gamestate.hpp"
+#include <cstdlib>
+
+#include "palette.hpp"
+#include "cheats.hpp"
+#include "overlay.hpp"
+
+extern "C" {
+    
+    #include "savedata.h"
+    #include "gem.h"
+    #include "unlocks.h"
+
+}
+
 
 void drawPauseMenu(Menu *menu, int selectedIndex) {
     fillOverlayCenter();
@@ -36,27 +44,31 @@ MenuItem pauseMenuItems[] = {
         MENU_CONST_TEXT,
         "RESUME",
         MENU_FUNCTION_BEHAVIOR,
-        unpause
+        NULL,
+        [](int index){unpause();}
     },
     {
         MENU_CONST_TEXT,
         "QUICK START",
         MENU_FUNCTION_BEHAVIOR,
-        initGame,
+        NULL,
+        [](int index){/*initGame();*/},
         showOnlyOnSurface
     },
     {
         MENU_CONST_TEXT,
         "RETRY",
         MENU_FUNCTION_BEHAVIOR,
-        initGame,
+        NULL,
+        [](int index){/*initGame();*/},
         showOnlyInGame
     },
     {
         MENU_CONST_TEXT,
         "INSTRUCTIONS",
         MENU_FUNCTION_BEHAVIOR,
-        initInstructions
+        NULL,
+        [](int index){initInstructions();},
     },
     // {
     //     MENU_CONST_TEXT,
@@ -68,7 +80,8 @@ MenuItem pauseMenuItems[] = {
         MENU_CONST_TEXT,
         "PALETTE",
         MENU_SUBMENU_BEHAVIOR,
-        &paletteMenu
+        &paletteMenu,
+        NULL
     },
     {
         MENU_CONST_TEXT,
@@ -80,13 +93,15 @@ MenuItem pauseMenuItems[] = {
         MENU_CONST_TEXT,
         "OPTION",
         MENU_SUBMENU_BEHAVIOR,
-        &optionsMenu
+        &optionsMenu,
+        NULL
     },
     {
         MENU_CONST_TEXT,
         "CHEATS",
         MENU_SUBMENU_BEHAVIOR,
         &cheatsMenu,
+        NULL,
         displayCheatsInMenu
     }
 
@@ -111,13 +126,15 @@ MenuItem optionsMenuItems[] = {
         MENU_CONST_TEXT,
         "BACK",
         MENU_SUBMENU_BEHAVIOR,
-        &pauseMenu
+        &pauseMenu,
+        NULL
     },
     {
         MENU_CONST_TEXT,
         "DELETE SAVE",
         MENU_SUBMENU_BEHAVIOR,
-        &deleteMenu
+        &deleteMenu,
+        NULL
     }
 };
 
@@ -146,13 +163,15 @@ MenuItem deleteMenuItems[] = {
         MENU_CONST_TEXT,
         "GO BACK",
         MENU_SUBMENU_BEHAVIOR,
-        &optionsMenu
+        &optionsMenu,
+        NULL
     },
     {
         MENU_CONST_TEXT,
         "DELETE SAVE DATA",
         MENU_FUNCTION_BEHAVIOR,
-        deleteSaveAndRestart
+        NULL,
+        [](int index){deleteSaveAndRestart();},
     }
 };
 
@@ -216,13 +235,15 @@ MenuItem loseMenuItems[] = {
         MENU_CONST_TEXT,
         "RETRY",
         MENU_FUNCTION_BEHAVIOR,
-        initGame
+        NULL,
+        [](int index){/*initGame();*/},
     },
     {
         MENU_CONST_TEXT,
         "SURFACE",
         MENU_FUNCTION_BEHAVIOR,
-        initSurface
+        NULL,
+        [](int index){initSurface();},
     }
 };
 

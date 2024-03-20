@@ -35,6 +35,8 @@ SPECS              = -specs=gba.specs
 AS                 = $(DEVKITARM)/bin/arm-none-eabi-as
 ASFLAGS            = -mthumb-interwork
 
+COMMONCFLAGS   	   = -Werror=return-type
+
 # --- Compiler
 CC                 = $(DEVKITARM)/bin/arm-none-eabi-gcc
 CFLAGS             = $(MODEL) -O3 -Wall -pedantic -Wextra -std=c99 -D_ROM=$(ROM_NAME) -I$(DEVKITPRO)/libgba/include
@@ -68,11 +70,11 @@ $(ELF_NAME) : $(OBJ) | $(BIN_DIR)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 		@mkdir -p $(dir $@)
-		$(CC) $(CFLAGS) -c $< -o $@
+		$(CC) $(COMMONCFLAGS) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 		@mkdir -p $(dir $@)
-		$(CPP) $(CPPFLAGS) -c $< -o $@
+		$(CPP) $(COMMONCFLAGS) $(CPPFLAGS) -c $< -o $@
 
 $(BIN_DIR) $(OBJ_DIR):
 		mkdir -p $@

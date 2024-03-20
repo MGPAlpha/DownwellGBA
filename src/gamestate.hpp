@@ -1,5 +1,5 @@
-#ifndef GAMESTATE_H
-#define GAMESTATE_H
+#ifndef GAMESTATE_HPP
+#define GAMESTATE_HPP
 
 enum GAMESTATE {GAME_SURFACE, GAME_PAUSE, GAME_WIN, GAME_LOSE, GAME_PLAY, GAME_INSTRUCTIONS};
 extern enum GAMESTATE gameState;
@@ -33,5 +33,7 @@ void updateLose(void);
 void initInstructions(void);
 
 void updateInstructions(void);
+
+void nextLevel(void);
 
 #endif

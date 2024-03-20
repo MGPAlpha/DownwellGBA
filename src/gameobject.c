@@ -26,7 +26,7 @@ void initGameObjects(void) {
     nextInactiveIndex = 0;
 }
 
-GameObject *newGameObject(GameObjectType *type) {
+GameObject *newGameObject(const GameObjectType *type) {
     if (nextInactiveIndex >= MAX_GAME_OBJECTS) return NULL;
     GameObject* gameObject = gameObjectRefs[nextInactiveIndex];
     gameObject->type = type;
