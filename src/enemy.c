@@ -75,6 +75,7 @@ GameObject *spawnEnemy(EnemyType *type, Vector2 pos) {
     data->frameExtraMovement.y = 0;
     data->health = type->maxHealth;
     data->dead = 0;
+    return newEnemyObject;
 }
 
 int getBlobSpriteIndex(GameObject *self) {
