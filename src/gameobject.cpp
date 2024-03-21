@@ -1,8 +1,13 @@
-#include "gameobject.h"
+#include "gameobject.hpp"
 
-#include <stdlib.h>
+#include <cstdlib>
+#include <functional>
+
+extern "C" {
 
 #include "print.h"
+
+}
 
 /* Notes for managing GameObject Memory
  * 
@@ -98,12 +103,12 @@ void destroyAllGameObjects(void) {
     consolidateActiveGameObjects();
 }
 
-unsigned int doForEachGameObjectOfTypeWith(GameObjectType* type, void *with, unsigned int (*func)(GameObject*, void*)) {
+unsigned int doForEachGameObjectOfTypeWith(const GameObjectType* type, void *with, std::function<unsigned int(GameObject*, void*)> func) {
     unsigned int outCode = 0;
     for (int i = 0; i < nextInactiveIndex; i++) {
         GameObject *curr = gameObjectRefs[i];
         if (curr->active && curr->type == type) {
-            unsigned int newOut = (*func)(curr, with);
+            unsigned int newOut = func(curr, with);
             if (newOut > outCode) outCode = newOut;
         }
     }

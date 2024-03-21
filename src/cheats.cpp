@@ -7,12 +7,12 @@
 #include "menus.hpp"
 #include "palette.hpp"
 #include "overlay.hpp"
+#include "player.hpp"
+#include "savedata.hpp"
 
 extern "C" {
 
 #include "HW05Lib.h"
-#include "player.h"
-#include "savedata.h"
 
 }
 

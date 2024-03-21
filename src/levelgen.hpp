@@ -1,9 +1,9 @@
-#ifndef LEVELGEN_H
-#define LEVELGEN_H
+#ifndef LEVELGEN_HPP
+#define LEVELGEN_HPP
 
-#include "leveldata.h"
+#include "leveldata.hpp"
 
-#include "player.h"
+#include "player.hpp"
 
 extern int currentLevelLength;
 

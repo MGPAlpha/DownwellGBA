@@ -3,11 +3,11 @@
 #include <cstdio>
 
 #include "menus.hpp"
+#include "savedata.hpp"
 
 extern "C" {
 
 #include "HW05Lib.h"
-#include "savedata.h"
 
 }
 

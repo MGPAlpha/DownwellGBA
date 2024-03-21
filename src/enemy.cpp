@@ -1,15 +1,22 @@
-#include "enemy.h"
+#include "enemy.hpp"
 
-#include "stdlib.h"
+#include <cstdlib>
+
+#include "player.hpp"
+#include "gem.hpp"
+
+extern "C" {
+
 #include "camera.h"
 #include "spritedata.h"
-#include "player.h"
 #include "collision.h"
+
+}
 
 int enemiesKilled = 0;
 
 int initializeEnemy(GameObject* self) {
-    EnemyData *data = malloc(sizeof(EnemyData));
+    EnemyData *data = (EnemyData*)malloc(sizeof(EnemyData));
     if (!data) return 1;
     data->dead = 0;
     
@@ -19,19 +26,19 @@ int initializeEnemy(GameObject* self) {
 }
 
 void updateEnemy(GameObject* self) {
-    EnemyData *data = self->data;
+    EnemyData *data = (EnemyData*)self->data;
 
     if (data->type->update) {
         (*data->type->update)(self);
     }
 
-    PlayerData *playerData = playerSingleton->data;
+    PlayerData *playerData = (PlayerData*)playerSingleton->data;
     int playerDist = playerData->resizedCollider.pos.y - data->collider.pos.y;
     if (playerDist > data->type->maxPlayerRange<<8) destroyGameObject(self);
 }
 
 void drawEnemy(GameObject* self) {
-    EnemyData *data = self->data;
+    EnemyData *data = (EnemyData*)self->data;
     OBJ_ATTR *sprite = self->sprite;
     int posX = (data->collider.pos.x >> 8) + data->type->spriteOffset.x - cameraPos.x;
     int posY = (data->collider.pos.y >> 8) + data->type->spriteOffset.y - cameraPos.y;
@@ -60,10 +67,10 @@ const GameObjectType enemyType = {
     destroyEnemy
 };
 
-GameObject *spawnEnemy(EnemyType *type, Vector2 pos) {
+GameObject *spawnEnemy(const EnemyType *type, Vector2 pos) {
     GameObject *newEnemyObject = newGameObject(&enemyType);
     if (!newEnemyObject) return NULL;
-    EnemyData* data = newEnemyObject->data;
+    EnemyData* data = (EnemyData*)newEnemyObject->data;
     data->type = type;
     data->collider.pos.x = pos.x<<8;
     data->collider.pos.y = pos.y<<8;
@@ -79,15 +86,15 @@ GameObject *spawnEnemy(EnemyType *type, Vector2 pos) {
 }
 
 int getBlobSpriteIndex(GameObject *self) {
-    EnemyData *data = self->data;
+    EnemyData *data = (EnemyData*)self->data;
     return ATTR2_TILEID(self->lifetime / 6 % 4 * 4,16);
 }
 
 void updateBlob(GameObject *self) {
-    EnemyData *data = self->data;
+    EnemyData *data = (EnemyData*)self->data;
 
     if (playerSingleton && playerSingleton->data) {
-        PlayerData *playerData = playerSingleton->data;
+        PlayerData *playerData = (PlayerData*)playerSingleton->data;
 
         Vector2 playerPos = playerData->collider.pos;
         playerPos.x += playerData->collider.size.x/2;
@@ -142,7 +149,7 @@ const EnemyType blobType = {
 };
 
 void damageEnemy(GameObject *self, int damage) {
-    EnemyData *data = self->data;
+    EnemyData *data = (EnemyData*)self->data;
     data->health -= damage;
     data->velocity.y += 2<<8;
     data->frameExtraMovement.y = 2<<8;
@@ -152,7 +159,7 @@ void damageEnemy(GameObject *self, int damage) {
 }
 
 void killEnemy(GameObject *self) {
-    EnemyData *data = self->data;
+    EnemyData *data = (EnemyData*)self->data;
     Vector2 gemSpawn = V2_ADD(data->collider.pos, V2_DIV(data->collider.size,2));
     int gemCount = randRange(2,4);
     for (int i = 0; i < gemCount; i++){

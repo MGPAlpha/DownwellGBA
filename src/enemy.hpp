@@ -1,7 +1,7 @@
-#ifndef ENEMY_H
-#define ENEMY_H
+#ifndef ENEMY_HPP
+#define ENEMY_HPP
 
-#include "gameobject.h"
+#include "gameobject.hpp"
 
 const extern GameObjectType enemyType;
 
@@ -15,7 +15,7 @@ typedef struct enemytype {
 } EnemyType;
 
 typedef struct enemydata {
-    EnemyType* type;
+    const EnemyType* type;
     Transform collider;
     Vector2 velocity;
     Vector2 frameExtraMovement;
@@ -25,7 +25,7 @@ typedef struct enemydata {
 
 const extern EnemyType blobType;
 
-GameObject *spawnEnemy(EnemyType *type, Vector2 pos);
+GameObject *spawnEnemy(const EnemyType *type, Vector2 pos);
 
 void damageEnemy(GameObject *self, int damage);
 

@@ -1,6 +1,12 @@
-#include "levelgen.h"
+#include "levelgen.hpp"
+
+extern "C" {
+
 #include "HW05Lib.h"
 #include "collision.h"
+#include "print.h"
+
+}
 
 EnemySpawn levelEnemies[MAX_LEVEL_LENGTH];
 int levelEnemyCount = 0;
@@ -11,7 +17,7 @@ int currentLevelLength = 0;
 int furthestGenerated = 0;
 int enemySpawnIndex = 0;
 
-void addSegmentToLevel(LevelSegment *seg) {
+void addSegmentToLevel(const LevelSegment *seg) {
     for (int i = 0; i < seg->enemyCount; i++) {
         levelEnemies[levelEnemyCount] = seg->enemies[i];
         levelEnemies[levelEnemyCount].pos.y += currentLevelLength;
@@ -32,15 +38,15 @@ void generateLevel(const SegmentPool *startPool, const SegmentPool *mainPool, co
     activeCollisionMapWidth = LEVEL_WIDTH;
 
     int startSegIndex = randRange(0, startPool->poolSize);
-    LevelSegment *startSeg = startPool->pool + startSegIndex;
+    const LevelSegment *startSeg = startPool->pool + startSegIndex;
     addSegmentToLevel(startSeg);
 
     int endSegIndex = randRange(0, endPool->poolSize);
-    LevelSegment *endSeg = endPool->pool + endSegIndex;
+    const LevelSegment *endSeg = endPool->pool + endSegIndex;
 
     int consecutiveBadSegments = 0;
     while (currentLevelLength < MAX_LEVEL_LENGTH && consecutiveBadSegments < 3) {
-        LevelSegment *newSeg = mainPool->pool + randRange(0, mainPool->poolSize);
+        const LevelSegment *newSeg = mainPool->pool + randRange(0, mainPool->poolSize);
         if (newSeg->terrainDataLines > MAX_LEVEL_LENGTH - endSeg->terrainDataLines - currentLevelLength) {
             consecutiveBadSegments++;
         } else {

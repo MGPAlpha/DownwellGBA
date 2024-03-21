@@ -1,23 +1,27 @@
-#include "player.h"
+#include "player.hpp"
 
 #include "gamestate.hpp"
 #include "cheats.hpp"
+#include "gameobject.hpp"
+#include "bullet.hpp"
+#include "enemy.hpp"
+
+extern "C" {
 
 #include "print.h"
 #include "collision.h"
 
 #include "camera.h"
-#include "gameobject.h"
 #include "stdlib.h"
 #include "sound.h"
-
-#include "bullet.h"
-#include "enemy.h"
 
 #include "sfx/machinegunbulletc8a.h"
 #include "sfx/playerdamagedd66.h"
 #include "sfx/playerkilledc50.h"
 #include "sfx/stompc96.h"
+
+}
+
 
 int jumpFrames[] = {
     0,0,0,0,0,0,0,0,0,0,0,0,
@@ -80,8 +84,8 @@ int playerMaxHealth = 4;
 int playerMaxHealthProgress = 0;
 
 void checkForPlayerEnemyContact(GameObject *enemy, GameObject *player) {
-    PlayerData *playerData = player->data;
-    EnemyData *enemyData = enemy->data;
+    PlayerData *playerData = (PlayerData*)player->data;
+    EnemyData *enemyData = (EnemyData*)enemy->data;
     Collision col = collideRects(playerData->resizedCollider, enemyData->collider);
     if (col.collided) {
         if (col.push.y < 0/* && col.push.y > -5<<8*/) {
@@ -101,7 +105,7 @@ void checkForPlayerEnemyContact(GameObject *enemy, GameObject *player) {
 }
 
 int initializePlayer(GameObject* self) {
-    PlayerData *data = malloc(sizeof(PlayerData));
+    PlayerData *data = (PlayerData*)malloc(sizeof(PlayerData));
     if (!data) return 1;
     data->collider.pos.x = 0;
     data->collider.pos.y = 0;
@@ -122,7 +126,7 @@ int initializePlayer(GameObject* self) {
 }
 
 void updatePlayer(GameObject* self) {
-    PlayerData *data = self->data;
+    PlayerData *data = (PlayerData*)self->data;
     playerSingleton = self;
     if (data->state != PLAYER_DEAD && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
         if (BUTTON_HELD(BUTTON_LEFT)) {
@@ -197,7 +201,7 @@ void updatePlayer(GameObject* self) {
             GameObject *newBullet = newGameObject(&bulletType);
             data->stateTime = 21;
             if (newBullet->active) {
-                BulletData *bulletData = newBullet->data;
+                BulletData *bulletData = (BulletData*)newBullet->data;
                 bulletData->collider.pos.x = data->collider.pos.x;
                 bulletData->collider.pos.y = data->collider.pos.y;
                 bulletData->collider = resizeRect(bulletData->collider, BULLET_SIZE_FACTOR);
@@ -216,7 +220,10 @@ void updatePlayer(GameObject* self) {
     
     data->resizedCollider = resizedCollider;
 
-    if (data->state != PLAYER_DEAD) doForEachGameObjectOfTypeWith(&enemyType, self, checkForPlayerEnemyContact);
+    if (data->state != PLAYER_DEAD) doForEachGameObjectOfTypeWith(&enemyType, self, [](GameObject* g, void* a) {
+        checkForPlayerEnemyContact(g, (GameObject*)a);
+        return 0;
+    });
 
     if (data->state != PLAYER_DEAD && playerHealth <= 0) {
         data->state = PLAYER_DEAD;
@@ -233,7 +240,7 @@ void updatePlayer(GameObject* self) {
 }
 
 void drawPlayer(GameObject* self) {
-    PlayerData *data = self->data;
+    PlayerData *data = (PlayerData*)self->data;
     int posY = data->collider.pos.y - cameraPos.y - 4;
     int posX = (data->collider.pos.x - cameraPos.x - 5);
     if ((data->iFrames > 0 && data->iFrames % 2) || posY < -16 || posY > 160 || posX < -16 || posX > 240) {

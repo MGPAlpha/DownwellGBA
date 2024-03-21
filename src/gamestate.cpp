@@ -7,6 +7,12 @@
 #include "cheats.hpp"
 #include "palette.hpp"
 #include "overlay.hpp"
+#include "player.hpp"
+#include "gem.hpp"
+#include "logosprite.hpp"
+#include "enemy.hpp"
+#include "levelgen.hpp"
+#include "savedata.hpp"
 
 extern "C" {
     
@@ -16,7 +22,6 @@ extern "C" {
 #include "collision.h"
 
 
-#include "levelgen.h"
 #include "unlocks.h"
 
 #include "art/title.h"
@@ -30,14 +35,9 @@ extern "C" {
 #include "music/cavernmusic.h"
 #include "sfx/logosound.h"
 #include "sfx/playerkilledc50.h"
-#include "savedata.h"
 
-#include "player.h"
 #include "camera.h"
-#include "logosprite.h"
-#include "gem.h"
 
-#include "enemy.h"
 
 }
 

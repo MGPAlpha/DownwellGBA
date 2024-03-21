@@ -1,7 +1,13 @@
-#include "savedata.h"
+#include "savedata.hpp"
+
+#include "cheats.hpp"
+
+extern "C" {
 
 #include "HW05Lib.h"
-#include "cheats.hpp"
+#include "print.h"
+
+}
 
 unsigned char saveBuffer[128];
 

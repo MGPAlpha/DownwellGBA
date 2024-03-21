@@ -1,16 +1,21 @@
-#include "logosprite.h"
+#include "logosprite.hpp"
+
+#include <cstdlib>
+
+#include "gameobject.hpp"
+#include "gamestate.hpp"
+
+extern "C" {
 
 #include "print.h"
+#include "camera.h"
 
 #include "art/logo.h"
 
-#include "camera.h"
-#include "gameobject.h"
-#include "stdlib.h"
-#include "gamestate.hpp"
+}
 
 int initializeLogoSprite(GameObject* self) {
-    LogoSpriteData *data = malloc(sizeof(LogoSpriteData));
+    LogoSpriteData *data = (LogoSpriteData*)malloc(sizeof(LogoSpriteData));
     if (!data) return 1;
     data->animationStart = 0;
     self->data = data;
@@ -19,12 +24,12 @@ int initializeLogoSprite(GameObject* self) {
 }
 
 void updateLogoSprite(GameObject* self) {
-    LogoSpriteData *data = self->data;
+    LogoSpriteData *data = (LogoSpriteData*)self->data;
     
 }
 
 void drawLogoSprite(GameObject* self) {
-    LogoSpriteData *data = self->data;
+    LogoSpriteData *data = (LogoSpriteData*)self->data;
     
 
     if (!data->animationStart) {

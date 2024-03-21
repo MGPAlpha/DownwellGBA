@@ -1,7 +1,7 @@
-#ifndef GEM_H
-#define GEM_H
+#ifndef GEM_HPP
+#define GEM_HPP
 
-#include "gameobject.h"
+#include "gameobject.hpp"
 
 const extern GameObjectType gemType;
 
@@ -25,5 +25,9 @@ extern int lifetimeGems;
 void initGemData(void);
 
 void collectGems(int gems);
+
+GameObject *spawnGem(Vector2 pos);
+
+void randomizeGem(GameObject *self);
 
 #endif

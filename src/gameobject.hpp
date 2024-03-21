@@ -1,8 +1,14 @@
-#ifndef GAMEOBJECT_H
-#define GAMEOBJECT_H
+#ifndef GAMEOBJECT_HPP
+#define GAMEOBJECT_HPP
+
+#include <functional>
+
+extern "C" {
 
 #include "mgpmath.h"
 #include "spritedata.h"
+
+}
 
 #define MAX_GAME_OBJECTS 128
 
@@ -15,7 +21,7 @@ typedef struct gameobjecttype {
 
 typedef struct gameobject {
     int active;
-    GameObjectType *type;
+    const GameObjectType *type;
     void *data;
     OBJ_ATTR *sprite;
     int lifetime;
@@ -33,6 +39,6 @@ void updateAllGameObjects(void);
 void drawAllGameObjects(void);
 void destroyAllGameObjects(void);
 
-unsigned int doForEachGameObjectOfTypeWith(GameObjectType* type, void *with, unsigned int (*func)(GameObject*, void*));
+unsigned int doForEachGameObjectOfTypeWith(const GameObjectType* type, void *with, std::function<unsigned int(GameObject*, void*)> func);
 
 #endif

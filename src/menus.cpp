@@ -6,11 +6,11 @@
 #include "palette.hpp"
 #include "cheats.hpp"
 #include "overlay.hpp"
+#include "gem.hpp"
+#include "savedata.hpp"
 
 extern "C" {
     
-    #include "savedata.h"
-    #include "gem.h"
     #include "unlocks.h"
 
 }

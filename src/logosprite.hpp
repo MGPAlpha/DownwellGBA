@@ -1,7 +1,7 @@
-#ifndef LOGOSPRITE_H
-#define LOGOSPRITE_H
+#ifndef LOGOSPRITE_HPP
+#define LOGOSPRITE_HPP
 
-#include "gameobject.h"
+#include "gameobject.hpp"
 
 const extern GameObjectType logoSpriteType;
 

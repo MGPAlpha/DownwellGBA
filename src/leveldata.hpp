@@ -1,25 +1,25 @@
-#ifndef LEVELDATA_H
-#define LEVELDATA_H
+#ifndef LEVELDATA_HPP
+#define LEVELDATA_HPP
 
-#include "enemy.h"
+#include "enemy.hpp"
 
 #define LEVEL_WIDTH 12
 #define MAX_LEVEL_LENGTH 400
 
 typedef struct enemyspawn {
-    EnemyType *type;
+    const EnemyType *type;
     Vector2 pos;
 } EnemySpawn;
 
 typedef struct levelsegment {
-    EnemySpawn *enemies;
+    const EnemySpawn *enemies;
     int enemyCount;
-    char *terrainData;
+    const char *terrainData;
     int terrainDataLines;
 } LevelSegment;
 
 typedef struct segmentpool {
-    LevelSegment *pool;
+    const LevelSegment *pool;
     int poolSize;
 } SegmentPool;
 

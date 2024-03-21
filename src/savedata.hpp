@@ -1,5 +1,5 @@
-#ifndef SAVEDATA_H
-#define SAVEDATA_H
+#ifndef SAVEDATA_HPP
+#define SAVEDATA_HPP
 
 #define SAVE_VERSION 0x03
 

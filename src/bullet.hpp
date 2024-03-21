@@ -1,7 +1,7 @@
-#ifndef BULLET_H
-#define BULLET_H
+#ifndef BULLET_HPP
+#define BULLET_HPP
 
-#include "gameobject.h"
+#include "gameobject.hpp"
 
 #define BULLET_SIZE_FACTOR 8
 

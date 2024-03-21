@@ -1,13 +1,18 @@
-#include "bullet.h"
+#include "bullet.hpp"
+
+#include "gameobject.hpp"
+#include "gamestate.hpp"
+#include "enemy.hpp"
+
+extern "C" {
 
 #include "print.h"
 #include "collision.h"
 
 #include "camera.h"
-#include "gameobject.h"
 #include "stdlib.h"
-#include "gamestate.hpp"
-#include "enemy.h"
+
+}
 
 int bulletTravelFrames[] = {
     8,8,8,8,8,
@@ -21,8 +26,8 @@ int bulletTravelFrames[] = {
 };
 
 unsigned int checkBulletCollisionWithEnemy(GameObject *enemy, GameObject *bullet) {
-    BulletData *bulletData = bullet->data;
-    EnemyData *enemyData = enemy->data;
+    BulletData *bulletData = (BulletData*)bullet->data;
+    EnemyData *enemyData = (EnemyData*)enemy->data;
 
     Collision testCollision = collideRects(bulletData->collider, enemyData->collider);
 
@@ -34,7 +39,7 @@ unsigned int checkBulletCollisionWithEnemy(GameObject *enemy, GameObject *bullet
 }
 
 int initializeBullet(GameObject* self) {
-    BulletData *data = malloc(sizeof(BulletData));
+    BulletData *data = (BulletData*)malloc(sizeof(BulletData));
     if (!data) return 1;
     data->collider.pos.x = 0;
     data->collider.pos.y = 0;
@@ -46,7 +51,7 @@ int initializeBullet(GameObject* self) {
 }
 
 void updateBullet(GameObject* self) {
-    BulletData *data = self->data;
+    BulletData *data = (BulletData*)self->data;
     int travelFrameIndex = self->lifetime;
     if (travelFrameIndex >= sizeof(bulletTravelFrames)/(sizeof(int))) travelFrameIndex = sizeof(bulletTravelFrames)/(sizeof(int)) - 1;
     data->collider.pos.y += bulletTravelFrames[travelFrameIndex] << BULLET_SIZE_FACTOR;
@@ -59,7 +64,9 @@ void updateBullet(GameObject* self) {
         destroyGameObject(self);
         return;
     }
-    unsigned int bulletCheckResult = doForEachGameObjectOfTypeWith(&enemyType, self, checkBulletCollisionWithEnemy);
+    unsigned int bulletCheckResult = doForEachGameObjectOfTypeWith(&enemyType, self, [](GameObject* g, void* a) {
+        return checkBulletCollisionWithEnemy(g, (GameObject*)a);
+    });
     if (bulletCheckResult) {
         destroyGameObject(self);
         return;
@@ -67,7 +74,7 @@ void updateBullet(GameObject* self) {
 }
 
 void drawBullet(GameObject* self) {
-    BulletData *data = self->data;
+    BulletData *data = (BulletData*)self->data;
     int posY = (data->collider.pos.y>>BULLET_SIZE_FACTOR) - cameraPos.y - 7;
     int posX = (data->collider.pos.x>>BULLET_SIZE_FACTOR) - cameraPos.x - 1;
     if (posY < -16 || posY > 160 || posX < -8 || posX > 240) {

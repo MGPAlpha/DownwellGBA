@@ -26,16 +26,16 @@
 
 #include "palette.hpp"
 #include "cheats.hpp"
+#include "gameobject.hpp"
+#include "player.hpp"
+#include "gem.hpp"
+#include "savedata.hpp"
 
 extern "C" {
 
 #include "HW05Lib.h"
 #include "print.h"
-#include "gameobject.h"
-#include "player.h"
-#include "savedata.h"
 #include "sound.h"
-#include "gem.h"
 
 #include "art/title.h"
 #include "art/dither.h"
