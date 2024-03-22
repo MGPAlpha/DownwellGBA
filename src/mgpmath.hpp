@@ -1,5 +1,5 @@
-#ifndef MGP_MATH
-#define MGP_MATH
+#ifndef MGPMATH_HPP
+#define MGPMATH_HPP
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))

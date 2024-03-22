@@ -1,8 +1,8 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
-#include "HW05Lib.h"
-#include "mgpmath.h"
+#include "HW05Lib.hpp"
+#include "mgpmath.hpp"
 
 extern char *activeCollisionMap;
 extern char activeCollisionMapWidth;

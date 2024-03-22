@@ -4,14 +4,9 @@
 
 #include "player.hpp"
 #include "gem.hpp"
-
-extern "C" {
-
-#include "camera.h"
-#include "spritedata.h"
-#include "collision.h"
-
-}
+#include "camera.hpp"
+#include "spritedata.hpp"
+#include "collision.hpp"
 
 int enemiesKilled = 0;
 

@@ -1,16 +1,16 @@
 #include "bullet.hpp"
 
+#include <cstdlib>
+
 #include "gameobject.hpp"
 #include "gamestate.hpp"
 #include "enemy.hpp"
+#include "camera.hpp"
+#include "collision.hpp"
 
 extern "C" {
 
 #include "print.h"
-#include "collision.h"
-
-#include "camera.h"
-#include "stdlib.h"
 
 }
 

@@ -1,5 +1,6 @@
-#include "collision.h"
-#include "stdlib.h"
+#include "collision.hpp"
+
+#include <cstdlib>
 
 char *activeCollisionMap = NULL;
 char activeCollisionMapWidth = 0;

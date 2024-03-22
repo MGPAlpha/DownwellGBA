@@ -1,19 +1,19 @@
 #include "player.hpp"
 
+#include <cstdlib>
+
 #include "gamestate.hpp"
 #include "cheats.hpp"
 #include "gameobject.hpp"
 #include "bullet.hpp"
 #include "enemy.hpp"
+#include "camera.hpp"
+#include "sound.hpp"
+#include "collision.hpp"
 
 extern "C" {
 
 #include "print.h"
-#include "collision.h"
-
-#include "camera.h"
-#include "stdlib.h"
-#include "sound.h"
 
 #include "sfx/machinegunbulletc8a.h"
 #include "sfx/playerdamagedd66.h"

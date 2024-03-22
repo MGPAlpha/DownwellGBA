@@ -1,9 +1,10 @@
 #include "levelgen.hpp"
 
+#include "HW05Lib.hpp"
+#include "collision.hpp"
+
 extern "C" {
 
-#include "HW05Lib.h"
-#include "collision.h"
 #include "print.h"
 
 }

@@ -1,10 +1,10 @@
 #include "savedata.hpp"
 
 #include "cheats.hpp"
+#include "HW05Lib.hpp"
 
 extern "C" {
 
-#include "HW05Lib.h"
 #include "print.h"
 
 }

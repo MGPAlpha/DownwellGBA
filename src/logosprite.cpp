@@ -4,11 +4,11 @@
 
 #include "gameobject.hpp"
 #include "gamestate.hpp"
+#include "camera.hpp"
 
 extern "C" {
 
 #include "print.h"
-#include "camera.h"
 
 #include "art/logo.h"
 

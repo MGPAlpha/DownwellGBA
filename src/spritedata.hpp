@@ -1,7 +1,7 @@
-#ifndef SPRITEDATA_H
-#define SPRITEDATA_H
+#ifndef SPRITEDATA_HPP
+#define SPRITEDATA_HPP
 
-#include "HW05Lib.h"
+#include "HW05Lib.hpp"
 
 // Sprite Attribute Struct
 typedef struct {

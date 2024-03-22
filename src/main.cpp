@@ -30,12 +30,12 @@
 #include "player.hpp"
 #include "gem.hpp"
 #include "savedata.hpp"
+#include "HW05Lib.hpp"
+#include "sound.hpp"
 
 extern "C" {
 
-#include "HW05Lib.h"
 #include "print.h"
-#include "sound.h"
 
 #include "art/title.h"
 #include "art/dither.h"

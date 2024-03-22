@@ -1,5 +1,6 @@
-#include "HW05Lib.h"
-#include "sound.h"
+#include "sound.hpp"
+
+#include "HW05Lib.hpp"
 
 SOUND soundA;
 SOUND soundB;

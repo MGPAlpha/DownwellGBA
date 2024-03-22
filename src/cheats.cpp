@@ -9,12 +9,7 @@
 #include "overlay.hpp"
 #include "player.hpp"
 #include "savedata.hpp"
-
-extern "C" {
-
-#include "HW05Lib.h"
-
-}
+#include "HW05Lib.hpp"
 
 int cheatsEnabled;
 

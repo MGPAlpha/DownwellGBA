@@ -1,5 +1,10 @@
-#include "HW05Lib.h"
+#include "HW05Lib.hpp"
+
+extern "C" {
+
 #include "print.h"
+
+}
 
 // The start of the video memory
 unsigned short *videoBuffer = (unsigned short *)0x6000000;

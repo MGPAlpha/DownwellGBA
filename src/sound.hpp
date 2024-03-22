@@ -1,3 +1,6 @@
+#ifndef SOUND_HPP
+#define SOUND_HPP
+
 void setupSounds();
 void playSoundA(const signed char* sound, int length, int loops);
 void playSoundB(const signed char* sound, int length, int loops);
@@ -61,3 +64,5 @@ typedef struct{
 
 extern SOUND soundA;
 extern SOUND soundB;
+
+#endif

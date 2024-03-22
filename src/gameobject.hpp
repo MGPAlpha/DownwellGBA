@@ -3,12 +3,8 @@
 
 #include <functional>
 
-extern "C" {
-
-#include "mgpmath.h"
-#include "spritedata.h"
-
-}
+#include "mgpmath.hpp"
+#include "spritedata.hpp"
 
 #define MAX_GAME_OBJECTS 128
 

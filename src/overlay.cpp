@@ -4,10 +4,10 @@
 #include <cstring>
 
 #include "menus.hpp"
+#include "HW05Lib.hpp"
 
 extern "C" {
 
-#include "HW05Lib.h"
 #include "stdlib.h"
 
 #include "art/overlaytiles.h"

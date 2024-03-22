@@ -1,5 +1,6 @@
-#include "spritedata.h"
-#include "stdlib.h"
+#include "spritedata.hpp"
+
+#include <cstdlib>
 
 static OBJ_ATTR shadowOAM[128];
 

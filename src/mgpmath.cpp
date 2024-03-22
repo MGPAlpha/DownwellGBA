@@ -1,5 +1,6 @@
-#include "mgpmath.h"
-#include "stdlib.h"
+#include "mgpmath.hpp"
+
+#include <cstdlib>
 
 int Vector2Length(Vector2 v, int fixedBits) {
     int x2 = (v.x * v.x);

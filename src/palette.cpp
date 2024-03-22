@@ -4,12 +4,7 @@
 
 #include "menus.hpp"
 #include "savedata.hpp"
-
-extern "C" {
-
-#include "HW05Lib.h"
-
-}
+#include "HW05Lib.hpp"
 
 int activePalette;
 

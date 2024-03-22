@@ -2,10 +2,10 @@
  * Based on a modified version of HW04Lib
  */
 
-#ifndef HW05_LIB_H
-#define HW05_LIB_H
+#ifndef HW05_LIB_HPP
+#define HW05_LIB_HPP
 
-#include "mgpmath.h"
+#include "mgpmath.hpp"
 
 // Typedefs & Structs
 typedef unsigned short u16;
@@ -157,11 +157,11 @@ extern unsigned short buttons;
 // =================================== DMA ====================================
 
 // DMA Struct
-typedef volatile struct {
+struct DMA {
     volatile const void *src;
     volatile void *dst;
-    unsigned int cnt;
-} DMA;
+    volatile unsigned int cnt;
+};
 
 // First DMA Register Address
 extern DMA *dma;

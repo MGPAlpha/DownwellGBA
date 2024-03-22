@@ -4,11 +4,11 @@
 
 #include "player.hpp"
 #include "savedata.hpp"
+#include "camera.hpp"
+#include "collision.hpp"
 
 extern "C" {
 
-#include "camera.h"
-#include "collision.h"
 #include "print.h"
 
 }

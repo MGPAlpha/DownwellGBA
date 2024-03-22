@@ -13,13 +13,14 @@
 #include "enemy.hpp"
 #include "levelgen.hpp"
 #include "savedata.hpp"
+#include "camera.hpp"
+#include "HW05Lib.hpp"
+#include "sound.hpp"
+#include "collision.hpp"
 
 extern "C" {
     
-#include "HW05Lib.h"
-#include "sound.h"
 #include "print.h"
-#include "collision.h"
 
 
 #include "unlocks.h"
@@ -36,7 +37,6 @@ extern "C" {
 #include "sfx/logosound.h"
 #include "sfx/playerkilledc50.h"
 
-#include "camera.h"
 
 
 }
