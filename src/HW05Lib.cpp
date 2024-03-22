@@ -14,13 +14,13 @@ DMA *dma = (DMA *)0x40000B0;
 
 // Set a pixel on the screen in Mode 3
 void setPixel3(Vector2 pos, unsigned short color) {
-	videoBuffer[OFFSET(pos.x, pos.y, SCREENWIDTH)] = color;
+	videoBuffer[OFFSET(int(pos.x), int(pos.y), SCREENWIDTH)] = color;
 }
 
 // Set a pixel on the screen in Mode 4
 void setPixel4(Vector2 pos, unsigned char colorIndex) {
-    volatile unsigned short pixelData = videoBuffer[OFFSET(pos.x, pos.y, SCREENWIDTH) / 2];
-    if (pos.x & 1)
+    volatile unsigned short pixelData = videoBuffer[OFFSET(int(pos.x), int(pos.y), SCREENWIDTH) / 2];
+    if (int(pos.x) & 1)
     {
         pixelData &= 0x00FF;
         pixelData |= colorIndex << 8;
@@ -30,47 +30,47 @@ void setPixel4(Vector2 pos, unsigned char colorIndex) {
         pixelData &= 0xFF00;
         pixelData |= colorIndex;
     }
-    videoBuffer[OFFSET(pos.x, pos.y, SCREENWIDTH) / 2] = pixelData;}
+    videoBuffer[OFFSET(int(pos.x), int(pos.y), SCREENWIDTH) / 2] = pixelData;}
 
 // Draw a rectangle at the specified location and size in Mode 3
 void drawRect3(Rect rect, volatile unsigned short color) {
-	for(int r = 0; r < rect.size.y; r++) {
-        DMANow(3, &color, &videoBuffer[OFFSET(rect.pos.x, rect.pos.y + r, SCREENWIDTH)], DMA_SOURCE_FIXED | rect.size.x);
+	for(int r = 0; r < int(rect.size.y); r++) {
+        DMANow(3, &color, &videoBuffer[OFFSET(int(rect.pos.x), int(rect.pos.y) + r, SCREENWIDTH)], DMA_SOURCE_FIXED | int(rect.size.x));
 	}
 }
 
 // Draw a rectangle at the specified location and size in Mode 4
 void drawRect4(Rect rect, volatile unsigned char colorIndex) {
     volatile unsigned short pixelData = colorIndex | (colorIndex << 8);
-    for (int r = 0; r < rect.size.y; r++)
+    for (int r = 0; r < int(rect.size.y); r++)
     {
         // Ensure we don't DMA 0 copies
         if (rect.size.x == 1)
-            setPixel4(V2_ADD(rect.pos, ((Vector2){0,r})), colorIndex);
+            setPixel4(rect.pos + Vector2(0,r), colorIndex);
         else if (rect.size.x == 2)
         {
-            setPixel4(V2_ADD(rect.pos, ((Vector2){0,r})), colorIndex);
-            setPixel4(V2_ADD(rect.pos, ((Vector2){1,r})), colorIndex);
+            setPixel4(rect.pos + Vector2(0,r), colorIndex);
+            setPixel4(rect.pos + Vector2(1,r), colorIndex);
         }
-        else if ((rect.pos.x & 1) && (rect.pos.y & 1)) // Odd width odd col
+        else if ((int(rect.pos.x) & 1) && (int(rect.pos.y) & 1)) // Odd width odd col
         {
-            setPixel4(V2_ADD(rect.pos, ((Vector2){0,r})), colorIndex);
-            DMANow(3, &pixelData, &videoBuffer[OFFSET(rect.pos.x + 1, rect.pos.y + r, SCREENWIDTH) / 2], DMA_SOURCE_FIXED | (rect.size.x - 1) / 2);
+            setPixel4(rect.pos + Vector2(0,r), colorIndex);
+            DMANow(3, &pixelData, &videoBuffer[OFFSET(int(rect.pos.x) + 1, int(rect.pos.y) + r, SCREENWIDTH) / 2], DMA_SOURCE_FIXED | (int(rect.size.x) - 1) / 2);
         }
-        else if (rect.size.x & 1) // Even col odd width
+        else if (int(rect.size.x) & 1) // Even col odd width
         {
-            DMANow(3, &pixelData, &videoBuffer[OFFSET(rect.pos.x, rect.pos.y + r, SCREENWIDTH) / 2], DMA_SOURCE_FIXED | (rect.size.x - 1) / 2);
+            DMANow(3, &pixelData, &videoBuffer[OFFSET(int(rect.pos.x), int(rect.pos.y) + r, SCREENWIDTH) / 2], DMA_SOURCE_FIXED | (int(rect.size.x) - 1) / 2);
             setPixel4((Vector2){rect.pos.x + rect.size.x - 1, rect.pos.y + r}, colorIndex);
         }
-        else if (rect.pos.x & 1) // Odd col even width
+        else if (int(rect.pos.x) & 1) // Odd col even width
         {
-            setPixel4(V2_ADD(rect.pos, ((Vector2){0,r})), colorIndex);
-            DMANow(3, &pixelData, &videoBuffer[OFFSET(rect.pos.x + 1, rect.pos.y + r, SCREENWIDTH) / 2], DMA_SOURCE_FIXED | (rect.size.x - 2) / 2);
+            setPixel4(rect.pos + Vector2(0,r), colorIndex);
+            DMANow(3, &pixelData, &videoBuffer[OFFSET(int(rect.pos.x) + 1, int(rect.pos.y) + r, SCREENWIDTH) / 2], DMA_SOURCE_FIXED | (int(rect.size.x) - 2) / 2);
             setPixel4((Vector2){rect.pos.x + rect.size.x - 1, rect.pos.y + r}, colorIndex);
         }
         else // Even col even width
         {
-            DMANow(3, &pixelData, &videoBuffer[OFFSET(rect.pos.x, rect.pos.y + r, SCREENWIDTH) / 2], DMA_SOURCE_FIXED | rect.size.x / 2);
+            DMANow(3, &pixelData, &videoBuffer[OFFSET(int(rect.pos.x), int(rect.pos.y) + r, SCREENWIDTH) / 2], DMA_SOURCE_FIXED | int(rect.size.x) / 2);
         }
     }}
 
@@ -90,7 +90,7 @@ void fillScreen4(volatile unsigned char colorIndex) {
 // Draw an image at the specified location and size in Mode 3
 void drawImage3(Vector2 pos, Vector2 size, const unsigned short *image) {
     for(int r = 0; r < size.y; r++) {
-        DMANow(3, &image[OFFSET(0, r, size.x)], &videoBuffer[OFFSET(pos.x, pos.y + r, SCREENWIDTH)], size.x);
+        DMANow(3, &image[OFFSET(0, r, int(size.x))], &videoBuffer[OFFSET(int(pos.x), int(pos.y) + r, SCREENWIDTH)], int(size.x));
     }
 }
 
@@ -99,7 +99,7 @@ void drawImage4(Vector2 pos, Vector2 size, const unsigned short *image) {
     for (int i = 0; i < size.y; i++)
     {
         if (pos.y + i < 0) continue;
-        DMANow(3, &image[OFFSET(0, i, size.x / 2)], &videoBuffer[OFFSET(pos.x, pos.y + i, SCREENWIDTH) / 2], size.x / 2);
+        DMANow(3, &image[OFFSET(0, i, int(size.x) / 2)], &videoBuffer[OFFSET(int(pos.x), int(pos.y) + i, SCREENWIDTH) / 2], int(size.x) / 2);
     }
 }
 

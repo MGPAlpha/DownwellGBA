@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include "mgpmath.hpp"
+#include "engine/gbamath.hpp"
 #include "spritedata.hpp"
 
 #define MAX_GAME_OBJECTS 128

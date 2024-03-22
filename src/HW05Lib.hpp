@@ -5,7 +5,7 @@
 #ifndef HW05_LIB_HPP
 #define HW05_LIB_HPP
 
-#include "mgpmath.hpp"
+#include "engine/gbamath.hpp"
 
 // Typedefs & Structs
 typedef unsigned short u16;

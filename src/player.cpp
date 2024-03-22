@@ -22,6 +22,8 @@ extern "C" {
 
 }
 
+//TODO debug this next
+
 
 int jumpFrames[] = {
     0,0,0,0,0,0,0,0,0,0,0,0,

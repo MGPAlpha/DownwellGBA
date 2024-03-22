@@ -1,7 +1,7 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
-#include "mgpmath.hpp"
+#include "engine/gbamath.hpp"
 
 extern Vector2 cameraPos;
 

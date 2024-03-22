@@ -48,7 +48,7 @@ enum GAMESTATE unpauseState;
 int stateTime = 0;
 int vBlankCount = 0;
 
-static int smoothCameraX = 0;
+static fixed32 smoothCameraX = 0;
 
 GameObject *logoSprite0;
 GameObject *logoSprite1;
@@ -107,7 +107,7 @@ void initSurface(void) {
         PlayerData *playerData = (PlayerData*)playerObject->data;
         playerData->collider.pos.y = 133;
         playerData->collider.pos.x = 152;
-        smoothCameraX = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
+        smoothCameraX = playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2;
     }
 
     logoSprite0 = newGameObject(&logoSpriteType);
@@ -146,11 +146,11 @@ void updateSurface(void) {
     consolidateActiveGameObjects();
     
 
-    int cameraXTarget = 0;
+    fixed32 cameraXTarget = 0;
 
     PlayerData *playerData = playerSingleton ? (PlayerData*)playerSingleton->data : NULL;
     if (!playerSingleton || playerData->collider.pos.x >= 260) {
-        cameraXTarget = 233 << 8;
+        cameraXTarget = 233;
         if (logoSprite0 && logoSprite1){
             LogoSpriteData *logoData0 = (LogoSpriteData*)logoSprite0->data;
             LogoSpriteData *logoData1 = (LogoSpriteData*)logoSprite1->data;
@@ -163,7 +163,7 @@ void updateSurface(void) {
 
 
     } else {
-        cameraXTarget = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
+        cameraXTarget = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2);
         if (playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
 
             if (playerData->dir == LEFT) cameraXTarget -= 48<<8;
@@ -179,8 +179,8 @@ void updateSurface(void) {
 
 
     smoothCameraX = smoothCameraX + (cameraXTarget - smoothCameraX) / 16;
-    if (smoothCameraX < -8) smoothCameraX = -8;
-    cameraPos.x = smoothCameraX >> 8;
+    if (smoothCameraX.value < -8) smoothCameraX.value = -8;
+    cameraPos.x = smoothCameraX;
     if (wellDescentTime) {
         int totalDescentTime = stateTime - wellDescentTime - 40;
         totalDescentTime = MAX(totalDescentTime, 0);
@@ -200,9 +200,9 @@ void updateSurface(void) {
 
     drawAllGameObjects();
     DMANow(3, &dither[MAX(0,6-stateTime/6)*16], &CHARBLOCK[1], 16);
-    REG_BG0HOFF = cameraPos.x;
-    REG_BG0VOFF = cameraPos.y;
-    REG_BG3HOFF = cameraPos.x*5/24-40;
+    REG_BG0HOFF = int(cameraPos.x);
+    REG_BG0VOFF = int(cameraPos.y);
+    REG_BG3HOFF = int(cameraPos.x*5/24-40);
 
     if (playerData) {
         updateAmmoDisplay(playerData->ammo, 1);
@@ -276,7 +276,7 @@ void updateWin(void) {
     }
 }
 
-int smoothCameraY = 0;
+fixed32 smoothCameraY = 0;
 
 int level = 0;
 
@@ -285,7 +285,7 @@ void nextLevel(void) {
 
     mgba_printf("go's destroyed");
 
-    smoothCameraY = 16<<8;
+    smoothCameraY = 16;
 
     generateLevel(&startSegmentPool, &cavernSegmentPool, &endSegmentPool);
 
@@ -394,7 +394,7 @@ void updateGame(void) {
     consolidateActiveGameObjects();
     
 
-    int cameraYTarget = 0;
+    fixed32 cameraYTarget = 0;
 
     PlayerData *playerData = playerSingleton ? (PlayerData*)playerSingleton->data : NULL;
     
@@ -405,9 +405,9 @@ void updateGame(void) {
     spawnNecessaryEnemies(playerData);
 
     if (playerData) {
-        cameraYTarget = (playerData->collider.pos.y - SCREENHEIGHT/2 + playerData->collider.size.y/2 + 16) << 8;
-        cameraYTarget = MAX(16<<8,cameraYTarget);
-        cameraYTarget = MIN((currentLevelLength-11)<<12,cameraYTarget);
+        cameraYTarget = (playerData->collider.pos.y - SCREENHEIGHT/2 + playerData->collider.size.y/2 + 16);
+        cameraYTarget = max(16,cameraYTarget);
+        cameraYTarget = min((currentLevelLength-11)<<4,cameraYTarget);
     }
 
     smoothCameraY = smoothCameraY + (cameraYTarget - smoothCameraY) / 16;
@@ -420,10 +420,10 @@ void updateGame(void) {
 
     if (playerData->state != PLAYER_DEAD) {
         cameraPos.x = -32;
-        cameraPos.y = smoothCameraY>>8;
+        cameraPos.y = smoothCameraY;
     }
 
-    generateTilemapUntil(cameraPos.y / 16 + 11);
+    generateTilemapUntil(int(cameraPos.y) / 16 + 11);
 
     if (playerData->state != PLAYER_DEAD && playerData->collider.pos.y > (currentLevelLength-1)<<4) {
         nextLevel();
@@ -433,8 +433,8 @@ void updateGame(void) {
     waitForVBlank();
 
     drawAllGameObjects();
-    REG_BG0HOFF = cameraPos.x;
-    REG_BG0VOFF = cameraPos.y;
+    REG_BG0HOFF = int(cameraPos.x);
+    REG_BG0VOFF = int(cameraPos.y);
 
     
     

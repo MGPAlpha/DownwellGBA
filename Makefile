@@ -9,7 +9,9 @@ OBJ_DIR := obj
 BIN_DIR := bin
 LIB_DIR := lib
 
-LIB := 
+FPSQRT := $(LIB_DIR)/fpsqrt/fpsqrt.o
+
+LIB := $(FPSQRT)
 # EXE := $(BIN_DIR)/pico2gba
 # CLI := $(BIN_DIR)/pico2gbacli
 # CORE := $(BIN_DIR)/libpico2gba.a
@@ -39,11 +41,11 @@ COMMONCFLAGS   	   = -Werror=return-type
 
 # --- Compiler
 CC                 = $(DEVKITARM)/bin/arm-none-eabi-gcc
-CFLAGS             = $(MODEL) -O3 -Wall -pedantic -Wextra -std=c99 -D_ROM=$(ROM_NAME) -I$(DEVKITPRO)/libgba/include
+CFLAGS             = $(MODEL) -O3 -Wall -pedantic -Wextra -std=c99 -D_ROM=$(ROM_NAME) -I$(DEVKITPRO)/libgba/include -Ilib/fpsqrt
 
 # --- C++ Compiler
 CPP                = $(DEVKITARM)/bin/arm-none-eabi-g++
-CPPFLAGS           = $(MODEL) -O3 -Wall -pedantic -Wextra -D_ROM=$(ROM_NAME) -I$(DEVKITPRO)/libgba/include
+CPPFLAGS           = $(MODEL) -O3 -Wall -pedantic -Wextra -D_ROM=$(ROM_NAME) -I$(DEVKITPRO)/libgba/include -Ilib/fpsqrt
 
 # --- Linker
 LD                 = $(DEVKITARM)/bin/arm-none-eabi-g++
@@ -65,7 +67,7 @@ $(ROM_NAME) : $(ELF_NAME)
 	$(GBAFIX) $(ROM_NAME)
 
 # --- Build .o files into .elf file
-$(ELF_NAME) : $(OBJ) | $(BIN_DIR)
+$(ELF_NAME) : $(OBJ) $(LIB) | $(BIN_DIR)
 	$(LD) $^ $(LDFLAGS) -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
@@ -75,6 +77,9 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 		@mkdir -p $(dir $@)
 		$(CPP) $(COMMONCFLAGS) $(CPPFLAGS) -c $< -o $@
+
+$(FPSQRT) : $(LIB_DIR)/fpsqrt/fpsqrt.c
+		$(CC) $(COMMONCFLAGS) $(CFLAGS) -c $< -o $@
 
 $(BIN_DIR) $(OBJ_DIR):
 		mkdir -p $@

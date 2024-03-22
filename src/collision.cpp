@@ -32,8 +32,8 @@ Collision collideRects(Rect rect1, Rect rect2) {
 
 Collision collideRectBounds(Rect obj, Rect bounds) {
     Collision out;
-    out.push.x = obj.pos.x < bounds.pos.x ? bounds.pos.x - obj.pos.x : MIN(bounds.pos.x + bounds.size.x - (obj.pos.x + obj.size.x),0);
-    out.push.y = obj.pos.y < bounds.pos.y ? bounds.pos.y - obj.pos.y : MIN(bounds.pos.y + bounds.size.y - (obj.pos.y + obj.size.y),0);
+    out.push.x = obj.pos.x < bounds.pos.x ? bounds.pos.x - obj.pos.x : min(bounds.pos.x + bounds.size.x - (obj.pos.x + obj.size.x),0);
+    out.push.y = obj.pos.y < bounds.pos.y ? bounds.pos.y - obj.pos.y : min(bounds.pos.y + bounds.size.y - (obj.pos.y + obj.size.y),0);
     out.collided = out.push.x || out.push.y;
     return out;
 }
@@ -62,20 +62,20 @@ Collision collideCollisionMap(Rect obj, char* map, int mapWidth, int relativeMag
     int downPush = 0;
 
     if (upperLeftCollision) {
-        rightPush = MAX(rightPush, ((upperLeftReduced.x+1)<<relativeMagnitude)-upperLeftCorner.x);
-        downPush = MAX(downPush, ((upperLeftReduced.y+1)<<relativeMagnitude)-upperLeftCorner.y);
+        rightPush = max(rightPush, ((upperLeftReduced.x+1)<<relativeMagnitude)-upperLeftCorner.x);
+        downPush = max(downPush, ((upperLeftReduced.y+1)<<relativeMagnitude)-upperLeftCorner.y);
     }
     if (upperRightCollision) {
-        leftPush = MAX(leftPush, upperRightCorner.x-(upperRightReduced.x<<relativeMagnitude)+1);
-        downPush = MAX(downPush, ((upperRightReduced.y+1)<<relativeMagnitude)-upperRightCorner.y);
+        leftPush = max(leftPush, upperRightCorner.x-(upperRightReduced.x<<relativeMagnitude)+1);
+        downPush = max(downPush, ((upperRightReduced.y+1)<<relativeMagnitude)-upperRightCorner.y);
     }
     if (lowerLeftCollision) {
-        rightPush = MAX(rightPush, ((lowerLeftReduced.x+1)<<relativeMagnitude)-lowerLeftCorner.x);
-        upPush = MAX(upPush, lowerLeftCorner.y-(lowerLeftReduced.y<<relativeMagnitude)+1);
+        rightPush = max(rightPush, ((lowerLeftReduced.x+1)<<relativeMagnitude)-lowerLeftCorner.x);
+        upPush = max(upPush, lowerLeftCorner.y-(lowerLeftReduced.y<<relativeMagnitude)+1);
     }
     if (lowerRightCollision) {
-        leftPush = MAX(leftPush, lowerRightCorner.x-(lowerRightReduced.x<<relativeMagnitude)+1);
-        upPush = MAX(upPush, lowerRightCorner.y-(lowerRightReduced.y<<relativeMagnitude)+1);
+        leftPush = max(leftPush, lowerRightCorner.x-(lowerRightReduced.x<<relativeMagnitude)+1);
+        upPush = max(upPush, lowerRightCorner.y-(lowerRightReduced.y<<relativeMagnitude)+1);
     }
 
     out.collided = (upperLeftCollision || upperRightCollision || lowerLeftCollision || lowerRightCollision);
