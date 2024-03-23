@@ -158,7 +158,6 @@ void updatePlayer(GameObject* self) {
             data->canFire = 0;
         } else {
             data->collider.pos.y+= 1;
-            mgba_printf("Player Y before collision: %x", data->collider.pos.y);
             Collision fallCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 20);
             if (fallCollision.push.y < 0) {
                 data->collider.pos.y += fallCollision.push.y;
@@ -177,7 +176,7 @@ void updatePlayer(GameObject* self) {
         if (data->stateTime >= sizeof(jumpDisplacementFrames)/sizeof(int)) jumpDiffIndex = sizeof(jumpDisplacementFrames)/sizeof(int) - 1;
         int jumpDisplacement = jumpDisplacementFrames[jumpDiffIndex];
         data->collider.pos.y += jumpDisplacement;
-        Collision yCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 4);
+        Collision yCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 20);
         if (yCollision.push.y) {
             data->collider.pos.y += yCollision.push.y;
             if (yCollision.push.y < 0 && data->state != PLAYER_DEAD) {

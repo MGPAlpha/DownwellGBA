@@ -148,7 +148,7 @@ void updateSurface(void) {
 
     fixed32 cameraXTarget = 0;
 
-    PlayerData *playerData = playerSingleton ? (PlayerData*)playerSingleton->data : NULL;
+    PlayerData *playerData = (playerSingleton) ? ((PlayerData*)playerSingleton->data) : nullptr;
     if (!playerSingleton || playerData->collider.pos.x >= 260) {
         cameraXTarget = 233;
         if (logoSprite0 && logoSprite1){
@@ -177,10 +177,6 @@ void updateSurface(void) {
     // int cameraFollowedX = playerData->collider.pos.x + (playerData->collider.size.x - SCREENWIDTH) / 2;
     // if (cameraFollowedX < -8) cameraFollowedX = -8;
 
-    mgba_printf("Player x: %x", playerData->collider.pos.x);
-    mgba_printf("Player y: %x", playerData->collider.pos.y);
-    mgba_printf("Camera X Target: %x", cameraXTarget);
-
 
     smoothCameraX = smoothCameraX + (cameraXTarget - smoothCameraX) / 16;
     if (smoothCameraX.value < -8) smoothCameraX.value = -8;
@@ -192,7 +188,6 @@ void updateSurface(void) {
         cameraPos.y = pan;
         if (pan > 350) {
             for (int i = 0; i < 60; i++) waitForVBlank();
-            mgba_printf("calling initGame");
             initGame();
             return;
         }
@@ -208,7 +203,7 @@ void updateSurface(void) {
     REG_BG0VOFF = int(cameraPos.y);
     REG_BG3HOFF = int(cameraPos.x*5/24-40);
 
-    if (playerData) {
+    if (playerSingleton) {
         updateAmmoDisplay(playerData->ammo, 1);
     }
 
@@ -287,13 +282,9 @@ int level = 0;
 void nextLevel(void) {
     destroyAllGameObjects();
 
-    mgba_printf("go's destroyed");
-
     smoothCameraY = 16;
 
     generateLevel(&startSegmentPool, &cavernSegmentPool, &endSegmentPool);
-
-    mgba_printf("level generated");
 
     GameObject *playerObject = newGameObject(&playerType);
 
@@ -337,19 +328,13 @@ void nextLevel(void) {
 
     REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | SPRITE_ENABLE | SPRITE_MODE_2D;
 
-    mgba_printf("Game_state before: %d", gameState);
     gameState = GAME_PLAY;
-    mgba_printf("Game_state after: %d", gameState);
 
     level++;
-
-    mgba_printf("reached end of nextLevel");
 
 }
 
 void initGame(void) {
-
-    mgba_printf("initGame called");
 
     srand(vBlankCount);
 
@@ -366,12 +351,7 @@ void initGame(void) {
 
     level = 0;
 
-    mgba_printf("game data reset");
-
-    mgba_printf("Calling nextLevel");
     nextLevel();
-
-    mgba_printf("next level triggered");
 
     REG_TM3CNT = 0;
     REG_TM3D = 0;
