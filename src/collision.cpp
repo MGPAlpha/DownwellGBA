@@ -2,6 +2,10 @@
 
 #include <cstdlib>
 
+extern "C" {
+    #include "print.h"
+}
+
 char *activeCollisionMap = NULL;
 char activeCollisionMapWidth = 0;
 
@@ -46,15 +50,15 @@ Collision collideCollisionMap(Rect obj, char* map, int mapWidth, int relativeMag
     Vector2 lowerLeftCorner = {obj.pos.x, obj.pos.y+obj.size.y-1};
     Vector2 lowerRightCorner = {obj.pos.x+obj.size.x-1, obj.pos.y+obj.size.y-1};
 
-    Vector2 upperLeftReduced = {upperLeftCorner.x >> relativeMagnitude, upperLeftCorner.y >> relativeMagnitude};
-    Vector2 upperRightReduced = {upperRightCorner.x >> relativeMagnitude, upperRightCorner.y >> relativeMagnitude};
-    Vector2 lowerLeftReduced = {lowerLeftCorner.x >> relativeMagnitude, lowerLeftCorner.y >> relativeMagnitude};
-    Vector2 lowerRightReduced = {lowerRightCorner.x >> relativeMagnitude, lowerRightCorner.y >> relativeMagnitude};
+    Vector2 upperLeftReduced = {upperLeftCorner.x.value >> relativeMagnitude, upperLeftCorner.y.value >> relativeMagnitude};
+    Vector2 upperRightReduced = {upperRightCorner.x.value >> relativeMagnitude, upperRightCorner.y.value >> relativeMagnitude};
+    Vector2 lowerLeftReduced = {lowerLeftCorner.x.value >> relativeMagnitude, lowerLeftCorner.y.value >> relativeMagnitude};
+    Vector2 lowerRightReduced = {lowerRightCorner.x.value >> relativeMagnitude, lowerRightCorner.y.value >> relativeMagnitude};
 
-    char upperLeftCollision = map[OFFSET(upperLeftReduced.x, upperLeftReduced.y, mapWidth)];
-    char upperRightCollision = map[OFFSET(upperRightReduced.x, upperRightReduced.y, mapWidth)];
-    char lowerLeftCollision = map[OFFSET(lowerLeftReduced.x, lowerLeftReduced.y, mapWidth)];
-    char lowerRightCollision = map[OFFSET(lowerRightReduced.x, lowerRightReduced.y, mapWidth)];
+    char upperLeftCollision = map[OFFSET(int(upperLeftReduced.x), int(upperLeftReduced.y), mapWidth)];
+    char upperRightCollision = map[OFFSET(int(upperRightReduced.x), int(upperRightReduced.y), mapWidth)];
+    char lowerLeftCollision = map[OFFSET(int(lowerLeftReduced.x), int(lowerLeftReduced.y), mapWidth)];
+    char lowerRightCollision = map[OFFSET(int(lowerRightReduced.x), int(lowerRightReduced.y), mapWidth)];
     
     int leftPush = 0;
     int rightPush = 0;
@@ -62,25 +66,25 @@ Collision collideCollisionMap(Rect obj, char* map, int mapWidth, int relativeMag
     int downPush = 0;
 
     if (upperLeftCollision) {
-        rightPush = max(rightPush, ((upperLeftReduced.x+1)<<relativeMagnitude)-upperLeftCorner.x);
-        downPush = max(downPush, ((upperLeftReduced.y+1)<<relativeMagnitude)-upperLeftCorner.y);
+        rightPush = max(rightPush, (int(upperLeftReduced.x+1)<<relativeMagnitude)-upperLeftCorner.x.value);
+        downPush = max(downPush, (int(upperLeftReduced.y+1)<<relativeMagnitude)-upperLeftCorner.y.value);
     }
     if (upperRightCollision) {
-        leftPush = max(leftPush, upperRightCorner.x-(upperRightReduced.x<<relativeMagnitude)+1);
-        downPush = max(downPush, ((upperRightReduced.y+1)<<relativeMagnitude)-upperRightCorner.y);
+        leftPush = max(leftPush, upperRightCorner.x.value-(int(upperRightReduced.x)<<relativeMagnitude)+1);
+        downPush = max(downPush, (int(upperRightReduced.y+1)<<relativeMagnitude)-upperRightCorner.y.value);
     }
     if (lowerLeftCollision) {
-        rightPush = max(rightPush, ((lowerLeftReduced.x+1)<<relativeMagnitude)-lowerLeftCorner.x);
-        upPush = max(upPush, lowerLeftCorner.y-(lowerLeftReduced.y<<relativeMagnitude)+1);
+        rightPush = max(rightPush, (int(lowerLeftReduced.x+1)<<relativeMagnitude)-lowerLeftCorner.x.value);
+        upPush = max(upPush, lowerLeftCorner.y.value-(int(lowerLeftReduced.y)<<relativeMagnitude)+1);
     }
     if (lowerRightCollision) {
-        leftPush = max(leftPush, lowerRightCorner.x-(lowerRightReduced.x<<relativeMagnitude)+1);
-        upPush = max(upPush, lowerRightCorner.y-(lowerRightReduced.y<<relativeMagnitude)+1);
+        leftPush = max(leftPush, lowerRightCorner.x.value-(int(lowerRightReduced.x)<<relativeMagnitude)+1);
+        upPush = max(upPush, lowerRightCorner.y.value-(int(lowerRightReduced.y)<<relativeMagnitude)+1);
     }
 
     out.collided = (upperLeftCollision || upperRightCollision || lowerLeftCollision || lowerRightCollision);
-    out.push.x = rightPush - leftPush;
-    out.push.y = downPush - upPush;
+    out.push.x.value = rightPush - leftPush;
+    out.push.y.value = downPush - upPush;
 
     return out;
 }

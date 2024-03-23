@@ -166,8 +166,8 @@ void updateSurface(void) {
         cameraXTarget = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2);
         if (playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
 
-            if (playerData->dir == LEFT) cameraXTarget -= 48<<8;
-            if (playerData->dir == RIGHT) cameraXTarget += 48<<8;
+            if (playerData->dir == LEFT) cameraXTarget -= 48;
+            if (playerData->dir == RIGHT) cameraXTarget += 48;
         }
         
     }
@@ -176,6 +176,10 @@ void updateSurface(void) {
 
     // int cameraFollowedX = playerData->collider.pos.x + (playerData->collider.size.x - SCREENWIDTH) / 2;
     // if (cameraFollowedX < -8) cameraFollowedX = -8;
+
+    mgba_printf("Player x: %x", playerData->collider.pos.x);
+    mgba_printf("Player y: %x", playerData->collider.pos.y);
+    mgba_printf("Camera X Target: %x", cameraXTarget);
 
 
     smoothCameraX = smoothCameraX + (cameraXTarget - smoothCameraX) / 16;

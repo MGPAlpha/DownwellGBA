@@ -22,8 +22,6 @@ extern "C" {
 
 }
 
-//TODO debug this next
-
 
 int jumpFrames[] = {
     0,0,0,0,0,0,0,0,0,0,0,0,
@@ -147,7 +145,7 @@ void updatePlayer(GameObject* self) {
         data->state = PLAYER_IDLE;
         data->stateTime = 0;
     }
-    Collision walkCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 4);
+    Collision walkCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 20);
     if (walkCollision.push.x) {
         data->collider.pos.x += walkCollision.push.x;
     }
@@ -159,8 +157,9 @@ void updatePlayer(GameObject* self) {
             data->stateTime = 0;
             data->canFire = 0;
         } else {
-            data->collider.pos.y++;
-            Collision fallCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 4);
+            data->collider.pos.y+= 1;
+            mgba_printf("Player Y before collision: %x", data->collider.pos.y);
+            Collision fallCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 20);
             if (fallCollision.push.y < 0) {
                 data->collider.pos.y += fallCollision.push.y;
             } else {
@@ -206,7 +205,6 @@ void updatePlayer(GameObject* self) {
                 BulletData *bulletData = (BulletData*)newBullet->data;
                 bulletData->collider.pos.x = data->collider.pos.x;
                 bulletData->collider.pos.y = data->collider.pos.y;
-                bulletData->collider = resizeRect(bulletData->collider, BULLET_SIZE_FACTOR);
             }
             playSoundBPriority(machinegunbulletc8a_data, machinegunbulletc8a_length, 0, 0);
         }
@@ -215,10 +213,6 @@ void updatePlayer(GameObject* self) {
     }
 
     Transform resizedCollider = data->collider;
-    resizedCollider.pos.x <<= 8;
-    resizedCollider.pos.y <<= 8;
-    resizedCollider.size.x <<= 8;
-    resizedCollider.size.y <<= 8;
     
     data->resizedCollider = resizedCollider;
 

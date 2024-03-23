@@ -56,10 +56,10 @@ void fixed32::initializeTan() {
 #pragma endregion
 
 Rect resizeRect(Rect r, int magnitudeDifference) {
-    r.pos.x <<= magnitudeDifference;
-    r.pos.y <<= magnitudeDifference;
-    r.size.x <<= magnitudeDifference;
-    r.size.y <<= magnitudeDifference;
+    r.pos.x.value <<= magnitudeDifference;
+    r.pos.y.value <<= magnitudeDifference;
+    r.size.x.value <<= magnitudeDifference;
+    r.size.y.value <<= magnitudeDifference;
     return r;
 }
 

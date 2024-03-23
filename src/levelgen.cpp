@@ -88,11 +88,11 @@ void generateTilemapUntil(int row) {
 }
 
 void spawnNecessaryEnemies(PlayerData *playerData) {
-    while (enemySpawnIndex < levelEnemyCount && levelEnemies[enemySpawnIndex].pos.y < (playerData->collider.pos.y>>4) + 16) {
+    while (enemySpawnIndex < levelEnemyCount && levelEnemies[enemySpawnIndex].pos.y < (playerData->collider.pos.y*16) + 16) {
         EnemySpawn spawn = levelEnemies[enemySpawnIndex];
         Vector2 spawnPos = spawn.pos;
-        spawnPos.x <<= 4;
-        spawnPos.y <<= 4;
+        spawnPos.x *= 16;
+        spawnPos.y *= 16;
         spawnPos.x += 8 - spawn.type->colliderSize.x / 2;
         spawnPos.y += 8 - spawn.type->colliderSize.y / 2;
         GameObject *newEnemy = spawnEnemy(spawn.type, spawnPos);

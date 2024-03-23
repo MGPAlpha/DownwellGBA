@@ -7,7 +7,7 @@
                 "${workspaceFolder}/lib/**"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/clang",
+            "compilerPath": "${env:DEVKITARM}/bin/arm-none-eabi-g++",
             "cStandard": "c17",
             "cppStandard": "c++14",
             "intelliSenseMode": "linux-clang-x64"
