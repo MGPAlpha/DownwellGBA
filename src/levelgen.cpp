@@ -88,7 +88,7 @@ void generateTilemapUntil(int row) {
 }
 
 void spawnNecessaryEnemies(PlayerData *playerData) {
-    while (enemySpawnIndex < levelEnemyCount && levelEnemies[enemySpawnIndex].pos.y < (playerData->collider.pos.y*16) + 16) {
+    while (enemySpawnIndex < levelEnemyCount && levelEnemies[enemySpawnIndex].pos.y*16 < (playerData->collider.pos.y) + 100) {
         EnemySpawn spawn = levelEnemies[enemySpawnIndex];
         Vector2 spawnPos = spawn.pos;
         spawnPos.x *= 16;
@@ -99,4 +99,5 @@ void spawnNecessaryEnemies(PlayerData *playerData) {
         if (!newEnemy) mgba_printf("failed to spawn enemy %d", enemySpawnIndex);
         enemySpawnIndex++;
     }
+    mgba_printf("EnemySpawnIndex: %x", enemySpawnIndex);
 }
