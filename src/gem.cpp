@@ -49,16 +49,16 @@ void updateGem(GameObject* self) {
 
         case GEM_PHYSICS:
             {
-                data->velocity.y.value += 1<<11;
+                data->velocity.y.value += 8;
 
                 data->collider.pos.x += data->velocity.x;
-                Collision xColl = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 12);
+                Collision xColl = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 20);
                 if (xColl.collided) {
                     data->collider.pos.x += xColl.push.x;
                     data->velocity.x = -data->velocity.x;
                 }
                 data->collider.pos.y += data->velocity.y;
-                Collision yColl = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 12);
+                Collision yColl = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 20);
                 if (yColl.collided) {
                     data->collider.pos.y += yColl.push.y;
                     if (data->velocity.y >= 0) data->velocity.y = -1;

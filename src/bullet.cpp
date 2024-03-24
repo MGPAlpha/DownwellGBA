@@ -54,12 +54,12 @@ void updateBullet(GameObject* self) {
     BulletData *data = (BulletData*)self->data;
     int travelFrameIndex = self->lifetime;
     if (travelFrameIndex >= sizeof(bulletTravelFrames)/(sizeof(int))) travelFrameIndex = sizeof(bulletTravelFrames)/(sizeof(int)) - 1;
-    data->collider.pos.y += bulletTravelFrames[travelFrameIndex] << BULLET_SIZE_FACTOR;
+    data->collider.pos.y += bulletTravelFrames[travelFrameIndex];
     if (self->lifetime >= 26) {
         destroyGameObject(self);
         return;
     }
-    Collision groundCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 4 + BULLET_SIZE_FACTOR);
+    Collision groundCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 20);
     if (groundCollision.collided) {
         destroyGameObject(self);
         return;
@@ -75,8 +75,8 @@ void updateBullet(GameObject* self) {
 
 void drawBullet(GameObject* self) {
     BulletData *data = (BulletData*)self->data;
-    int posY = (data->collider.pos.y>>BULLET_SIZE_FACTOR) - cameraPos.y - 7;
-    int posX = (data->collider.pos.x>>BULLET_SIZE_FACTOR) - cameraPos.x - 1;
+    int posY = (data->collider.pos.y) - cameraPos.y - 7;
+    int posX = (data->collider.pos.x) - cameraPos.x - 1;
     if (posY < -16 || posY > 160 || posX < -8 || posX > 240) {
         self->sprite->attr0 = ATTR0_HIDE;
         return;

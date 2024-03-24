@@ -13,18 +13,18 @@ char activeCollisionMapWidth = 0;
 Collision collideRects(Rect rect1, Rect rect2) {
     Collision out = {0,{0,0}};
     
-    int x12 = rect2.pos.x - (rect1.pos.x + rect1.size.x);
-    int x21 = rect1.pos.x - (rect2.pos.x + rect2.size.x);
-    int y12 = rect2.pos.y - (rect1.pos.y + rect1.size.y);
-    int y21 = rect1.pos.y - (rect2.pos.y + rect2.size.y);
+    fixed32 x12 = rect2.pos.x - (rect1.pos.x + rect1.size.x);
+    fixed32 x21 = rect1.pos.x - (rect2.pos.x + rect2.size.x);
+    fixed32 y12 = rect2.pos.y - (rect1.pos.y + rect1.size.y);
+    fixed32 y21 = rect1.pos.y - (rect2.pos.y + rect2.size.y);
 
     out.collided = x12 < 0 && x21 < 0 && y12 < 0 && y21 < 0;
 
     if (out.collided) {
-        int closestSideX = x21 > x12 ? -1 : 1;
-        int closestSideY = y21 > y12 ? -1 : 1;
-        int closestDistX = x21 > x12 ? x21 : x12;
-        int closestDistY = y21 > y12 ? y21 : y12;
+        fixed32 closestSideX = x21 > x12 ? -1 : 1;
+        fixed32 closestSideY = y21 > y12 ? -1 : 1;
+        fixed32 closestDistX = x21 > x12 ? x21 : x12;
+        fixed32 closestDistY = y21 > y12 ? y21 : y12;
         
         if (x12 < 0) out.push.x -= x12; 
         if (x21 < 0) out.push.x += x21;

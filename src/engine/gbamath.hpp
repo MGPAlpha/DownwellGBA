@@ -6,6 +6,7 @@
 extern "C" {
 
 #include <fpsqrt.h>
+#include "../print.h"
 
 }
 
@@ -273,49 +274,25 @@ struct Vector2 {
     fixed32 x;
     fixed32 y;
 
-    inline Vector2(fixed32 x, fixed32 y) {
-        this->x = x;
-        this->y = y;
-    }
+    inline Vector2(fixed32 x, fixed32 y);
 
-    inline Vector2(fixed32 m) : Vector2(m,m) {
+    inline Vector2(fixed32 m);
 
-    }
+    inline Vector2();
 
-    inline Vector2() : Vector2(0) {
-        
-    }
+    inline fixed32 magnitude();
 
-    inline fixed32 magnitude() {
-        return (x*x + y*y).sqrt();
-    }
+    inline Vector2 normalized();
 
-    inline Vector2 normalized() {
-        fixed32 magnitude = this->magnitude();
-        return Vector2(*this)/magnitude;
-    }
+    inline fixed32 dot(Vector2 b);
 
-    inline fixed32 dot(Vector2 b) {
-        return this->x * b.x + this->y * b.y;
-    }
-
-    inline operator bool() {
+    explicit inline operator bool() {
         return (this->x || this->y);
     }
 
-    static inline Vector2 lerp(Vector2 a, Vector2 b, fixed32 t) {
-        Vector2 result = Vector2();
-        result.x = fixed32::lerp(a.x, b.x, t);
-        result.y = fixed32::lerp(a.y, b.y, t);
-        return result;
-    }
+    static inline Vector2 lerp(Vector2 a, Vector2 b, fixed32 t);
 
-    inline static Vector2 clampBounds(Vector2 v, Vector2 a, Vector2 b) {
-        Vector2 result;
-        result.x = (v.x > a.x) ? ((v.x < b.x) ? v.x : b.x) : a.x;
-        result.y = (v.y > a.y) ? ((v.y < b.y) ? v.y : b.y) : a.y;
-        return result;
-    }
+    inline static Vector2 clampBounds(Vector2 v, Vector2 a, Vector2 b);
 
 };
 
@@ -375,6 +352,52 @@ inline Vector2 operator/(int a, Vector2 b) {
 
 inline Vector2 operator-(Vector2 v) {
     Vector2 result = Vector2(v.x, v.y);
+    return result;
+}
+
+#pragma endregion
+
+#pragma region vector2functions
+
+inline Vector2::Vector2(fixed32 x, fixed32 y) {
+    this->x = x;
+    this->y = y;
+}
+
+inline Vector2::Vector2(fixed32 m) : Vector2(m,m) {
+
+}
+
+inline Vector2::Vector2() : Vector2(0) {
+    
+}
+
+inline fixed32 Vector2::magnitude() {
+    return (x*x + y*y).sqrt();
+}
+
+inline Vector2 Vector2::normalized() {
+    fixed32 magnitude = this->magnitude();
+    Vector2 v = Vector2(*this);
+    Vector2 result = v/magnitude;
+    return result;
+}
+
+inline fixed32 Vector2::dot(Vector2 b) {
+    return this->x * b.x + this->y * b.y;
+}
+
+inline Vector2 Vector2::lerp(Vector2 a, Vector2 b, fixed32 t) {
+    Vector2 result = Vector2();
+    result.x = fixed32::lerp(a.x, b.x, t);
+    result.y = fixed32::lerp(a.y, b.y, t);
+    return result;
+}
+
+inline Vector2 Vector2::clampBounds(Vector2 v, Vector2 a, Vector2 b) {
+    Vector2 result;
+    result.x = (v.x > a.x) ? ((v.x < b.x) ? v.x : b.x) : a.x;
+    result.y = (v.y > a.y) ? ((v.y < b.y) ? v.y : b.y) : a.y;
     return result;
 }
 
