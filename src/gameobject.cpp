@@ -20,97 +20,112 @@ extern "C" {
  *  and upon finding an inactive GO, swap it with the GO at the end of active region, and decrement active region length
  */
 
-static GameObject gameObjectMemory[MAX_GAME_OBJECTS];
-static GameObject *gameObjectRefs[MAX_GAME_OBJECTS];
-static int nextInactiveIndex = 0;
-
-void initGameObjects(void) {
-    for (int i = 0; i < MAX_GAME_OBJECTS; i++) {
-        gameObjectRefs[i] = &gameObjectMemory[i];
-    }
-    nextInactiveIndex = 0;
-}
-
-GameObject *newGameObject(const GameObjectType *type) {
-    if (nextInactiveIndex >= MAX_GAME_OBJECTS) return NULL;
-    GameObject* gameObject = gameObjectRefs[nextInactiveIndex];
-    gameObject->type = type;
-    gameObject->sprite = spriteAlloc();
-    if (!gameObject->sprite) {
+Component::Component() {
+    this->sprite = spriteAlloc();
+    if (!this->sprite) {
         mgba_printf("Sprite allocation failed");
-        return NULL;
-    }
-    int initStatus = (*type->initialize)(gameObject);
-    if (initStatus) {
-        mgba_printf("GameObject Initialization Failed");
-        spriteFree(gameObject->sprite);
-        return NULL;
-    }
-    gameObject->active = 1;
-    gameObject->lifetime = 0;
-    nextInactiveIndex++;
-    return gameObject;
-}
-
-void destroyGameObject(GameObject *gameObject) {
-    gameObject->active = 0;
-    if (gameObject->sprite) {
-        gameObject->sprite->attr0 = ATTR0_HIDE;
-        spriteFree(gameObject->sprite);
-    }
-    (*gameObject->type->destroy)(gameObject);
-    return;
-}
-
-void consolidateActiveGameObjects(void) {
-    for (int i = 0; i < nextInactiveIndex; i++) {
-        if (!gameObjectRefs[i]->active) {
-            nextInactiveIndex--;
-            GameObject *temp = gameObjectRefs[i];
-            gameObjectRefs[i] = gameObjectRefs[nextInactiveIndex];
-            gameObjectRefs[nextInactiveIndex] = temp;
-            i--;
-        }
+        // return NULL;
     }
 }
 
-void updateAllGameObjects(void) {
-    for (int i = 0; i < nextInactiveIndex; i++) {
-        GameObject *curr = gameObjectRefs[i];
-        if (curr->active) {
-            (*curr->type->update)(curr);
-            curr->lifetime++;
-        }
+void Component::awake() {
+    
+}
+void Component::update() {
+    
+}
+void Component::draw() {
+    
+}
+void Component::destroy() {
+    
+}
+
+
+// void initGameObjects(void) {
+//     for (int i = 0; i < MAX_GAME_OBJECTS; i++) {
+//         gameObjectRefs[i] = &gameObjectMemory[i];
+//     }
+//     nextInactiveIndex = 0;
+// }
+
+void GameObject::addComponent(Component* newComponent) {
+    components.push_back(newComponent);
+    newComponent->gameObject = this;
+}
+
+int GameObject::getLifetime() {
+    return this->lifetime;
+}
+
+void GameObject::awakeComponents() {
+    for (Component* c : this->components) {
+        c->awake();
+    }
+}
+void GameObject::updateComponents() {
+    for (Component* c : this->components) {
+        c->update();
+    }
+    this->lifetime++;
+}
+void GameObject::drawComponents() {
+    for (Component* c : this->components) {
+        c->draw();
+    }
+}
+void GameObject::destroyComponents() {
+    for (Component* c : this->components) {
+        c->destroy();
+        delete c;
+    }
+    components.clear();
+}
+
+void GameObject::destroy() {
+    toBeDestroyed.insert(this);
+}
+
+// void consolidateActiveGameObjects(void) {
+//     for (int i = 0; i < nextInactiveIndex; i++) {
+//         if (!gameObjectRefs[i]->active) {
+//             nextInactiveIndex--;
+//             GameObject *temp = gameObjectRefs[i];
+//             gameObjectRefs[i] = gameObjectRefs[nextInactiveIndex];
+//             gameObjectRefs[nextInactiveIndex] = temp;
+//             i--;
+//         }
+//     }
+// }
+
+void GameObject::loadGameObject(GameObject* g) {
+    gameObjectRefs.push_back(g);
+    g->awakeComponents();
+} 
+
+void GameObject::updateAllGameObjects(void) {
+    for (GameObject* curr : gameObjectRefs) {
+        // if (curr->active) {
+        curr->updateComponents();
+        // }
     }
 }
 
-void drawAllGameObjects(void) {
-    for (int i = 0; i < nextInactiveIndex; i++) {
-        GameObject *curr = gameObjectRefs[i];
-        if (curr->active) {
-            (*curr->type->draw)(curr);
-        }
+void GameObject::drawAllGameObjects(void) {
+    for (GameObject* curr : gameObjectRefs) {
+        // if (curr->active) {
+        curr->drawComponents();
+        // }
     }
 }
 
-void destroyAllGameObjects(void) {
-    for (int i = 0; i < nextInactiveIndex; i++) {
-        GameObject *curr = gameObjectRefs[i];
-        if (curr->active) {
-            destroyGameObject(curr);
-        }
+void GameObject::destroyAllGameObjects(void) {
+    for (GameObject* curr : gameObjectRefs) {
+        // if (curr->active) {
+        curr->destroyComponents();
+        delete curr;
+        // }
     }
-    consolidateActiveGameObjects();
-}
-
-unsigned int doForEachGameObjectOfTypeWith(const GameObjectType* type, void *with, std::function<unsigned int(GameObject*, void*)> func) {
-    unsigned int outCode = 0;
-    for (int i = 0; i < nextInactiveIndex; i++) {
-        GameObject *curr = gameObjectRefs[i];
-        if (curr->active && curr->type == type) {
-            unsigned int newOut = func(curr, with);
-            if (newOut > outCode) outCode = newOut;
-        }
-    }
-    return outCode;
+    gameObjectRefs.clear();
+    toBeDestroyed.clear();
 }
