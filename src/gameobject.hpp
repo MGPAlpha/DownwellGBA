@@ -26,7 +26,7 @@ class Component {
         virtual void destroy();
 
         Component();
-        ~Component();
+        virtual ~Component();
 
         OBJ_ATTR *sprite;
     
@@ -44,7 +44,7 @@ class GameObject {
         template <class ComponentType>
         ComponentType* getComponent() {
             for (Component* c : components) {
-                ComponentType* result = dynamic_cast<ComponentType>(c);
+                ComponentType* result = dynamic_cast<ComponentType*>(c);
                 if (result) return result;
             }
             return nullptr;
@@ -53,10 +53,10 @@ class GameObject {
         static void loadGameObject(GameObject* g); 
 
         template <class ComponentType>
-        static unsigned int doForEachGameObject(std::function<unsigned int(ComponentType)> func) {
+        static unsigned int doForEachGameObject(std::function<unsigned int(ComponentType*)> func) {
             unsigned int outCode = 0;
             for (GameObject* go : gameObjectRefs) {
-                ComponentType c = go->getComponent<ComponentType>();
+                ComponentType* c = go->getComponent<ComponentType>();
                 if (c) {
                     unsigned int newOut = func(c);
                     if (newOut > outCode) outCode = newOut;
@@ -64,6 +64,10 @@ class GameObject {
             }
             return outCode;
         }
+        static void updateAllGameObjects(void);
+        static void drawAllGameObjects(void);
+        static void destroyAllGameObjects(void);
+        static void clearDestructionQueue();
 
     private:
 
@@ -78,9 +82,6 @@ class GameObject {
         static std::list<GameObject*> gameObjectRefs;
         static std::set<GameObject*> toBeDestroyed;
 
-        static void updateAllGameObjects(void);
-        static void drawAllGameObjects(void);
-        static void destroyAllGameObjects(void);
 
 };
 
@@ -105,6 +106,14 @@ void initGameObjects(void);
 
 
 void consolidateActiveGameObjects(void);
+
+class GameObjectGenerator {
+    public:
+        GameObjectGenerator(std::function<GameObject*(Vector2)> genFunc);
+        GameObject* operator() (Vector2 v) const;
+    private:
+        std::function<GameObject*(Vector2)> generatorFunction;
+};
 
 
 #endif

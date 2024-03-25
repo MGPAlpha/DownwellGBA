@@ -83,23 +83,21 @@ int Player::playerHealth = 4;
 int Player::playerMaxHealth = 4;
 int Player::playerMaxHealthProgress = 0;
 
-void checkForPlayerEnemyContact(GameObject *enemy, GameObject *player) {
-    PlayerData *playerData = (PlayerData*)player->this;
-    EnemyData *enemyData = (EnemyData*)enemy->this;
-    Collision col = collideRects(playerData->resizedCollider, enemyData->collider);
+void Player::checkForEnemyContact(Enemy *enemy) {
+    Collision col = collideRects(this->collider, enemy->collider);
     if (col.collided) {
         if (col.push.y < 0/* && col.push.y > -5<<8*/) {
-            killEnemy(enemy);
-            playerData->state = PLAYER_HOP;
-            playerData->stateTime = 6;
-            playerData->runningJump = 1;
-            playerData->ammo = playerData->charge;
-            playerData->canFire = 0;
+            enemy->killEnemy();
+            this->state = PLAYER_HOP;
+            this->stateTime = 6;
+            this->runningJump = 1;
+            this->ammo = this->charge;
+            this->canFire = 0;
             playSoundBPriority(stompc96_data, stompc96_length, 0, 5);
-        } else if (playerData->iFrames < 1) {
+        } else if (this->iFrames < 1) {
             playerHealth--;
             playSoundBPriority(playerdamagedd66_data, playerdamagedd66_length, 0, 10);
-            playerData->iFrames = 60;
+            this->iFrames = 60;
         }
     }
 }
@@ -107,6 +105,11 @@ void checkForPlayerEnemyContact(GameObject *enemy, GameObject *player) {
 Player* Player::getSingleton() {
     return singleton;
 }
+
+Rect Player::getCollider() {
+    return collider;
+}
+
 
 Player::Player() {
     this->collider.pos.x = 0;
@@ -123,6 +126,8 @@ Player::Player() {
     this->ammo = 8;
     this->iFrames = 0;
 }
+
+Player* Player::singleton;
 
 void Player::awake() {
     singleton = this;
@@ -199,13 +204,13 @@ void Player::update() {
             this->fireTime = 0;
             this->runningJump = 0;
             if (!infiniteAmmoCheat) this->ammo -= 1;
-            GameObject *newBullet = newGameObject(&bulletType);
+            GameObject* bulletObj = new GameObject();
+            Bullet* bullet = new Bullet(this->collider.pos);
+            bulletObj->addComponent(bullet);
+            GameObject::loadGameObject(bulletObj);
+
             this->stateTime = 21;
-            if (newBullet->active) {
-                BulletData *bulletData = (BulletData*)newBullet->this;
-                bulletData->collider.pos.x = this->collider.pos.x;
-                bulletData->collider.pos.y = this->collider.pos.y;
-            }
+            
             playSoundBPriority(machinegunbulletc8a_data, machinegunbulletc8a_length, 0, 0);
         }
 
@@ -216,8 +221,8 @@ void Player::update() {
     
     this->resizedCollider = resizedCollider;
 
-    if (this->state != PLAYER_DEAD) doForEachGameObjectOfTypeWith(&enemyType, self, [](GameObject* g, void* a) {
-        checkForPlayerEnemyContact(g, (GameObject*)a);
+    if (this->state != PLAYER_DEAD) GameObject::doForEachGameObject<Enemy>([this](Enemy* e) {
+        this->checkForEnemyContact(e);
         return 0;
     });
 

@@ -11,6 +11,6 @@ void generateLevel(const SegmentPool *startPool, const SegmentPool *mainPool, co
 
 void generateTilemapUntil(int row);
 
-void spawnNecessaryEnemies(PlayerData* playerData);
+void spawnNecessaryEnemies(Player* player);
 
 #endif

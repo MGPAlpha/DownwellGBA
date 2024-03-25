@@ -50,20 +50,20 @@ int vBlankCount = 0;
 
 static fixed32 smoothCameraX = 0;
 
-GameObject *logoSprite0;
-GameObject *logoSprite1;
+LogoSprite *logoSprite0;
+LogoSprite *logoSprite1;
 
 int wellDescentTime = 0;
 
 void initSurface(void) {
 
-    destroyAllGameObjects();
+    GameObject::destroyAllGameObjects();
 
     stopSound();
 
-    playerHealth = 4;
-    playerMaxHealth = 4;
-    playerMaxHealthProgress = 0;
+    Player::playerHealth = 4;
+    Player::playerMaxHealth = 4;
+    Player::playerMaxHealthProgress = 0;
 
     waitForVBlank();
 
@@ -100,31 +100,22 @@ void initSurface(void) {
 
     wellDescentTime = 0;
 
-    GameObject *playerObject = newGameObject(&playerType);
+    GameObject *playerObject = new GameObject();
+    Player* player = new Player();
+    playerObject->addComponent(player);
+    player->collider.pos = Vector2(152,133);
+    smoothCameraX = player->collider.pos.x - SCREENWIDTH/2 + player->collider.size.x/2;
+    GameObject::loadGameObject(playerObject);
 
-    if (playerObject) {
-        playerSingleton = playerObject;
-        PlayerData *playerData = (PlayerData*)playerObject->data;
-        playerData->collider.pos.y = 133;
-        playerData->collider.pos.x = 152;
-        smoothCameraX = playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2;
-    }
+    GameObject* logoSpriteObj0 = new GameObject();
+    logoSprite0 = new LogoSprite(0, Vector2(288, 60));
+    logoSpriteObj0->addComponent(logoSprite0);
+    GameObject::loadGameObject(logoSpriteObj0);
 
-    logoSprite0 = newGameObject(&logoSpriteType);
-    if (logoSprite0) {
-        LogoSpriteData *logoData = (LogoSpriteData*)logoSprite0->data;
-        logoData->pos.x = 288;
-        logoData->pos.y = 60;
-        logoData->index = 0;
-    }
-    logoSprite1 = newGameObject(&logoSpriteType);
-    if (logoSprite1) {
-        LogoSpriteData *logoData = (LogoSpriteData*)logoSprite1->data;
-        logoData->pos.x = 354;
-        logoData->pos.y = 60;
-        logoData->index = 1;
-    }
-
+    GameObject* logoSpriteObj1 = new GameObject();
+    logoSprite1 = new LogoSprite(1, Vector2(354, 60));
+    logoSpriteObj1->addComponent(logoSprite1);
+    GameObject::loadGameObject(logoSpriteObj1);
 
     for (int i = 0; i < 60; i++) {
         waitForVBlank();
@@ -140,34 +131,33 @@ void updateSurface(void) {
 
     int playerCanMove = stateTime > 8*6;
 
-    if (playerCanMove) updateAllGameObjects();
+    if (playerCanMove) GameObject::updateAllGameObjects();
     
     
-    consolidateActiveGameObjects();
+    GameObject::clearDestructionQueue();
+    // consolidateActiveGameObjects();
     
 
     fixed32 cameraXTarget = 0;
 
-    PlayerData *playerData = (playerSingleton) ? ((PlayerData*)playerSingleton->data) : nullptr;
-    if (!playerSingleton || playerData->collider.pos.x >= 260) {
+    Player *player = Player::getSingleton();
+    if (!player || player->collider.pos.x >= 260) {
         cameraXTarget = 233;
         if (logoSprite0 && logoSprite1){
-            LogoSpriteData *logoData0 = (LogoSpriteData*)logoSprite0->data;
-            LogoSpriteData *logoData1 = (LogoSpriteData*)logoSprite1->data;
-            if (!logoData0->animationStart && playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
-                logoData0->animationStart = logoSprite0->lifetime;
-                logoData1->animationStart = logoSprite1->lifetime;
+            if (!logoSprite0->animationStart && playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
+                logoSprite0->animationStart = logoSprite0->getGameObject()->getLifetime();
+                logoSprite1->animationStart = logoSprite1->getGameObject()->getLifetime();
                 playSoundA(logosound_data, logosound_length, 0);
             }
         }
 
 
     } else {
-        cameraXTarget = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2);
+        cameraXTarget = (player->collider.pos.x - SCREENWIDTH/2 + player->collider.size.x/2);
         if (playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
 
-            if (playerData->dir == LEFT) cameraXTarget -= 48;
-            if (playerData->dir == RIGHT) cameraXTarget += 48;
+            if (player->dir == LEFT) cameraXTarget -= 48;
+            if (player->dir == RIGHT) cameraXTarget += 48;
         }
         
     }
@@ -197,17 +187,17 @@ void updateSurface(void) {
 
     waitForVBlank();
 
-    drawAllGameObjects();
+    GameObject::drawAllGameObjects();
     DMANow(3, &dither[MAX(0,6-stateTime/6)*16], &CHARBLOCK[1], 16);
     REG_BG0HOFF = int(cameraPos.x);
     REG_BG0VOFF = int(cameraPos.y);
     REG_BG3HOFF = int(cameraPos.x*5/24-40);
 
-    if (playerSingleton) {
-        updateAmmoDisplay(playerData->ammo, 1);
+    if (player) {
+        updateAmmoDisplay(player->ammo, 1);
     }
 
-    updateHealthDisplay(playerHealth,playerMaxHealth,playerMaxHealthProgress);
+    updateHealthDisplay(Player::playerHealth,Player::playerMaxHealth,Player::playerMaxHealthProgress);
 
     updateSprites();
 
@@ -215,8 +205,8 @@ void updateSurface(void) {
 
     if (playerCanMove && BUTTON_PRESSED(BUTTON_START)) {
         pauseFromSurface();
-    } else if (!wellDescentTime && playerData && playerData->collider.pos.y > 160) {
-        destroyGameObject(playerSingleton);
+    } else if (!wellDescentTime && player && player->collider.pos.y > 160) {
+        player->getGameObject()->destroy();
         wellDescentTime = stateTime;
     }
 }
@@ -280,22 +270,23 @@ fixed32 smoothCameraY = 0;
 int level = 0;
 
 void nextLevel(void) {
-    destroyAllGameObjects();
+    GameObject::destroyAllGameObjects();
 
     smoothCameraY = 16;
 
     generateLevel(&startSegmentPool, &cavernSegmentPool, &endSegmentPool);
 
-    GameObject *playerObject = newGameObject(&playerType);
+    GameObject *playerObject = new GameObject();
+    Player* player = new Player();
+    playerObject->addComponent(player);
+    GameObject::loadGameObject(playerObject);
 
-    if (playerObject) {
-        playerSingleton = playerObject;
-        PlayerData *playerData = (PlayerData*)playerObject->data;
-        playerData->collider.pos.y = 0;
-        playerData->collider.pos.x = 85;
-        playerData->runningJump = 1;
-        playerData->state = PLAYER_JUMPING;
-        playerData->stateTime = 64;
+    if (player) {
+        player->collider.pos.y = 0;
+        player->collider.pos.x = 85;
+        player->runningJump = 1;
+        player->state = PLAYER_JUMPING;
+        player->stateTime = 64;
 
         // smoothCameraX = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
     }
@@ -341,9 +332,9 @@ void initGame(void) {
     stopSound();    
 
 
-    playerHealth = 4;
-    playerMaxHealth = 4;
-    playerMaxHealthProgress = 0;
+    Player::playerHealth = 4;
+    Player::playerMaxHealth = 4;
+    Player::playerMaxHealthProgress = 0;
 
     initGemData();
 
@@ -373,23 +364,23 @@ void updateGame(void) {
     //     }
     // }
 
-    updateAllGameObjects();
+    GameObject::updateAllGameObjects();
     
-    consolidateActiveGameObjects();
+    GameObject::clearDestructionQueue();
     
 
     fixed32 cameraYTarget = 0;
 
-    PlayerData *playerData = playerSingleton ? (PlayerData*)playerSingleton->data : NULL;
+    Player *player = Player::getSingleton();
     
-    if (playerData && !soundA.isPlaying && (playerData->state == PLAYER_WALKING || playerData->state == PLAYER_IDLE)) {
+    if (player && !soundA.isPlaying && (player->state == PLAYER_WALKING || player->state == PLAYER_IDLE)) {
         playSoundA(cavernmusic_data, cavernmusic_length, 1);
     }
 
-    spawnNecessaryEnemies(playerData);
+    spawnNecessaryEnemies(player);
 
-    if (playerData) {
-        cameraYTarget = (playerData->collider.pos.y - SCREENHEIGHT/2 + playerData->collider.size.y/2 + 16);
+    if (player) {
+        cameraYTarget = (player->collider.pos.y - SCREENHEIGHT/2 + player->collider.size.y/2 + 16);
         cameraYTarget = max(16,cameraYTarget);
         cameraYTarget = min((currentLevelLength-11)<<4,cameraYTarget);
     }
@@ -402,30 +393,30 @@ void updateGame(void) {
     // if (cameraFollowedX < -8) cameraFollowedX = -8;
 
 
-    if (playerData->state != PLAYER_DEAD) {
+    if (player->state != PLAYER_DEAD) {
         cameraPos.x = -32;
         cameraPos.y = smoothCameraY;
     }
 
     generateTilemapUntil(int(cameraPos.y) / 16 + 11);
 
-    if (playerData->state != PLAYER_DEAD && playerData->collider.pos.y > (currentLevelLength-1)<<4) {
+    if (player->state != PLAYER_DEAD && player->collider.pos.y > (currentLevelLength-1)<<4) {
         nextLevel();
         return;
     }
 
     waitForVBlank();
 
-    drawAllGameObjects();
+    GameObject::drawAllGameObjects();
     REG_BG0HOFF = int(cameraPos.x);
     REG_BG0VOFF = int(cameraPos.y);
 
     
     
-    if (playerData) {
-        updateAmmoDisplay(playerData->ammo, 1);
+    if (player) {
+        updateAmmoDisplay(player->ammo, 1);
     }
-    updateHealthDisplay(playerHealth,playerMaxHealth,playerMaxHealthProgress);
+    updateHealthDisplay(Player::playerHealth,Player::playerMaxHealth,Player::playerMaxHealthProgress);
     updateGemsDisplay(gemsHeld);
     drawTimeDisplay();
 
@@ -435,11 +426,11 @@ void updateGame(void) {
 
     checkToEnableCheats();
 
-    if (playerData->state != PLAYER_DEAD && BUTTON_PRESSED(BUTTON_START)) {
+    if (player->state != PLAYER_DEAD && BUTTON_PRESSED(BUTTON_START)) {
         pauseFromGame();
     }
 
-    if (playerData->state == PLAYER_DEAD && playerData->stateTime > 135) {
+    if (player->state == PLAYER_DEAD && player->stateTime > 135) {
         // playSoundBPriority(playerkilledc50_data, playerkilledc50_length, 0, 200);
 
         // waitNVBlanks(60);

@@ -3,34 +3,37 @@
 
 #include "gameobject.hpp"
 
-const extern GameObjectType enemyType;
+class Enemy : public Component {
+    public:
+        void damageEnemy(int damage);
+        void killEnemy();
+        Transform collider;
+        Vector2 velocity;
+        Vector2 frameExtraMovement;
+        Vector2 spriteOffset;
+        int health;
+        int dead;
+        fixed32 maxPlayerRange;
+    protected:
+        
+        Enemy(Vector2 pos);
+        void update() override;
+        void draw() override;
+    private:
+        virtual int calculateSpriteIndex() = 0;
 
-typedef struct enemytype {
-    int maxHealth;
-    Vector2 spriteOffset;
-    Vector2 colliderSize;
-    void (*update)(GameObject* self);
-    int (*spriteIndex)(GameObject* self);
-    fixed32 maxPlayerRange;
-} EnemyType;
+};
 
-typedef struct enemydata {
-    const EnemyType* type;
-    Transform collider;
-    Vector2 velocity;
-    Vector2 frameExtraMovement;
-    int health;
-    int dead;
-} EnemyData;
-
-const extern EnemyType blobType;
-
-GameObject *spawnEnemy(const EnemyType *type, Vector2 pos);
-
-void damageEnemy(GameObject *self, int damage);
-
-void killEnemy(GameObject *self);
+class BlobEnemy : public Enemy {
+    public:
+        BlobEnemy(Vector2 pos);
+    protected:
+        void update() override;
+        int calculateSpriteIndex() override;
+};
 
 extern int enemiesKilled;
+
+extern GameObjectGenerator blobGenerator;
 
 #endif

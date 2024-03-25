@@ -7,7 +7,7 @@
 #define MAX_LEVEL_LENGTH 400
 
 typedef struct enemyspawn {
-    const EnemyType *type;
+    const GameObjectGenerator *type;
     Vector2 pos;
 } EnemySpawn;
 

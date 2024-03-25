@@ -28,6 +28,16 @@ Component::Component() {
     }
 }
 
+Component::~Component() {
+    this->sprite->attr0 = ATTR0_HIDE;
+    spriteFree(this->sprite);
+}
+
+GameObject* Component::getGameObject() {
+    return this->gameObject;
+}
+
+
 void Component::awake() {
     
 }
@@ -48,6 +58,9 @@ void Component::destroy() {
 //     }
 //     nextInactiveIndex = 0;
 // }
+
+std::list<GameObject*> GameObject::gameObjectRefs;
+std::set<GameObject*> GameObject::toBeDestroyed;
 
 void GameObject::addComponent(Component* newComponent) {
     components.push_back(newComponent);
@@ -128,4 +141,21 @@ void GameObject::destroyAllGameObjects(void) {
     }
     gameObjectRefs.clear();
     toBeDestroyed.clear();
+}
+
+void GameObject::clearDestructionQueue() {
+    for (GameObject* curr : toBeDestroyed) {
+        curr->destroyComponents();
+        gameObjectRefs.remove(curr);
+        delete curr;
+    }
+    toBeDestroyed.clear();
+}
+
+
+GameObjectGenerator::GameObjectGenerator(std::function<GameObject*(Vector2)> genFunc) {
+    generatorFunction = genFunc;
+}
+GameObject* GameObjectGenerator::operator() (Vector2 v) const {
+    return generatorFunction(v);
 }

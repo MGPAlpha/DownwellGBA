@@ -5,14 +5,14 @@
 
 // const extern GameObjectType logoSpriteType;
 
-class LogoSprite : Component {
+class LogoSprite : public Component {
     public:
         LogoSprite(int index, Vector2 pos);
+        int animationStart = 0;
     protected:
         void draw() override;
     private:
         Vector2 pos;
         int index;
-        int animationStart = 0;
 };
 #endif

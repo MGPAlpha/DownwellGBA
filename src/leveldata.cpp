@@ -67,8 +67,8 @@ const char levelCavern1Terrain[] = {
 };
 
 const EnemySpawn levelCavern1Enemies[] = {
-    &blobType, {8, 2},
-    &blobType, {2, 9}
+    &blobGenerator, {8, 2},
+    &blobGenerator, {2, 9}
 };
 
 const char levelCavern2Terrain[] = {
@@ -83,7 +83,7 @@ const char levelCavern2Terrain[] = {
 };
 
 const EnemySpawn levelCavern2Enemies[] = {
-    &blobType, {8, 2}
+    &blobGenerator, {8, 2}
 };
 
 const char levelCavern3Terrain[] = {
@@ -103,8 +103,8 @@ const char levelCavern3Terrain[] = {
 };
 
 const EnemySpawn levelCavern3Enemies[] = {
-    &blobType, {5, 5},
-    &blobType, {2, 9}
+    &blobGenerator, {5, 5},
+    &blobGenerator, {2, 9}
 };
 
 const LevelSegment startSegments[] = {

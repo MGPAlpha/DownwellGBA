@@ -120,8 +120,8 @@ void unlockPalettesCheat(void) {
 }
 
 void hpCheat(void) {
-    playerHealth++;
-    updateHealthDisplay(playerHealth, playerMaxHealth, 0);
+    Player::playerHealth++;
+    updateHealthDisplay(Player::playerHealth, Player::playerMaxHealth, 0);
 }
 
 Cheat cheats[NUM_CHEATS] = {

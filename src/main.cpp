@@ -58,7 +58,7 @@ int main() {
     initCheats();
 
     initSpriteMemory();
-    initGameObjects();
+    // initGameObjects();
     initGemData();
 
     waitForVBlank();

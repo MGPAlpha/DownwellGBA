@@ -87,17 +87,16 @@ void generateTilemapUntil(int row) {
     furthestGenerated = row;
 }
 
-void spawnNecessaryEnemies(PlayerData *playerData) {
-    while (enemySpawnIndex < levelEnemyCount && levelEnemies[enemySpawnIndex].pos.y*16 < (playerData->collider.pos.y) + 100) {
+void spawnNecessaryEnemies(Player *player) {
+    while (enemySpawnIndex < levelEnemyCount && levelEnemies[enemySpawnIndex].pos.y*16 < (player->getCollider().pos.y) + 100) {
         EnemySpawn spawn = levelEnemies[enemySpawnIndex];
         Vector2 spawnPos = spawn.pos;
         spawnPos.x *= 16;
         spawnPos.y *= 16;
-        spawnPos.x += 8 - spawn.type->colliderSize.x / 2;
-        spawnPos.y += 8 - spawn.type->colliderSize.y / 2;
-        GameObject *newEnemy = spawnEnemy(spawn.type, spawnPos);
-        if (!newEnemy) mgba_printf("failed to spawn enemy %d", enemySpawnIndex);
+        spawnPos.x += 8;
+        spawnPos.y += 8;
+        GameObject *newEnemy = (*spawn.type)(spawnPos);
+        GameObject::loadGameObject(newEnemy);
         enemySpawnIndex++;
     }
-    mgba_printf("EnemySpawnIndex: %x", enemySpawnIndex);
 }

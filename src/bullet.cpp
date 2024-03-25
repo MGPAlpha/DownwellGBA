@@ -25,81 +25,60 @@ int bulletTravelFrames[] = {
     1,1,1
 };
 
-unsigned int checkBulletCollisionWithEnemy(GameObject *enemy, GameObject *bullet) {
-    BulletData *bulletData = (BulletData*)bullet->data;
-    EnemyData *enemyData = (EnemyData*)enemy->data;
+unsigned int Bullet::CheckCollisionWithEnemy(Enemy *enemy) {
 
-    Collision testCollision = collideRects(bulletData->collider, enemyData->collider);
+    Collision testCollision = collideRects(this->collider, enemy->collider);
 
     if (testCollision.collided) {
-        damageEnemy(enemy, 1);
+        enemy->damageEnemy(1);
         return 1;
     }
     return 0;
 }
 
-int initializeBullet(GameObject* self) {
-    BulletData *data = (BulletData*)malloc(sizeof(BulletData));
-    if (!data) return 1;
-    data->collider.pos.x = 0;
-    data->collider.pos.y = 0;
-    data->collider.size.x = 6;
-    data->collider.size.y = 4;
-    self->data = data;
-
-    return 0;
+Bullet::Bullet(Vector2 pos) {
+    this->collider.pos = pos;
+    this->collider.size.x = 6;
+    this->collider.size.y = 4;
 }
 
-void updateBullet(GameObject* self) {
-    BulletData *data = (BulletData*)self->data;
-    int travelFrameIndex = self->lifetime;
+void Bullet::update() {
+    int lifetime = this->getGameObject()->getLifetime();
+    int travelFrameIndex = lifetime;
     if (travelFrameIndex >= sizeof(bulletTravelFrames)/(sizeof(int))) travelFrameIndex = sizeof(bulletTravelFrames)/(sizeof(int)) - 1;
-    data->collider.pos.y += bulletTravelFrames[travelFrameIndex];
-    if (self->lifetime >= 26) {
-        destroyGameObject(self);
+    this->collider.pos.y += bulletTravelFrames[travelFrameIndex];
+    if (lifetime >= 26) {
+        this->getGameObject()->destroy();
         return;
     }
-    Collision groundCollision = collideCollisionMap(data->collider, activeCollisionMap, activeCollisionMapWidth, 20);
+    Collision groundCollision = collideCollisionMap(this->collider, activeCollisionMap, activeCollisionMapWidth, 20);
     if (groundCollision.collided) {
-        destroyGameObject(self);
+        this->getGameObject()->destroy();
         return;
     }
-    unsigned int bulletCheckResult = doForEachGameObjectOfTypeWith(&enemyType, self, [](GameObject* g, void* a) {
-        return checkBulletCollisionWithEnemy(g, (GameObject*)a);
+    unsigned int bulletCheckResult = GameObject::doForEachGameObject<Enemy>([this](Enemy* g) {
+        return this->CheckCollisionWithEnemy(g);
     });
     if (bulletCheckResult) {
-        destroyGameObject(self);
+        this->getGameObject()->destroy();
         return;
     }
 }
 
-void drawBullet(GameObject* self) {
-    BulletData *data = (BulletData*)self->data;
-    int posY = (data->collider.pos.y) - cameraPos.y - 7;
-    int posX = (data->collider.pos.x) - cameraPos.x - 1;
+void Bullet::draw() {
+    int lifetime = this->getGameObject()->getLifetime();
+    int posY = (this->collider.pos.y) - cameraPos.y - 7;
+    int posX = (this->collider.pos.x) - cameraPos.x - 1;
     if (posY < -16 || posY > 160 || posX < -8 || posX > 240) {
-        self->sprite->attr0 = ATTR0_HIDE;
+        this->sprite->attr0 = ATTR0_HIDE;
         return;
     }
-    self->sprite->attr0 = ATTR0_REGULAR | ATTR0_TALL | posY & 0x00ff;
-    self->sprite->attr1 = ATTR1_TINY | posX & 0x01ff;
-    if (self->lifetime <= 16) {
-        self->sprite->attr2 = ATTR2_TILEID(0,10) | ATTR2_PRIORITY(2);
+    this->sprite->attr0 = ATTR0_REGULAR | ATTR0_TALL | posY & 0x00ff;
+    this->sprite->attr1 = ATTR1_TINY | posX & 0x01ff;
+    if (lifetime <= 16) {
+        this->sprite->attr2 = ATTR2_TILEID(0,10) | ATTR2_PRIORITY(2);
     } else {
-        int aniFrame = (self->lifetime - 17) / 2 + 1;
-        self->sprite->attr2 = ATTR2_TILEID(aniFrame,10) | ATTR2_PRIORITY(2);
+        int aniFrame = (lifetime - 17) / 2 + 1;
+        this->sprite->attr2 = ATTR2_TILEID(aniFrame,10) | ATTR2_PRIORITY(2);
     }
 }
-
-void destroyBullet(GameObject* self) {
-    if (self->data) {
-        free(self->data);
-    }
-}
-
-const GameObjectType bulletType = {
-    initializeBullet,
-    updateBullet,
-    drawBullet,
-    destroyBullet
-};
