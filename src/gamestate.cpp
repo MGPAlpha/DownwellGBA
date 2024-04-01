@@ -41,6 +41,7 @@ extern "C" {
 
 }
 
+using namespace GBAEngine;
 
 enum GAMESTATE gameState;
 enum GAMESTATE unpauseState;

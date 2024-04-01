@@ -9,6 +9,8 @@ extern "C" {
 
 }
 
+using namespace GBAEngine;
+
 EnemySpawn levelEnemies[MAX_LEVEL_LENGTH];
 int levelEnemyCount = 0;
 

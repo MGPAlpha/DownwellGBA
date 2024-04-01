@@ -8,6 +8,8 @@
 #include "spritedata.hpp"
 #include "collision.hpp"
 
+using namespace GBAEngine;
+
 int enemiesKilled = 0;
 
 void Enemy::update() {

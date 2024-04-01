@@ -1,17 +1,17 @@
 #ifndef BULLET_HPP
 #define BULLET_HPP
 
-#include "gameobject.hpp"
+#include "engine/gameobject.hpp"
 #include "enemy.hpp"
 
-class Bullet : public Component {
+class Bullet : public GBAEngine::Component {
     public:
-        Bullet(Vector2 pos);
+        Bullet(GBAEngine::Vector2 pos);
     protected:
         void update() override;
         void draw() override;
     private:
-        Rect collider;
+        GBAEngine::Rect collider;
         
         unsigned int CheckCollisionWithEnemy(Enemy *enemy);
 };

@@ -13,6 +13,8 @@ extern "C" {
 
 }
 
+using namespace GBAEngine;
+
 int gemsHeld = 0;
 int totalGemsThisRun = 0;
 

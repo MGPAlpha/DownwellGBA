@@ -1,24 +1,24 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
-#include "gameobject.hpp"
+#include "engine/gameobject.hpp"
 #include "enemy.hpp"
 
 // const extern GameObjectType playerType;
 
 enum PLAYERSTATE {PLAYER_IDLE, PLAYER_WALKING, PLAYER_JUMPING, PLAYER_HOP, PLAYER_FALLING, PLAYER_DEAD};
 
-class Player : public Component {
+class Player : public GBAEngine::Component {
     public:
         Player();
-        Rect getCollider();
+        GBAEngine::Rect getCollider();
 
         static Player* getSingleton();
         static int playerHealth;
         static int playerMaxHealth;
         static int playerMaxHealthProgress;
-        Rect collider;
-        Rect resizedCollider;
+        GBAEngine::Rect collider;
+        GBAEngine::Rect resizedCollider;
         enum PLAYERSTATE state;
         int stateTime;
         enum DIRECTION dir;

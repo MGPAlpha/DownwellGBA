@@ -4,7 +4,7 @@
 
 #include "gamestate.hpp"
 #include "cheats.hpp"
-#include "gameobject.hpp"
+#include "engine/gameobject.hpp"
 #include "bullet.hpp"
 #include "enemy.hpp"
 #include "camera.hpp"
@@ -21,6 +21,8 @@ extern "C" {
 #include "sfx/stompc96.h"
 
 }
+
+using namespace GBAEngine;
 
 
 int jumpFrames[] = {
@@ -217,7 +219,7 @@ void Player::update() {
         this->fireTime++;
     }
 
-    Transform resizedCollider = this->collider;
+    Rect resizedCollider = this->collider;
     
     this->resizedCollider = resizedCollider;
 

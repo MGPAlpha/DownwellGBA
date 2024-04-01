@@ -10,6 +10,9 @@ extern "C" {
 
 }
 
+namespace GBAEngine {
+
+
 struct fixed32 {
     int value;
 
@@ -446,5 +449,7 @@ int randRange(int min, int max);
 int sign(int v);
 
 int mod(int a, int b);
+
+}
 
 #endif

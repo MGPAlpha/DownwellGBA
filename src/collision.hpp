@@ -12,15 +12,15 @@ extern char activeCollisionMapWidth;
 // push represents adjustment necessary to move out of collision
 typedef struct Collision {
     int collided;
-    Vector2 push;
+    GBAEngine::Vector2 push;
 } Collision;
 
 // Check if two rects are colliding, the '.push' returned represents adjustment to rect1, not rect2
-Collision collideRects(Rect rect1, Rect rect2);
+Collision collideRects(GBAEngine::Rect rect1, GBAEngine::Rect rect2);
 
 // Check if obj is fully inside the bounds
-Collision collideRectBounds(Rect obj, Rect bounds);
+Collision collideRectBounds(GBAEngine::Rect obj, GBAEngine::Rect bounds);
 
-Collision collideCollisionMap(Rect obj, char* map, int mapWidth, int relativeMagnitude);
+Collision collideCollisionMap(GBAEngine::Rect obj, char* map, int mapWidth, int relativeMagnitude);
 
 #endif

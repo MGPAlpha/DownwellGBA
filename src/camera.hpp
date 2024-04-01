@@ -3,6 +3,6 @@
 
 #include "engine/gbamath.hpp"
 
-extern Vector2 cameraPos;
+extern GBAEngine::Vector2 cameraPos;
 
 #endif

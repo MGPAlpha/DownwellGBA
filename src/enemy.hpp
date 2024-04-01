@@ -1,22 +1,22 @@
 #ifndef ENEMY_HPP
 #define ENEMY_HPP
 
-#include "gameobject.hpp"
+#include "engine/gameobject.hpp"
 
-class Enemy : public Component {
+class Enemy : public GBAEngine::Component {
     public:
         void damageEnemy(int damage);
         void killEnemy();
-        Transform collider;
-        Vector2 velocity;
-        Vector2 frameExtraMovement;
-        Vector2 spriteOffset;
+        GBAEngine::Rect collider;
+        GBAEngine::Vector2 velocity;
+        GBAEngine::Vector2 frameExtraMovement;
+        GBAEngine::Vector2 spriteOffset;
         int health;
         int dead;
-        fixed32 maxPlayerRange;
+        GBAEngine::fixed32 maxPlayerRange;
     protected:
         
-        Enemy(Vector2 pos);
+        Enemy(GBAEngine::Vector2 pos);
         void update() override;
         void draw() override;
     private:
@@ -26,7 +26,7 @@ class Enemy : public Component {
 
 class BlobEnemy : public Enemy {
     public:
-        BlobEnemy(Vector2 pos);
+        BlobEnemy(GBAEngine::Vector2 pos);
     protected:
         void update() override;
         int calculateSpriteIndex() override;
@@ -34,6 +34,6 @@ class BlobEnemy : public Enemy {
 
 extern int enemiesKilled;
 
-extern GameObjectGenerator blobGenerator;
+extern GBAEngine::GameObjectGenerator blobGenerator;
 
 #endif

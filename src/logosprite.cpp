@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 
-#include "gameobject.hpp"
+#include "engine/gameobject.hpp"
 #include "gamestate.hpp"
 #include "camera.hpp"
 
@@ -13,6 +13,8 @@ extern "C" {
 #include "art/logo.h"
 
 }
+
+using namespace GBAEngine;
 
 LogoSprite::LogoSprite(int index, Vector2 pos) {
     

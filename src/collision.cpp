@@ -6,6 +6,8 @@ extern "C" {
     #include "print.h"
 }
 
+using namespace GBAEngine;
+
 char *activeCollisionMap = NULL;
 char activeCollisionMapWidth = 0;
 

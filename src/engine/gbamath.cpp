@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <cmath>
 
+using namespace GBAEngine;
+
 #pragma region fixed32
 
 fixed32 fixed32::sin(int theta) {
@@ -63,16 +65,16 @@ Rect resizeRect(Rect r, int magnitudeDifference) {
     return r;
 }
 
-int randRange(int min, int max) {
+int GBAEngine::randRange(int min, int max) {
     int randVal = (int)( rand() % (max-min) );
     return randVal + min;
 }
 
-int sign(int v) {
+int GBAEngine::sign(int v) {
     return (v > 0) ? 1 : (v < 0 ? -1 : 0);
 }
 
-int mod(int a, int b)
+int GBAEngine::mod(int a, int b)
 {
     int r = a % b;
     return r < 0 ? r + b : r;

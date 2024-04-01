@@ -26,7 +26,7 @@
 
 #include "palette.hpp"
 #include "cheats.hpp"
-#include "gameobject.hpp"
+#include "engine/gameobject.hpp"
 #include "player.hpp"
 #include "gem.hpp"
 #include "savedata.hpp"

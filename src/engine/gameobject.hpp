@@ -6,8 +6,10 @@
 #include <set>
 // #include <typeinfo>
 
-#include "engine/gbamath.hpp"
-#include "spritedata.hpp"
+#include "gbamath.hpp"
+#include "../spritedata.hpp"
+
+namespace GBAEngine {
 
 class GameObject;
 class Component;
@@ -109,11 +111,12 @@ void consolidateActiveGameObjects(void);
 
 class GameObjectGenerator {
     public:
-        GameObjectGenerator(std::function<GameObject*(Vector2)> genFunc);
-        GameObject* operator() (Vector2 v) const;
+        GameObjectGenerator(std::function<GameObject*(GBAEngine::Vector2)> genFunc);
+        GameObject* operator() (GBAEngine::Vector2 v) const;
     private:
-        std::function<GameObject*(Vector2)> generatorFunction;
+        std::function<GameObject*(GBAEngine::Vector2)> generatorFunction;
 };
 
+}
 
 #endif

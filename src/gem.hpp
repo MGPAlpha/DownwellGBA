@@ -1,24 +1,24 @@
 #ifndef GEM_HPP
 #define GEM_HPP
 
-#include "gameobject.hpp"
+#include "engine/gameobject.hpp"
 
 enum GEMSTATE {GEM_PHYSICS, GEM_ATTRACT};
 enum GEMTYPE {GEM_SMALL, GEM_LARGE};
 enum GEMROTATION {GEM_CW, GEM_CCW};
 
-class Gem : public Component {
+class Gem : public GBAEngine::Component {
     
     public:
-        Gem(Vector2 pos);
+        Gem(GBAEngine::Vector2 pos);
 
     protected:
         void update() override;
         void draw() override;
 
     private:
-        Rect collider;
-        Vector2 velocity;
+        GBAEngine::Rect collider;
+        GBAEngine::Vector2 velocity;
         enum GEMSTATE state;
         int stateTime;
         enum GEMTYPE type;

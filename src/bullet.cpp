@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 
-#include "gameobject.hpp"
+#include "engine/gameobject.hpp"
 #include "gamestate.hpp"
 #include "enemy.hpp"
 #include "camera.hpp"
@@ -13,6 +13,8 @@ extern "C" {
 #include "print.h"
 
 }
+
+using namespace GBAEngine;
 
 int bulletTravelFrames[] = {
     8,8,8,8,8,

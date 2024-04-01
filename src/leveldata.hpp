@@ -7,8 +7,8 @@
 #define MAX_LEVEL_LENGTH 400
 
 typedef struct enemyspawn {
-    const GameObjectGenerator *type;
-    Vector2 pos;
+    const GBAEngine::GameObjectGenerator *type;
+    GBAEngine::Vector2 pos;
 } EnemySpawn;
 
 typedef struct levelsegment {

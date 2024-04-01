@@ -106,17 +106,17 @@ typedef struct {
 #define SCREENBLOCK ((screenblock *)0x6000000)
 
 // Mode 3 Drawing Functions
-void setPixel3(Vector2 pos, unsigned short color);
-void drawRect3(Rect rect, volatile unsigned short color);
+void setPixel3(GBAEngine::Vector2 pos, unsigned short color);
+void drawRect3(GBAEngine::Rect rect, volatile unsigned short color);
 void fillScreen3(volatile unsigned short color);
-void drawImage3(Vector2 pos, Vector2 size, const unsigned short *image);
+void drawImage3(GBAEngine::Vector2 pos, GBAEngine::Vector2 size, const unsigned short *image);
 void drawFullscreenImage3(const unsigned short *image);
 
 // Mode 4 Drawing Functions
-void setPixel4(Vector2 pos, unsigned char colorIndex);
-void drawRect4(Rect rect, volatile unsigned char colorIndex);
+void setPixel4(GBAEngine::Vector2 pos, unsigned char colorIndex);
+void drawRect4(GBAEngine::Rect rect, volatile unsigned char colorIndex);
 void fillScreen4(volatile unsigned char colorIndex);
-void drawImage4(Vector2 pos, Vector2 size, const unsigned short *image);
+void drawImage4(GBAEngine::Vector2 pos, GBAEngine::Vector2 size, const unsigned short *image);
 void drawFullscreenImage4(const unsigned short *image);
 
 // Miscellaneous Drawing Functions

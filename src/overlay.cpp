@@ -14,6 +14,8 @@ extern "C" {
 
 }
 
+using namespace GBAEngine;
+
 void initOverlay(void) {
 
 
