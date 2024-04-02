@@ -101,12 +101,12 @@ void initSurface(void) {
 
     wellDescentTime = 0;
 
-    GameObject *playerObject = new GameObject();
-    Player* player = new Player();
-    playerObject->addComponent(player);
-    player->collider.pos = Vector2(152,133);
-    smoothCameraX = player->collider.pos.x - SCREENWIDTH/2 + player->collider.size.x/2;
-    GameObject::loadGameObject(playerObject);
+    GameObject* player = new PlayerPrefab(Vector2(152,133));
+    Transform* playerTransform = player->getComponent<Transform>();
+    Player* playerComponent = player->getComponent<Player>();
+    playerComponent->collider.pos = Vector2(152, 133);
+    smoothCameraX = playerComponent->collider.pos.x - SCREENWIDTH/2 + playerComponent->collider.size.x/2;
+    GameObject::loadGameObject(player);
 
     GameObject* logoSpriteObj0 = new GameObject();
     logoSprite0 = new LogoSprite(0, Vector2(288, 60));
@@ -277,17 +277,16 @@ void nextLevel(void) {
 
     generateLevel(&startSegmentPool, &cavernSegmentPool, &endSegmentPool);
 
-    GameObject *playerObject = new GameObject();
-    Player* player = new Player();
-    playerObject->addComponent(player);
-    GameObject::loadGameObject(playerObject);
+    GameObject *player = new PlayerPrefab(Vector2(85, 0));
+    Player* playerComponent = player->getComponent<Player>();
+    GameObject::loadGameObject(player);
 
-    if (player) {
-        player->collider.pos.y = 0;
-        player->collider.pos.x = 85;
-        player->runningJump = 1;
-        player->state = PLAYER_JUMPING;
-        player->stateTime = 64;
+    if (playerComponent) {
+        playerComponent->collider.pos.y = 0;
+        playerComponent->collider.pos.x = 85;
+        playerComponent->runningJump = 1;
+        playerComponent->state = PLAYER_JUMPING;
+        playerComponent->stateTime = 64;
 
         // smoothCameraX = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
     }

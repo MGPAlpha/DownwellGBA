@@ -2,6 +2,7 @@
 #define PLAYER_HPP
 
 #include "engine/gameobject.hpp"
+#include "engine/transform.hpp"
 #include "enemy.hpp"
 
 // const extern GameObjectType playerType;
@@ -11,6 +12,9 @@ enum PLAYERSTATE {PLAYER_IDLE, PLAYER_WALKING, PLAYER_JUMPING, PLAYER_HOP, PLAYE
 class Player : public GBAEngine::Component {
     public:
         Player();
+
+        GBAEngine::Transform* getTransform();
+
         GBAEngine::Rect getCollider();
 
         static Player* getSingleton();
@@ -35,10 +39,20 @@ class Player : public GBAEngine::Component {
         void destroy() override;
 
     private:
+        GBAEngine::Transform* transform;
+
         static Player* singleton;
         void checkForEnemyContact(Enemy *enemy);
 
         
+};
+
+class PlayerPrefab : public GBAEngine::GameObject {
+
+    public:
+        PlayerPrefab(GBAEngine::Vector2);
+        PlayerPrefab();
+
 };
 
 #endif

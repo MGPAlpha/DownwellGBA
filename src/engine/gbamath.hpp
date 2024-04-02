@@ -438,7 +438,6 @@ typedef struct rect {
     Vector2 pos;
     Vector2 size;
 } Rect;
-typedef Rect Transform;
 
 Rect resizeRect(Rect r, int magnitudeDifference);
 

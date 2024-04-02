@@ -129,9 +129,12 @@ Player::Player() {
     this->iFrames = 0;
 }
 
+Transform* Player::getTransform() { return this->transform; }
+
 Player* Player::singleton;
 
 void Player::awake() {
+    this->transform = this->getGameObject()->getComponent<Transform>();
     singleton = this;
 }
 
@@ -275,3 +278,10 @@ void Player::destroy() {
         singleton = nullptr;
     }
 }
+
+PlayerPrefab::PlayerPrefab(Vector2 pos) {
+    this->addComponent(new Transform(pos));
+    this->addComponent(new Player());
+}
+
+PlayerPrefab::PlayerPrefab() : PlayerPrefab(Vector2(0,0)) {}
