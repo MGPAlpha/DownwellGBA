@@ -15,7 +15,7 @@ int enemiesKilled = 0;
 void Enemy::update() {
     
     if (Player* player = Player::getSingleton()) {
-        int playerDist = player->getCollider().pos.y - this->collider.pos.y;
+        int playerDist = player->getTransform()->position.y - this->collider.pos.y;
         if (playerDist > this->maxPlayerRange) this->getGameObject()->destroy();
     }
 }
@@ -62,7 +62,7 @@ void BlobEnemy::update() {
     Enemy::update();
     if (Player* player = Player::getSingleton()) {
         
-        Rect playerCollider = player->getCollider();
+        Rect playerCollider = player->getCollider()->getRect();
         Vector2 playerPos = playerCollider.pos;
         playerPos.x += playerCollider.size.x/2;
         playerPos.y += playerCollider.size.y/2;

@@ -104,8 +104,7 @@ void initSurface(void) {
     GameObject* player = new PlayerPrefab(Vector2(152,133));
     Transform* playerTransform = player->getComponent<Transform>();
     Player* playerComponent = player->getComponent<Player>();
-    playerComponent->collider.pos = Vector2(152, 133);
-    smoothCameraX = playerComponent->collider.pos.x - SCREENWIDTH/2 + playerComponent->collider.size.x/2;
+    smoothCameraX = playerTransform->position.x - SCREENWIDTH/2;
     GameObject::loadGameObject(player);
 
     GameObject* logoSpriteObj0 = new GameObject();
@@ -142,7 +141,7 @@ void updateSurface(void) {
     fixed32 cameraXTarget = 0;
 
     Player *player = Player::getSingleton();
-    if (!player || player->collider.pos.x >= 260) {
+    if (!player || player->getTransform()->position.x >= 260) {
         cameraXTarget = 233;
         if (logoSprite0 && logoSprite1){
             if (!logoSprite0->animationStart && playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
@@ -154,7 +153,7 @@ void updateSurface(void) {
 
 
     } else {
-        cameraXTarget = (player->collider.pos.x - SCREENWIDTH/2 + player->collider.size.x/2);
+        cameraXTarget = (player->getTransform()->position.x - SCREENWIDTH/2);
         if (playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
 
             if (player->dir == LEFT) cameraXTarget -= 48;
@@ -206,7 +205,7 @@ void updateSurface(void) {
 
     if (playerCanMove && BUTTON_PRESSED(BUTTON_START)) {
         pauseFromSurface();
-    } else if (!wellDescentTime && player && player->collider.pos.y > 160) {
+    } else if (!wellDescentTime && player && player->getTransform()->position.y > 160) {
         player->getGameObject()->destroy();
         wellDescentTime = stateTime;
     }
@@ -282,8 +281,7 @@ void nextLevel(void) {
     GameObject::loadGameObject(player);
 
     if (playerComponent) {
-        playerComponent->collider.pos.y = 0;
-        playerComponent->collider.pos.x = 85;
+        playerComponent->getTransform()->position = Vector2(85,0);
         playerComponent->runningJump = 1;
         playerComponent->state = PLAYER_JUMPING;
         playerComponent->stateTime = 64;
@@ -380,7 +378,7 @@ void updateGame(void) {
     spawnNecessaryEnemies(player);
 
     if (player) {
-        cameraYTarget = (player->collider.pos.y - SCREENHEIGHT/2 + player->collider.size.y/2 + 16);
+        cameraYTarget = (player->getTransform()->position.y - SCREENHEIGHT/2 + 16);
         cameraYTarget = max(16,cameraYTarget);
         cameraYTarget = min((currentLevelLength-11)<<4,cameraYTarget);
     }
@@ -400,7 +398,7 @@ void updateGame(void) {
 
     generateTilemapUntil(int(cameraPos.y) / 16 + 11);
 
-    if (player->state != PLAYER_DEAD && player->collider.pos.y > (currentLevelLength-1)<<4) {
+    if (player->state != PLAYER_DEAD && player->getTransform()->position.y > (currentLevelLength-1)<<4) {
         nextLevel();
         return;
     }

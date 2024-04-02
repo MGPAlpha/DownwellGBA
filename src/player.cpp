@@ -86,7 +86,7 @@ int Player::playerMaxHealth = 4;
 int Player::playerMaxHealthProgress = 0;
 
 void Player::checkForEnemyContact(Enemy *enemy) {
-    Collision col = collideRects(this->collider, enemy->collider);
+    Collision col = collideRects(this->collider->getRect(), enemy->collider);
     if (col.collided) {
         if (col.push.y < 0/* && col.push.y > -5<<8*/) {
             enemy->killEnemy();
@@ -108,16 +108,7 @@ Player* Player::getSingleton() {
     return singleton;
 }
 
-Rect Player::getCollider() {
-    return collider;
-}
-
-
 Player::Player() {
-    this->collider.pos.x = 0;
-    this->collider.pos.y = 0;
-    this->collider.size.x = 6;
-    this->collider.size.y = 11;
     this->state = PLAYER_IDLE;
     this->stateTime = 0;
     this->dir = RIGHT;
@@ -131,21 +122,24 @@ Player::Player() {
 
 Transform* Player::getTransform() { return this->transform; }
 
+RectCollider* Player::getCollider() { return collider; }
+
 Player* Player::singleton;
 
 void Player::awake() {
     this->transform = this->getGameObject()->getComponent<Transform>();
+    this->collider = this->getGameObject()->getComponent<RectCollider>();
     singleton = this;
 }
 
 void Player::update() {
     if (this->state != PLAYER_DEAD && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
         if (BUTTON_HELD(BUTTON_LEFT)) {
-            this->collider.pos.x -= 2;
+            this->transform->position.x -= 2;
             this->dir = LEFT;
         }
         if (BUTTON_HELD(BUTTON_RIGHT)) {
-            this->collider.pos.x += 2;
+            this->transform->position.x += 2;
             this->dir = RIGHT;
         }
         if (this->state == PLAYER_IDLE){
@@ -156,9 +150,9 @@ void Player::update() {
         this->state = PLAYER_IDLE;
         this->stateTime = 0;
     }
-    Collision walkCollision = collideCollisionMap(this->collider, activeCollisionMap, activeCollisionMapWidth, 20);
+    Collision walkCollision = collideCollisionMap(this->collider->getRect(), activeCollisionMap, activeCollisionMapWidth, 20);
     if (walkCollision.push.x) {
-        this->collider.pos.x += walkCollision.push.x;
+        this->transform->position.x += walkCollision.push.x;
     }
 
     if (this->state == PLAYER_IDLE || this->state == PLAYER_WALKING) {
@@ -168,10 +162,10 @@ void Player::update() {
             this->stateTime = 0;
             this->canFire = 0;
         } else {
-            this->collider.pos.y+= 1;
-            Collision fallCollision = collideCollisionMap(this->collider, activeCollisionMap, activeCollisionMapWidth, 20);
+            this->transform->position.y+= 1;
+            Collision fallCollision = collideCollisionMap(this->collider->getRect(), activeCollisionMap, activeCollisionMapWidth, 20);
             if (fallCollision.push.y < 0) {
-                this->collider.pos.y += fallCollision.push.y;
+                this->transform->position.y += fallCollision.push.y;
             } else {
                 this->state = PLAYER_JUMPING;
                 this->runningJump = 0;
@@ -186,10 +180,10 @@ void Player::update() {
         int jumpDiffIndex = this->stateTime;
         if (this->stateTime >= sizeof(jumpDisplacementFrames)/sizeof(int)) jumpDiffIndex = sizeof(jumpDisplacementFrames)/sizeof(int) - 1;
         int jumpDisplacement = jumpDisplacementFrames[jumpDiffIndex];
-        this->collider.pos.y += jumpDisplacement;
-        Collision yCollision = collideCollisionMap(this->collider, activeCollisionMap, activeCollisionMapWidth, 20);
+        this->transform->position.y += jumpDisplacement;
+        Collision yCollision = collideCollisionMap(this->collider->getRect(), activeCollisionMap, activeCollisionMapWidth, 20);
         if (yCollision.push.y) {
-            this->collider.pos.y += yCollision.push.y;
+            this->transform->position.y += yCollision.push.y;
             if (yCollision.push.y < 0 && this->state != PLAYER_DEAD) {
                 this->state = PLAYER_IDLE;
                 this->ammo = this->charge;
@@ -210,7 +204,7 @@ void Player::update() {
             this->runningJump = 0;
             if (!infiniteAmmoCheat) this->ammo -= 1;
             GameObject* bulletObj = new GameObject();
-            Bullet* bullet = new Bullet(this->collider.pos);
+            Bullet* bullet = new Bullet(this->transform->position);
             bulletObj->addComponent(bullet);
             GameObject::loadGameObject(bulletObj);
 
@@ -221,10 +215,6 @@ void Player::update() {
 
         this->fireTime++;
     }
-
-    Rect resizedCollider = this->collider;
-    
-    this->resizedCollider = resizedCollider;
 
     if (this->state != PLAYER_DEAD) GameObject::doForEachGameObject<Enemy>([this](Enemy* e) {
         this->checkForEnemyContact(e);
@@ -246,8 +236,8 @@ void Player::update() {
 }
 
 void Player::draw() {
-    int posY = this->collider.pos.y - cameraPos.y - 4;
-    int posX = (this->collider.pos.x - cameraPos.x - 5);
+    int posY = this->transform->position.y - cameraPos.y - 4;
+    int posX = (this->transform->position.x - cameraPos.x - 5);
     if ((this->iFrames > 0 && this->iFrames % 2) || posY < -16 || posY > 160 || posX < -16 || posX > 240) {
         this->sprite->attr0 = ATTR0_HIDE;
         return;
@@ -281,6 +271,7 @@ void Player::destroy() {
 
 PlayerPrefab::PlayerPrefab(Vector2 pos) {
     this->addComponent(new Transform(pos));
+    this->addComponent(new RectCollider(Vector2(6,11), RectCollider::TOP_LEFT));
     this->addComponent(new Player());
 }
 

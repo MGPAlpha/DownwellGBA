@@ -62,8 +62,7 @@ void Gem::update() {
                 }
 
                 if (Player* player = Player::getSingleton()) {
-                    Rect playerCollider = player->getCollider();
-                    Vector2 playerCenter = playerCollider.pos + playerCollider.size / 2;
+                    Vector2 playerCenter = player->getTransform()->position;
                     Vector2 gemCenter = this->collider.pos + this->collider.size / 2;
                     Vector2 playerDisp = playerCenter - gemCenter;
                     if (playerDisp.magnitude() < 18) {
@@ -82,8 +81,7 @@ void Gem::update() {
         case GEM_ATTRACT:
             {
                 if (Player* player = Player::getSingleton()) {
-                    Rect playerCollider = player->getCollider();
-                    Vector2 playerCenter = playerCollider.pos + playerCollider.size / 2;
+                    Vector2 playerCenter = player->getTransform()->position;
                     Vector2 gemCenter = this->collider.pos + this->collider.size / 2;
                     Vector2 playerDisp = playerCenter - gemCenter;
                     fixed32 playerDistance = playerDisp.magnitude();
@@ -95,7 +93,7 @@ void Gem::update() {
                     this->collider.pos.x += this->velocity.x + accel.x;
                     this->collider.pos.y += this->velocity.y + accel.y;
 
-                    Collision collisionWithPlayer = collideRects(playerCollider, this->collider);
+                    Collision collisionWithPlayer = collideRects(player->getCollider()->getRect(), this->collider);
                     if (collisionWithPlayer.collided) {
                         this->getGameObject()->destroy();
                         collectGems(this->type == GEM_LARGE ? 10 : 2);

@@ -354,7 +354,7 @@ inline Vector2 operator/(int a, Vector2 b) {
 }
 
 inline Vector2 operator-(Vector2 v) {
-    Vector2 result = Vector2(v.x, v.y);
+    Vector2 result = Vector2(-v.x, -v.y);
     return result;
 }
 

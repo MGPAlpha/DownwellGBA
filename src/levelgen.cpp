@@ -90,7 +90,7 @@ void generateTilemapUntil(int row) {
 }
 
 void spawnNecessaryEnemies(Player *player) {
-    while (enemySpawnIndex < levelEnemyCount && levelEnemies[enemySpawnIndex].pos.y*16 < (player->getCollider().pos.y) + 100) {
+    while (enemySpawnIndex < levelEnemyCount && levelEnemies[enemySpawnIndex].pos.y*16 < (player->getTransform()->position.y) + 100) {
         EnemySpawn spawn = levelEnemies[enemySpawnIndex];
         Vector2 spawnPos = spawn.pos;
         spawnPos.x *= 16;

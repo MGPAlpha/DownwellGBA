@@ -3,6 +3,7 @@
 
 #include "engine/gameobject.hpp"
 #include "engine/transform.hpp"
+#include "engine/physics.hpp"
 #include "enemy.hpp"
 
 // const extern GameObjectType playerType;
@@ -14,15 +15,13 @@ class Player : public GBAEngine::Component {
         Player();
 
         GBAEngine::Transform* getTransform();
+        GBAEngine::RectCollider* getCollider();
 
-        GBAEngine::Rect getCollider();
 
         static Player* getSingleton();
         static int playerHealth;
         static int playerMaxHealth;
         static int playerMaxHealthProgress;
-        GBAEngine::Rect collider;
-        GBAEngine::Rect resizedCollider;
         enum PLAYERSTATE state;
         int stateTime;
         enum DIRECTION dir;
@@ -40,6 +39,7 @@ class Player : public GBAEngine::Component {
 
     private:
         GBAEngine::Transform* transform;
+        GBAEngine::RectCollider* collider;
 
         static Player* singleton;
         void checkForEnemyContact(Enemy *enemy);

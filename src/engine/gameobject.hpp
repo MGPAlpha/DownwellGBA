@@ -16,26 +16,6 @@ class Component;
 
 #define MAX_GAME_OBJECTS 128
 
-class Component {
-    friend class GameObject;
-    public:
-        GameObject* getGameObject();
-    protected:
-
-        virtual void awake();
-        virtual void update();
-        virtual void draw();
-        virtual void destroy();
-
-        Component();
-        virtual ~Component();
-
-        OBJ_ATTR *sprite;
-    
-    private:
-        GameObject* gameObject;
-};
-
 class GameObject {
     friend class Component;
     public:
@@ -85,6 +65,32 @@ class GameObject {
         static std::set<GameObject*> toBeDestroyed;
 
 
+};
+
+class Component {
+    friend class GameObject;
+    public:
+        GameObject* getGameObject();
+
+        template <class ComponentType>
+        ComponentType* getComponent() {
+            if (!gameObject) return nullptr;
+            return gameObject->getComponent<ComponentType>();
+        }
+    protected:
+
+        virtual void awake();
+        virtual void update();
+        virtual void draw();
+        virtual void destroy();
+
+        Component();
+        virtual ~Component();
+
+        OBJ_ATTR *sprite;
+    
+    private:
+        GameObject* gameObject;
 };
 
 // typedef struct gameobjecttype {
