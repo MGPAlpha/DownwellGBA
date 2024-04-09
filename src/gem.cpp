@@ -26,17 +26,18 @@ void initGemData(void) {
     lifetimeGems = getSaveInt(8);
 }
 
-Gem::Gem(Vector2 pos) {
-    this->collider.size.x = 4;
-    this->collider.size.y = 4;
-    this->collider.pos = pos - this->collider.size/2;
+Gem::Gem() {
     this->velocity.x = 0;
     this->velocity.y = 0;
     this->state = GEM_PHYSICS;
     this->stateTime = 0;
     this->type = GEM_SMALL;
     this->rotationDirection = GEM_CCW;
+}
 
+void Gem::awake() {
+    this->transform = getComponent<Transform>();
+    this->collider = getComponent<RectCollider>();
     this->randomizeGem();
 }
 
@@ -45,25 +46,27 @@ void Gem::update() {
 
         case GEM_PHYSICS:
             {
+                mgba_printf("gem pos: (%x, %x)", this->transform->position.x, this->transform->position.y);
+                
                 this->velocity.y.value += 8;
 
-                this->collider.pos.x += this->velocity.x;
-                Collision xColl = collideCollisionMap(this->collider, activeCollisionMap, activeCollisionMapWidth, 20);
+                this->transform->position.x += this->velocity.x;
+                Collision xColl = collideCollisionMap(this->collider->getRect(), activeCollisionMap, activeCollisionMapWidth, 20);
                 if (xColl.collided) {
-                    this->collider.pos.x += xColl.push.x;
+                    this->transform->position.x += xColl.push.x;
                     this->velocity.x = -this->velocity.x;
                 }
-                this->collider.pos.y += this->velocity.y;
-                Collision yColl = collideCollisionMap(this->collider, activeCollisionMap, activeCollisionMapWidth, 20);
+                this->transform->position.y += this->velocity.y;
+                Collision yColl = collideCollisionMap(this->collider->getRect(), activeCollisionMap, activeCollisionMapWidth, 20);
                 if (yColl.collided) {
-                    this->collider.pos.y += yColl.push.y;
+                    this->transform->position.y += yColl.push.y;
                     if (this->velocity.y >= 0) this->velocity.y = -1;
                     else this->velocity.y = -this->velocity.y;
                 }
 
                 if (Player* player = Player::getSingleton()) {
                     Vector2 playerCenter = player->getTransform()->position;
-                    Vector2 gemCenter = this->collider.pos + this->collider.size / 2;
+                    Vector2 gemCenter = this->transform->position + this->collider->size / 2;
                     Vector2 playerDisp = playerCenter - gemCenter;
                     if (playerDisp.magnitude() < 18) {
                         this->state = GEM_ATTRACT;
@@ -82,7 +85,7 @@ void Gem::update() {
             {
                 if (Player* player = Player::getSingleton()) {
                     Vector2 playerCenter = player->getTransform()->position;
-                    Vector2 gemCenter = this->collider.pos + this->collider.size / 2;
+                    Vector2 gemCenter = this->transform->position + this->collider->size / 2;
                     Vector2 playerDisp = playerCenter - gemCenter;
                     fixed32 playerDistance = playerDisp.magnitude();
                     Vector2 accel = playerDisp.normalized();
@@ -90,10 +93,10 @@ void Gem::update() {
                     int accelRamp = this->stateTime;
                     if (accelRamp) accel = accel * accelRamp;
 
-                    this->collider.pos.x += this->velocity.x + accel.x;
-                    this->collider.pos.y += this->velocity.y + accel.y;
+                    this->transform->position.x += this->velocity.x + accel.x;
+                    this->transform->position.y += this->velocity.y + accel.y;
 
-                    Collision collisionWithPlayer = collideRects(player->getCollider()->getRect(), this->collider);
+                    Collision collisionWithPlayer = collideRects(player->getCollider()->getRect(), this->collider->getRect());
                     if (collisionWithPlayer.collided) {
                         this->getGameObject()->destroy();
                         collectGems(this->type == GEM_LARGE ? 10 : 2);
@@ -110,8 +113,8 @@ void Gem::update() {
 void Gem::draw() {
     int lifetime = this->getGameObject()->getLifetime();
     int spOffset = this->type == GEM_SMALL ? 2 : 6;
-    fixed32 posY = (this->collider.pos.y) - cameraPos.y - spOffset;
-    fixed32 posX = (this->collider.pos.x) - cameraPos.x - spOffset;
+    fixed32 posY = (this->transform->position.y) - cameraPos.y - spOffset;
+    fixed32 posX = (this->transform->position.x) - cameraPos.x - spOffset;
     int aniFrame = lifetime/4;
     if (this->rotationDirection == GEM_CW) {
         aniFrame = -aniFrame;
@@ -139,6 +142,16 @@ void Gem::randomizeGem() {
     this->rotationDirection = (rand() % 2) ? GEM_CCW : GEM_CW;
     this->type = (rand() % 4) ? GEM_SMALL : GEM_LARGE;
 }
+
+GemPrefab::GemPrefab(Vector2 pos) {
+    Vector2 actualPos = pos - Vector2(2);
+    this->addComponent(new Transform(actualPos));
+
+    mgba_printf("Gem start pos: (%x, %x)", actualPos.x, actualPos.y);
+    this->addComponent(new Gem());
+    this->addComponent(new RectCollider(Vector2(4,4), RectCollider::TOP_LEFT));
+}
+GemPrefab::GemPrefab() : GemPrefab(Vector2()) {}
 
 void collectGems(int gems) {
     gemsHeld += gems;

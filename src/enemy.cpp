@@ -116,8 +116,7 @@ void Enemy::killEnemy() {
     Vector2 gemSpawn = this->collider.pos + this->collider.size / 2;
     int gemCount = randRange(2,4);
     for (int i = 0; i < gemCount; i++){
-        GameObject *newGem = new GameObject();
-        newGem->addComponent(new Gem(gemSpawn));
+        GemPrefab* newGem = new GemPrefab(gemSpawn);
         GameObject::loadGameObject(newGem);
     }
     enemiesKilled++;

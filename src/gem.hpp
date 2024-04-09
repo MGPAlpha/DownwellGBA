@@ -2,6 +2,7 @@
 #define GEM_HPP
 
 #include "engine/gameobject.hpp"
+#include "engine/physics.hpp"
 
 enum GEMSTATE {GEM_PHYSICS, GEM_ATTRACT};
 enum GEMTYPE {GEM_SMALL, GEM_LARGE};
@@ -10,14 +11,17 @@ enum GEMROTATION {GEM_CW, GEM_CCW};
 class Gem : public GBAEngine::Component {
     
     public:
-        Gem(GBAEngine::Vector2 pos);
+        Gem();
 
     protected:
+        void awake() override;
         void update() override;
         void draw() override;
 
     private:
-        GBAEngine::Rect collider;
+        GBAEngine::Transform* transform;
+        GBAEngine::RectCollider* collider;
+
         GBAEngine::Vector2 velocity;
         enum GEMSTATE state;
         int stateTime;
@@ -33,6 +37,12 @@ extern int totalGemsThisRun;
 extern int lifetimeGems;
 
 void initGemData(void);
+
+class GemPrefab : public GBAEngine::GameObject {
+    public:
+        GemPrefab(GBAEngine::Vector2);
+        GemPrefab();
+};
 
 void collectGems(int gems);
 
