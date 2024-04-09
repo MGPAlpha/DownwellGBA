@@ -3,6 +3,7 @@
 #include <cstdlib>
 
 #include "engine/gameobject.hpp"
+#include "engine/transform.hpp"
 #include "gamestate.hpp"
 #include "camera.hpp"
 
@@ -16,10 +17,13 @@ extern "C" {
 
 using namespace GBAEngine;
 
-LogoSprite::LogoSprite(int index, Vector2 pos) {
+LogoSprite::LogoSprite(int index) {
     
     this->index = index;
-    this->pos = pos;
+}
+
+void LogoSprite::awake() {
+    this->transform = getComponent<Transform>();
 }
 
 void LogoSprite::draw() {
@@ -40,8 +44,8 @@ void LogoSprite::draw() {
         int dstOffset = 16*16+16*32*i+16*8*this->index;
         DMANow(3, logo + srcOffset, CHARBLOCK[4].tileimg + dstOffset, 16*8);
     }
-    int posY = this->pos.y - cameraPos.y + yOffset;
-    int posX = this->pos.x - cameraPos.x;
+    int posY = this->transform->position.y - cameraPos.y + yOffset;
+    int posX = this->transform->position.x - cameraPos.x;
     if (posY < -32 || posY > 160 || posX < -64 || posY > 240) {
         this->sprite->attr0 = ATTR0_HIDE;
         return;

@@ -108,13 +108,17 @@ void initSurface(void) {
     GameObject::loadGameObject(player);
 
     GameObject* logoSpriteObj0 = new GameObject();
-    logoSprite0 = new LogoSprite(0, Vector2(288, 60));
+    logoSprite0 = new LogoSprite(0);
+    Transform* logoSpriteTransform0 = new Transform(Vector2(288, 60));
     logoSpriteObj0->addComponent(logoSprite0);
+    logoSpriteObj0->addComponent(logoSpriteTransform0);
     GameObject::loadGameObject(logoSpriteObj0);
 
     GameObject* logoSpriteObj1 = new GameObject();
-    logoSprite1 = new LogoSprite(1, Vector2(354, 60));
+    logoSprite1 = new LogoSprite(1);
+    Transform* logoSpriteTransform1 = new Transform(Vector2(354, 60));
     logoSpriteObj1->addComponent(logoSprite1);
+    logoSpriteObj1->addComponent(logoSpriteTransform1);
     GameObject::loadGameObject(logoSpriteObj1);
 
     for (int i = 0; i < 60; i++) {

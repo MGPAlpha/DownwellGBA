@@ -2,17 +2,19 @@
 #define LOGOSPRITE_HPP
 
 #include "engine/gameobject.hpp"
+#include "engine/transform.hpp"
 
 // const extern GameObjectType logoSpriteType;
 
 class LogoSprite : public GBAEngine::Component {
     public:
-        LogoSprite(int index, GBAEngine::Vector2 pos);
+        LogoSprite(int index);
         int animationStart = 0;
     protected:
         void draw() override;
+        void awake() override;
     private:
-        GBAEngine::Vector2 pos;
+        GBAEngine::Transform* transform;
         int index;
 };
 #endif
