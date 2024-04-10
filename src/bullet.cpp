@@ -5,7 +5,7 @@
 #include "engine/gameobject.hpp"
 #include "gamestate.hpp"
 #include "enemy.hpp"
-#include "camera.hpp"
+#include "engine/camera.hpp"
 #include "collision.hpp"
 
 extern "C" {

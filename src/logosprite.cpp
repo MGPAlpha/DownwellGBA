@@ -5,7 +5,7 @@
 #include "engine/gameobject.hpp"
 #include "engine/transform.hpp"
 #include "gamestate.hpp"
-#include "camera.hpp"
+#include "engine/camera.hpp"
 
 extern "C" {
 

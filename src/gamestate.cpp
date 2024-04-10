@@ -13,7 +13,7 @@
 #include "enemy.hpp"
 #include "levelgen.hpp"
 #include "savedata.hpp"
-#include "camera.hpp"
+#include "engine/camera.hpp"
 #include "HW05Lib.hpp"
 #include "sound.hpp"
 #include "collision.hpp"
@@ -102,9 +102,12 @@ void initSurface(void) {
     wellDescentTime = 0;
 
     GameObject* player = new PlayerPrefab(Vector2(152,133));
+    Camera* playerCam = new Camera();
+    playerCam->damping = 15;
+    player->addComponent(playerCam);
     Transform* playerTransform = player->getComponent<Transform>();
     Player* playerComponent = player->getComponent<Player>();
-    smoothCameraX = playerTransform->position.x - SCREENWIDTH/2;
+    // smoothCameraX = playerTransform->position.x - SCREENWIDTH/2;
     GameObject::loadGameObject(player);
 
     GameObject* logoSpriteObj0 = new GameObject();
@@ -137,16 +140,18 @@ void updateSurface(void) {
 
     if (playerCanMove) GameObject::updateAllGameObjects();
     
+    GameObject::lateUpdateAllGameObjects();
     
     GameObject::clearDestructionQueue();
     // consolidateActiveGameObjects();
     
+    CameraSystem::update();
 
-    fixed32 cameraXTarget = 0;
 
     Player *player = Player::getSingleton();
+    Camera* playerCamera = player->getComponent<Camera>();
     if (!player || player->getTransform()->position.x >= 260) {
-        cameraXTarget = 233;
+        playerCamera->offset.x = 0;
         if (logoSprite0 && logoSprite1){
             if (!logoSprite0->animationStart && playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
                 logoSprite0->animationStart = logoSprite0->getGameObject()->getLifetime();
@@ -157,12 +162,11 @@ void updateSurface(void) {
 
 
     } else {
-        cameraXTarget = (player->getTransform()->position.x - SCREENWIDTH/2);
         if (playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
 
-            if (player->dir == LEFT) cameraXTarget -= 48;
-            if (player->dir == RIGHT) cameraXTarget += 48;
-        }
+            if (player->dir == LEFT) playerCamera->offset.x = -48;
+            else if (player->dir == RIGHT) playerCamera->offset.x = 48;
+        } else playerCamera->offset.x = 0;
         
     }
 
@@ -171,22 +175,19 @@ void updateSurface(void) {
     // int cameraFollowedX = playerData->collider.pos.x + (playerData->collider.size.x - SCREENWIDTH) / 2;
     // if (cameraFollowedX < -8) cameraFollowedX = -8;
 
-
-    smoothCameraX = smoothCameraX + (cameraXTarget - smoothCameraX) / 16;
-    if (smoothCameraX.value < -8) smoothCameraX.value = -8;
-    cameraPos.x = smoothCameraX;
     if (wellDescentTime) {
         int totalDescentTime = stateTime - wellDescentTime - 40;
         totalDescentTime = MAX(totalDescentTime, 0);
         int pan = totalDescentTime * totalDescentTime / 32;
-        cameraPos.y = pan;
+        // cameraPos.y = pan;
         if (pan > 350) {
             for (int i = 0; i < 60; i++) waitForVBlank();
+            mgba_printf("initiating game");
             initGame();
             return;
         }
     } else {
-        cameraPos.y = 0;
+        // cameraPos.y = 0;
     }
 
     waitForVBlank();
@@ -210,6 +211,7 @@ void updateSurface(void) {
     if (playerCanMove && BUTTON_PRESSED(BUTTON_START)) {
         pauseFromSurface();
     } else if (!wellDescentTime && player && player->getTransform()->position.y > 160) {
+        mgba_printf("destroying player");
         player->getGameObject()->destroy();
         wellDescentTime = stateTime;
     }

@@ -35,6 +35,9 @@ void Component::awake() {
 void Component::update() {
     
 }
+void Component::lateUpdate() {
+    
+}
 void Component::draw() {
     
 }
@@ -72,6 +75,11 @@ void GameObject::updateComponents() {
         c->update();
     }
     this->lifetime++;
+}
+void GameObject::lateUpdateComponents() {
+    for (Component* c : this->components) {
+        c->lateUpdate();
+    }
 }
 void GameObject::drawComponents() {
     for (Component* c : this->components) {
@@ -113,6 +121,15 @@ void GameObject::updateAllGameObjects(void) {
         curr->updateComponents();
         // }
     }
+    GameObject::sceneLifetime++;
+}
+
+void GameObject::lateUpdateAllGameObjects(void) {
+    for (GameObject* curr : gameObjectRefs) {
+        // if (curr->active) {
+        curr->lateUpdateComponents();
+        // }
+    }
 }
 
 void GameObject::drawAllGameObjects(void) {
@@ -150,3 +167,9 @@ GameObjectGenerator::GameObjectGenerator(std::function<GameObject*(Vector2)> gen
 GameObject* GameObjectGenerator::operator() (Vector2 v) const {
     return generatorFunction(v);
 }
+
+int GameObject::sceneLifetime = 0;
+int GameObject::getSceneLifetime() {
+    return sceneLifetime;
+}
+

@@ -20,6 +20,7 @@ class GameObject {
     friend class Component;
     public:
         void addComponent(Component* newComponent);
+        static int getSceneLifetime();
         int getLifetime();
         void destroy();
 
@@ -47,6 +48,7 @@ class GameObject {
             return outCode;
         }
         static void updateAllGameObjects(void);
+        static void lateUpdateAllGameObjects(void);
         static void drawAllGameObjects(void);
         static void destroyAllGameObjects(void);
         static void clearDestructionQueue();
@@ -55,6 +57,7 @@ class GameObject {
 
         void awakeComponents();
         void updateComponents();
+        void lateUpdateComponents();
         void drawComponents();
         void destroyComponents();
 
@@ -64,6 +67,7 @@ class GameObject {
         static std::list<GameObject*> gameObjectRefs;
         static std::set<GameObject*> toBeDestroyed;
 
+        static int sceneLifetime;
 
 };
 
@@ -80,6 +84,7 @@ class Component {
     protected:
 
         virtual void awake();
+        virtual void lateUpdate();
         virtual void update();
         virtual void draw();
         virtual void destroy();

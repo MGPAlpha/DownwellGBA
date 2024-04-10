@@ -27,7 +27,7 @@ OBJ_ATTR *spriteAlloc(void) {
     if (dynamicOAMIndex < sizeof dynamicOAM / sizeof(OBJ_ATTR*)) {
         return dynamicOAM[dynamicOAMIndex++];
     }
-    return NULL;
+    return nullptr;
 }
 
 void spriteFree(OBJ_ATTR* sprite) {

@@ -7,7 +7,7 @@
 #include "engine/gameobject.hpp"
 #include "bullet.hpp"
 #include "enemy.hpp"
-#include "camera.hpp"
+#include "engine/camera.hpp"
 #include "sound.hpp"
 #include "collision.hpp"
 

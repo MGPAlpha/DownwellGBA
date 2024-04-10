@@ -4,7 +4,7 @@
 
 #include "player.hpp"
 #include "savedata.hpp"
-#include "camera.hpp"
+#include "engine/camera.hpp"
 #include "collision.hpp"
 
 extern "C" {

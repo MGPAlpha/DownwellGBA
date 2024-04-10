@@ -4,7 +4,7 @@
 
 #include "player.hpp"
 #include "gem.hpp"
-#include "camera.hpp"
+#include "engine/camera.hpp"
 #include "spritedata.hpp"
 #include "collision.hpp"
 

@@ -48,26 +48,15 @@ struct fixed32 {
         return *this;
     }
 
-    
-
     inline struct fixed32 sqrt() {
         fixed32 result;
         result.value = sqrt_fx16_16_to_fx16_16((fx16_16_t)this->value);
         return result;
     }
 
-    inline fixed32 pow(int b) {
-        fixed32 result;
-        result = 1;
-        for (int i = 0; i < b; i++) {
-            result = result * *this;
-        }
-        return result;
-    }
+    inline fixed32 pow(int b);
 
-    inline static fixed32 lerp(fixed32 a, fixed32 b, fixed32 t) {
-        return a + (b-a) * t;
-    }
+    inline static fixed32 lerp(fixed32 a, fixed32 b, fixed32 t);
 
     inline operator short() {
         return this->value >> 16;
@@ -272,6 +261,20 @@ inline bool operator >=(const int& a, const fixed32& b) {
 
 #pragma endregion
 
+inline fixed32 fixed32::lerp(fixed32 a, fixed32 b, fixed32 t) {
+    mgba_printf("Lerp:: a: %x, b: %x, t: %x, b-a: %x, (b-a) * t: %x", a, b, t, b-a, (b-a)*t);
+    return a + (b-a) * t;
+}
+
+inline fixed32 fixed32::pow(int b) {
+    fixed32 result;
+    result = 1;
+    for (int i = 0; i < b; i++) {
+        result = result * *this;
+    }
+    return result;
+}
+
 struct Vector2 {
 
     fixed32 x;
@@ -360,6 +363,14 @@ inline Vector2 operator-(Vector2 v) {
 
 #pragma endregion
 
+#pragma region vector2comparison
+
+inline bool operator ==(const Vector2& a, const Vector2& b) {
+    return a.x == b.x && a.y == b.y;
+}
+
+#pragma endregion
+
 #pragma region vector2functions
 
 inline Vector2::Vector2(fixed32 x, fixed32 y) {
@@ -393,6 +404,7 @@ inline fixed32 Vector2::dot(Vector2 b) {
 inline Vector2 Vector2::lerp(Vector2 a, Vector2 b, fixed32 t) {
     Vector2 result = Vector2();
     result.x = fixed32::lerp(a.x, b.x, t);
+    mgba_printf("lerp x: %x", result.x);
     result.y = fixed32::lerp(a.y, b.y, t);
     return result;
 }
@@ -432,6 +444,9 @@ inline fixed32 min(fixed32 a, int b) {
 }
 inline fixed32 min(fixed32 a, fixed32 b) {
     return (a < b) ? a : b;
+}
+inline fixed32 clamp(fixed32 a, fixed32 b, fixed32 v) {
+    return min(b, max(a, v));
 }
 
 typedef struct rect {
