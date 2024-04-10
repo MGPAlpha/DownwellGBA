@@ -86,7 +86,7 @@ int Player::playerMaxHealth = 4;
 int Player::playerMaxHealthProgress = 0;
 
 void Player::checkForEnemyContact(Enemy *enemy) {
-    Collision col = collideRects(this->collider->getRect(), enemy->collider);
+    Collision col = collideRects(this->collider->getRect(), enemy->getComponent<RectCollider>()->getRect());
     if (col.collided) {
         if (col.push.y < 0/* && col.push.y > -5<<8*/) {
             enemy->killEnemy();

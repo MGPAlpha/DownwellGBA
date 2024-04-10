@@ -29,7 +29,7 @@ int bulletTravelFrames[] = {
 
 unsigned int Bullet::CheckCollisionWithEnemy(Enemy *enemy) {
 
-    Collision testCollision = collideRects(this->collider->getRect(), enemy->collider);
+    Collision testCollision = collideRects(this->collider->getRect(), enemy->getComponent<RectCollider>()->getRect());
 
     if (testCollision.collided) {
         enemy->damageEnemy(1);

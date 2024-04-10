@@ -46,8 +46,6 @@ void Gem::update() {
 
         case GEM_PHYSICS:
             {
-                mgba_printf("gem pos: (%x, %x)", this->transform->position.x, this->transform->position.y);
-                
                 this->velocity.y.value += 8;
 
                 this->transform->position.x += this->velocity.x;
@@ -65,7 +63,7 @@ void Gem::update() {
                 }
 
                 if (Player* player = Player::getSingleton()) {
-                    Vector2 playerCenter = player->getTransform()->position;
+                    Vector2 playerCenter = player->getTransform()->position + player->getCollider()->size / 2;
                     Vector2 gemCenter = this->transform->position + this->collider->size / 2;
                     Vector2 playerDisp = playerCenter - gemCenter;
                     if (playerDisp.magnitude() < 18) {
@@ -84,7 +82,7 @@ void Gem::update() {
         case GEM_ATTRACT:
             {
                 if (Player* player = Player::getSingleton()) {
-                    Vector2 playerCenter = player->getTransform()->position;
+                    Vector2 playerCenter = player->getTransform()->position + player->getCollider()->size / 2;
                     Vector2 gemCenter = this->transform->position + this->collider->size / 2;
                     Vector2 playerDisp = playerCenter - gemCenter;
                     fixed32 playerDistance = playerDisp.magnitude();
@@ -147,7 +145,6 @@ GemPrefab::GemPrefab(Vector2 pos) {
     Vector2 actualPos = pos - Vector2(2);
     this->addComponent(new Transform(actualPos));
 
-    mgba_printf("Gem start pos: (%x, %x)", actualPos.x, actualPos.y);
     this->addComponent(new Gem());
     this->addComponent(new RectCollider(Vector2(4,4), RectCollider::TOP_LEFT));
 }

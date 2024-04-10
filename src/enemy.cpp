@@ -12,18 +12,27 @@ using namespace GBAEngine;
 
 int enemiesKilled = 0;
 
+void Enemy::awake() {
+    this->transform = getComponent<Transform>();
+    this->collider = getComponent<RectCollider>();
+}
+
 void Enemy::update() {
     
     if (Player* player = Player::getSingleton()) {
-        int playerDist = player->getTransform()->position.y - this->collider.pos.y;
+        int playerDist = player->getTransform()->position.y - this->transform->position.y;
         if (playerDist > this->maxPlayerRange) this->getGameObject()->destroy();
     }
 }
 
 void Enemy::draw() {
     OBJ_ATTR *sprite = this->sprite;
-    int posX = (this->collider.pos.x) + this->spriteOffset.x - cameraPos.x;
-    int posY = (this->collider.pos.y) + this->spriteOffset.y - cameraPos.y;
+    int posX = (this->transform->position.x) /*+ this->spriteOffset.x*/ - cameraPos.x;
+    int posY = (this->transform->position.y) /*+ this->spriteOffset.y*/ - cameraPos.y;
+
+    mgba_printf("cam y: %x", cameraPos.y);
+    mgba_printf("pos y: %x", this->transform->position.y);
+    mgba_printf("blob draw y %d", posY);
 
     if (posY < -16 || posY > 160 || posX < -32 || posX > 240) {
         sprite->attr0 = ATTR0_HIDE;
@@ -36,9 +45,7 @@ void Enemy::draw() {
 
 }
 
-Enemy::Enemy(Vector2 pos) {
-    this->collider.pos.x = pos.x;
-    this->collider.pos.y = pos.y;
+Enemy::Enemy() {
     this->velocity.x = 0;
     this->velocity.y = 0;
     this->frameExtraMovement.x = 0;
@@ -46,12 +53,17 @@ Enemy::Enemy(Vector2 pos) {
     this->dead = 0;
 }
 
-BlobEnemy::BlobEnemy(Vector2 pos) : Enemy(pos) {
+BlobEnemy::BlobEnemy() : Enemy() {
     this->health = 3;
     this->spriteOffset = Vector2(-7, -3);
-    this->collider.size = Vector2(18, 11);
-    this->collider.pos = this->collider.pos - this->collider.size / 2;
+    
     this->maxPlayerRange = 800;
+}
+
+void BlobEnemy::awake() {
+    Enemy::awake();
+    this->transform = getComponent<Transform>();
+    this->collider = getComponent<RectCollider>();
 }
 
 int BlobEnemy::calculateSpriteIndex() {
@@ -60,6 +72,7 @@ int BlobEnemy::calculateSpriteIndex() {
 
 void BlobEnemy::update() {
     Enemy::update();
+    mgba_printf("Enemy pos: (%x, %x)", this->transform->position.x, this->transform->position.y);
     if (Player* player = Player::getSingleton()) {
         
         Rect playerCollider = player->getCollider()->getRect();
@@ -67,9 +80,8 @@ void BlobEnemy::update() {
         playerPos.x += playerCollider.size.x/2;
         playerPos.y += playerCollider.size.y/2;
 
-        Vector2 enemyPos = this->collider.pos;
-        enemyPos.x += this->collider.size.x/2;
-        enemyPos.y += this->collider.size.y/2;
+        Vector2 enemyPos = this->transform->position;
+        enemyPos = enemyPos + this->collider->size / 2;
 
         Vector2 displacement = playerPos - enemyPos;
         displacement = displacement.normalized();
@@ -86,22 +98,31 @@ void BlobEnemy::update() {
     }
 
 
-    this->collider.pos.x += this->velocity.x + this->frameExtraMovement.x;
-    Collision terrainCollision = collideCollisionMap(this->collider, activeCollisionMap, activeCollisionMapWidth, 20);
+    this->transform->position.x += this->velocity.x + this->frameExtraMovement.x;
+    Collision terrainCollision = collideCollisionMap(this->collider->getRect(), activeCollisionMap, activeCollisionMapWidth, 20);
     if (terrainCollision.collided) {
-        this->collider.pos.x += terrainCollision.push.x;
+        this->transform->position.x += terrainCollision.push.x;
         // this->velocity.x *= -1;
     }
     this->frameExtraMovement.x = 0;
 
-    this->collider.pos.y += this->velocity.y + this->frameExtraMovement.y;
-    terrainCollision = collideCollisionMap(this->collider, activeCollisionMap, activeCollisionMapWidth, 20);
+    this->transform->position.y += this->velocity.y + this->frameExtraMovement.y;
+    terrainCollision = collideCollisionMap(this->collider->getRect(), activeCollisionMap, activeCollisionMapWidth, 20);
     if (terrainCollision.collided) {
-        this->collider.pos.y += terrainCollision.push.y;
+        this->transform->position.y += terrainCollision.push.y;
         this->velocity.y *= -1;
     }
     this->frameExtraMovement.y = 0;
 }
+
+BlobPrefab::BlobPrefab(Vector2 pos) {
+    mgba_printf("Blob spawn pos: (%x, %x)", pos.x, pos.y);
+    Vector2 adjustedPos = pos - Vector2(18, 11)/2;
+    mgba_printf("Adjusted spawn pos: (%x, %x)", adjustedPos.x, adjustedPos.y);
+    this->addComponent(new BlobEnemy());
+    this->addComponent(new Transform(pos - Vector2(18,11)/2));
+    this->addComponent(new RectCollider(Vector2(18,11), RectCollider::TOP_LEFT));
+};  
 
 void Enemy::damageEnemy(int damage) {
     this->health -= damage;
@@ -113,7 +134,7 @@ void Enemy::damageEnemy(int damage) {
 }
 
 void Enemy::killEnemy() {
-    Vector2 gemSpawn = this->collider.pos + this->collider.size / 2;
+    Vector2 gemSpawn = this->transform->position + this->collider->size / 2;
     int gemCount = randRange(2,4);
     for (int i = 0; i < gemCount; i++){
         GemPrefab* newGem = new GemPrefab(gemSpawn);
@@ -124,7 +145,6 @@ void Enemy::killEnemy() {
 }
 
 GameObjectGenerator blobGenerator = GameObjectGenerator([](Vector2 pos) {
-    GameObject* go = new GameObject();
-    go->addComponent(new BlobEnemy(pos));
+    GameObject* go = new BlobPrefab(pos);
     return go;
 });
