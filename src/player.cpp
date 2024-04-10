@@ -203,10 +203,8 @@ void Player::update() {
             this->fireTime = 0;
             this->runningJump = 0;
             if (!infiniteAmmoCheat) this->ammo -= 1;
-            GameObject* bulletObj = new GameObject();
-            Bullet* bullet = new Bullet(this->transform->position);
-            bulletObj->addComponent(bullet);
-            GameObject::loadGameObject(bulletObj);
+            BulletPrefab* bullet = new BulletPrefab(this->transform->position);
+            GameObject::loadGameObject(bullet);
 
             this->stateTime = 21;
             

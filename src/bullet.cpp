@@ -29,7 +29,7 @@ int bulletTravelFrames[] = {
 
 unsigned int Bullet::CheckCollisionWithEnemy(Enemy *enemy) {
 
-    Collision testCollision = collideRects(this->collider, enemy->collider);
+    Collision testCollision = collideRects(this->collider->getRect(), enemy->collider);
 
     if (testCollision.collided) {
         enemy->damageEnemy(1);
@@ -38,22 +38,21 @@ unsigned int Bullet::CheckCollisionWithEnemy(Enemy *enemy) {
     return 0;
 }
 
-Bullet::Bullet(Vector2 pos) {
-    this->collider.pos = pos;
-    this->collider.size.x = 6;
-    this->collider.size.y = 4;
+void Bullet::awake() {
+    this->transform = getComponent<Transform>();
+    this->collider = getComponent<RectCollider>();
 }
 
 void Bullet::update() {
     int lifetime = this->getGameObject()->getLifetime();
     int travelFrameIndex = lifetime;
     if (travelFrameIndex >= sizeof(bulletTravelFrames)/(sizeof(int))) travelFrameIndex = sizeof(bulletTravelFrames)/(sizeof(int)) - 1;
-    this->collider.pos.y += bulletTravelFrames[travelFrameIndex];
+    this->transform->position.y += bulletTravelFrames[travelFrameIndex];
     if (lifetime >= 26) {
         this->getGameObject()->destroy();
         return;
     }
-    Collision groundCollision = collideCollisionMap(this->collider, activeCollisionMap, activeCollisionMapWidth, 20);
+    Collision groundCollision = collideCollisionMap(this->collider->getRect(), activeCollisionMap, activeCollisionMapWidth, 20);
     if (groundCollision.collided) {
         this->getGameObject()->destroy();
         return;
@@ -69,8 +68,8 @@ void Bullet::update() {
 
 void Bullet::draw() {
     int lifetime = this->getGameObject()->getLifetime();
-    int posY = (this->collider.pos.y) - cameraPos.y - 7;
-    int posX = (this->collider.pos.x) - cameraPos.x - 1;
+    int posY = (this->transform->position.y) - cameraPos.y - 7;
+    int posX = (this->transform->position.x) - cameraPos.x - 1;
     if (posY < -16 || posY > 160 || posX < -8 || posX > 240) {
         this->sprite->attr0 = ATTR0_HIDE;
         return;
@@ -83,4 +82,10 @@ void Bullet::draw() {
         int aniFrame = (lifetime - 17) / 2 + 1;
         this->sprite->attr2 = ATTR2_TILEID(aniFrame,10) | ATTR2_PRIORITY(2);
     }
+}
+
+BulletPrefab::BulletPrefab(Vector2 pos) {
+    this->addComponent(new Transform(pos));
+    this->addComponent(new RectCollider(Vector2(6,4), RectCollider::TOP_LEFT));
+    this->addComponent(new Bullet());
 }
