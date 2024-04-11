@@ -30,10 +30,6 @@ void Enemy::draw() {
     int posX = (this->transform->position.x) /*+ this->spriteOffset.x*/ - cameraPos.x;
     int posY = (this->transform->position.y) /*+ this->spriteOffset.y*/ - cameraPos.y;
 
-    mgba_printf("cam y: %x", cameraPos.y);
-    mgba_printf("pos y: %x", this->transform->position.y);
-    mgba_printf("blob draw y %d", posY);
-
     if (posY < -16 || posY > 160 || posX < -32 || posX > 240) {
         sprite->attr0 = ATTR0_HIDE;
         return;
@@ -72,7 +68,6 @@ int BlobEnemy::calculateSpriteIndex() {
 
 void BlobEnemy::update() {
     Enemy::update();
-    mgba_printf("Enemy pos: (%x, %x)", this->transform->position.x, this->transform->position.y);
     if (Player* player = Player::getSingleton()) {
         
         Rect playerCollider = player->getCollider()->getRect();
@@ -116,9 +111,7 @@ void BlobEnemy::update() {
 }
 
 BlobPrefab::BlobPrefab(Vector2 pos) {
-    mgba_printf("Blob spawn pos: (%x, %x)", pos.x, pos.y);
     Vector2 adjustedPos = pos - Vector2(18, 11)/2;
-    mgba_printf("Adjusted spawn pos: (%x, %x)", adjustedPos.x, adjustedPos.y);
     this->addComponent(new BlobEnemy());
     this->addComponent(new Transform(pos - Vector2(18,11)/2));
     this->addComponent(new RectCollider(Vector2(18,11), RectCollider::TOP_LEFT));

@@ -262,7 +262,6 @@ inline bool operator >=(const int& a, const fixed32& b) {
 #pragma endregion
 
 inline fixed32 fixed32::lerp(fixed32 a, fixed32 b, fixed32 t) {
-    mgba_printf("Lerp:: a: %x, b: %x, t: %x, b-a: %x, (b-a) * t: %x", a, b, t, b-a, (b-a)*t);
     return a + (b-a) * t;
 }
 
@@ -404,7 +403,6 @@ inline fixed32 Vector2::dot(Vector2 b) {
 inline Vector2 Vector2::lerp(Vector2 a, Vector2 b, fixed32 t) {
     Vector2 result = Vector2();
     result.x = fixed32::lerp(a.x, b.x, t);
-    mgba_printf("lerp x: %x", result.x);
     result.y = fixed32::lerp(a.y, b.y, t);
     return result;
 }

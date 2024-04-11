@@ -1,4 +1,5 @@
 #include "camera.hpp"
+#include "animation.hpp"
 
 using namespace GBAEngine;
 
@@ -82,20 +83,16 @@ void CameraSystem::deregisterCamera(Camera* cam) {
 
 void CameraSystem::update() {
     
-
-    mgba_printf("current camera: %p", currentCamera);
     if (transitionCamera && transitionCamera != currentCamera) {
         if (activeTransition) {
             delete activeTransition;
         }
-        activeTransition = new Transition(actualCameraPosition, transitionCamera, 20);
+        activeTransition = new Transition(actualCameraPosition, transitionCamera, 40);
         currentCamera = transitionCamera;
         transitionCamera = nullptr;
     }
     if (activeTransition) {
-        mgba_printf("using transition");
         actualCameraPosition = activeTransition->evaluate();
-        mgba_printf("camera pos from eval: (%x, %x)", actualCameraPosition.x, actualCameraPosition.y);
         if (actualCameraPosition == currentCamera->smoothedPosition) {
             delete activeTransition;
             activeTransition = nullptr;
@@ -117,17 +114,13 @@ CameraSystem::Transition::Transition(Vector2 startPos, Camera* target, int lengt
 
 Vector2 CameraSystem::Transition::evaluate() {
     int currTime = GameObject::getSceneLifetime();
-    mgba_printf("eval Current time: %d", currTime);
-    mgba_printf("eval Start time: %d", this->startTime);
     int elapsed = currTime - this->startTime;
-    mgba_printf("eval Elapsed time: %d", elapsed);
-    mgba_printf("Target cam: %x", targetCam);
     if (elapsed < 0) return startPos;
     if (elapsed > this->length) {
         return targetCam->smoothedPosition;
     }
     fixed32 t = fixed32(elapsed) / fixed32(this->length);
-    mgba_printf("eval T: %x", t);
+    t = EasingFunction::EASE_OUT(t);
     return Vector2::lerp(startPos, targetCam->smoothedPosition, t);
 }
 

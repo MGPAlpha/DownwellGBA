@@ -54,6 +54,9 @@ static fixed32 smoothCameraX = 0;
 LogoSprite *logoSprite0;
 LogoSprite *logoSprite1;
 
+Camera* titleCamComponent;
+
+
 int wellDescentTime = 0;
 
 void initSurface(void) {
@@ -104,6 +107,11 @@ void initSurface(void) {
     GameObject* player = new PlayerPrefab(Vector2(152,133));
     Camera* playerCam = new Camera();
     playerCam->damping = 15;
+    playerCam->lockPos.y = 80;
+    playerCam->lockY = true;
+    playerCam->clampX = true;
+    playerCam->clampMin.x = 112;
+    playerCam->clampMax.x = 260;
     player->addComponent(playerCam);
     Transform* playerTransform = player->getComponent<Transform>();
     Player* playerComponent = player->getComponent<Player>();
@@ -123,6 +131,12 @@ void initSurface(void) {
     logoSpriteObj1->addComponent(logoSprite1);
     logoSpriteObj1->addComponent(logoSpriteTransform1);
     GameObject::loadGameObject(logoSpriteObj1);
+
+    GameObject* titleCam = new GameObject();
+    titleCamComponent = new Camera(5, false);
+    titleCam->addComponent(new Transform(Vector2(352, 80)));
+    titleCam->addComponent(titleCamComponent);
+    GameObject::loadGameObject(titleCam);
 
     for (int i = 0; i < 60; i++) {
         waitForVBlank();
@@ -147,11 +161,16 @@ void updateSurface(void) {
     
     CameraSystem::update();
 
-
     Player *player = Player::getSingleton();
-    Camera* playerCamera = player->getComponent<Camera>();
+    Camera* playerCamera;
+    if (player) {
+        playerCamera = player->getComponent<Camera>();
+    }
     if (!player || player->getTransform()->position.x >= 260) {
-        playerCamera->offset.x = 0;
+        if (player) {
+            playerCamera->offset.x = 0;
+            titleCamComponent->enable();
+        }
         if (logoSprite0 && logoSprite1){
             if (!logoSprite0->animationStart && playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
                 logoSprite0->animationStart = logoSprite0->getGameObject()->getLifetime();
@@ -162,6 +181,7 @@ void updateSurface(void) {
 
 
     } else {
+        titleCamComponent->disable();
         if (playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
 
             if (player->dir == LEFT) playerCamera->offset.x = -48;
@@ -213,7 +233,9 @@ void updateSurface(void) {
     } else if (!wellDescentTime && player && player->getTransform()->position.y > 160) {
         mgba_printf("destroying player");
         player->getGameObject()->destroy();
+        mgba_printf("player destroyed"); 
         wellDescentTime = stateTime;
+        mgba_printf("wellDescentTime: %d", wellDescentTime); 
     }
 }
 

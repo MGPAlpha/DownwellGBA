@@ -30,7 +30,7 @@ namespace GBAEngine {
 
             struct Comparator {
                 bool operator()(const Camera* lhs, const Camera* rhs) const {
-                    return lhs->priority < rhs->priority;
+                    return lhs->priority > rhs->priority;
                 }
             };
         protected:
