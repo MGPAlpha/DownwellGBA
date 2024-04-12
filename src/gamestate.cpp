@@ -55,7 +55,7 @@ LogoSprite *logoSprite0;
 LogoSprite *logoSprite1;
 
 Camera* titleCamComponent;
-
+MovementAnimator* titleCamAnimator;
 
 int wellDescentTime = 0;
 
@@ -111,7 +111,7 @@ void initSurface(void) {
     playerCam->lockY = true;
     playerCam->clampX = true;
     playerCam->clampMin.x = 112;
-    playerCam->clampMax.x = 260;
+    playerCam->clampMax.x = 300;
     player->addComponent(playerCam);
     Transform* playerTransform = player->getComponent<Transform>();
     Player* playerComponent = player->getComponent<Player>();
@@ -136,6 +136,8 @@ void initSurface(void) {
     titleCamComponent = new Camera(5, false);
     titleCam->addComponent(new Transform(Vector2(352, 80)));
     titleCam->addComponent(titleCamComponent);
+    titleCamAnimator = new MovementAnimator(Vector2(0,350), 106, EasingFunction::EASE_IN);
+    titleCam->addComponent(titleCamAnimator);
     GameObject::loadGameObject(titleCam);
 
     for (int i = 0; i < 60; i++) {
@@ -235,6 +237,7 @@ void updateSurface(void) {
         player->getGameObject()->destroy();
         mgba_printf("player destroyed"); 
         wellDescentTime = stateTime;
+        titleCamAnimator->start();
         mgba_printf("wellDescentTime: %d", wellDescentTime); 
     }
 }

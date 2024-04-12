@@ -4,6 +4,7 @@
 #include "gbamath.hpp"
 #include "gameobject.hpp"
 #include "transform.hpp"
+#include "animation.hpp"
 
 namespace GBAEngine {
 

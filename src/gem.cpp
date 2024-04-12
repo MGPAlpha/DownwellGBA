@@ -133,7 +133,6 @@ void Gem::randomizeGem() {
     Vector2 vel;
     vel.x.value = randRange(-1<<16, 1<<16);
     vel.y.value = randRange(-1<<15, 1<<16);
-    mgba_printf("Vel: %d,%d", vel.x, vel.y);
     vel = vel.normalized();
     vel = vel * fixed32(1.5);
     this->velocity = vel;

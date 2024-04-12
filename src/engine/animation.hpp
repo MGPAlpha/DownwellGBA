@@ -3,6 +3,7 @@
 
 #include <functional>
 #include "gbamath.hpp"
+#include "transform.hpp"
 
 namespace GBAEngine {
     class EasingFunction {
@@ -16,6 +17,26 @@ namespace GBAEngine {
             static const EasingFunction LINEAR;
         private:
             std::function<fixed32(fixed32)> func;
+    };
+
+    class MovementAnimator : public Component {
+        public:
+            MovementAnimator(Vector2 movement, int length, EasingFunction easing);
+            MovementAnimator(Vector2 movement, int length);
+            void start();
+            bool startOnAwake = false;
+        protected:
+            void update() override;
+            void awake() override;
+        private:
+            Transform* transform;
+            EasingFunction easing = EasingFunction::LINEAR;
+            Vector2 movement;
+            Vector2 targetPos;
+            bool started = false;
+            Vector2 startPos;
+            int length;
+            int timer = 0;
     };
 }
 
