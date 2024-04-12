@@ -39,7 +39,6 @@ void MovementAnimator::awake() {
 
 void MovementAnimator::update() {
     if (started) {
-        mgba_printf("doing anim timer update");
         timer++;
         if (timer >= length) {
             transform->position = targetPos;
@@ -48,9 +47,6 @@ void MovementAnimator::update() {
             fixed32 t = fixed32(timer)/length;
             t = easing(t);
             transform->position = Vector2::lerp(startPos, targetPos, t);
-            mgba_printf("start pos (%x, %x)", startPos.x, startPos.y);
-            mgba_printf("target pos (%x, %x)", targetPos.x, targetPos.y);
-            mgba_printf("cam pos (%x, %x)", transform->position.x, transform->position.y);
         }
     }
 }

@@ -89,12 +89,11 @@ void CameraSystem::update() {
         }
         reset = false;
         if (currentCamera || transitionCamera) {
-            currentCamera = transitionCamera;
+            if (transitionCamera) currentCamera = transitionCamera;
             transitionCamera = nullptr;
             actualCameraPosition = currentCamera->smoothedPosition;
         }
     } else {
-
         if (transitionCamera && transitionCamera != currentCamera) {
             if (activeTransition) {
                 delete activeTransition;

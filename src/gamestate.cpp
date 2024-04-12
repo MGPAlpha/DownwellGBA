@@ -49,8 +49,6 @@ enum GAMESTATE unpauseState;
 int stateTime = 0;
 int vBlankCount = 0;
 
-static fixed32 smoothCameraX = 0;
-
 LogoSprite *logoSprite0;
 LogoSprite *logoSprite1;
 
@@ -115,7 +113,6 @@ void initSurface(void) {
     player->addComponent(playerCam);
     Transform* playerTransform = player->getComponent<Transform>();
     Player* playerComponent = player->getComponent<Player>();
-    // smoothCameraX = playerTransform->position.x - SCREENWIDTH/2;
     GameObject::loadGameObject(player);
 
     GameObject* logoSpriteObj0 = new GameObject();
@@ -193,24 +190,16 @@ void updateSurface(void) {
         
     }
 
-    // int invertedCameraProgress = 256 - cameraShiftProgress;
-
-    // int cameraFollowedX = playerData->collider.pos.x + (playerData->collider.size.x - SCREENWIDTH) / 2;
-    // if (cameraFollowedX < -8) cameraFollowedX = -8;
-
     if (wellDescentTime) {
         int totalDescentTime = stateTime - wellDescentTime - 40;
         totalDescentTime = MAX(totalDescentTime, 0);
         int pan = totalDescentTime * totalDescentTime / 32;
-        // cameraPos.y = pan;
         if (pan > 350) {
             for (int i = 0; i < 60; i++) waitForVBlank();
             mgba_printf("initiating game");
             initGame();
             return;
         }
-    } else {
-        // cameraPos.y = 0;
     }
 
     waitForVBlank();
@@ -297,33 +286,34 @@ void updateWin(void) {
     }
 }
 
-fixed32 smoothCameraY = 0;
-
 int level = 0;
 
 void nextLevel(void) {
     GameObject::destroyAllGameObjects();
 
-    smoothCameraY = 16;
-
     generateLevel(&startSegmentPool, &cavernSegmentPool, &endSegmentPool);
 
     GameObject *player = new PlayerPrefab(Vector2(85, 0));
+    Camera* playerCamera = new Camera();
+    playerCamera->offset.y = 16;
+    playerCamera->lockX = true;
+    playerCamera->lockPos.x = 88;
+    playerCamera->damping = 15;
+    playerCamera->clampY = true;
+    playerCamera->clampMin.y = 96;
+    playerCamera->clampMax.y = (currentLevelLength-6)<<4;
+    player->addComponent(playerCamera);
     Player* playerComponent = player->getComponent<Player>();
     GameObject::loadGameObject(player);
 
     if (playerComponent) {
-        playerComponent->getTransform()->position = Vector2(85,0);
         playerComponent->runningJump = 1;
         playerComponent->state = PLAYER_JUMPING;
         playerComponent->stateTime = 64;
-
-        // smoothCameraX = (playerData->collider.pos.x - SCREENWIDTH/2 + playerData->collider.size.x/2) << 8;
     }
 
     mgba_printf("new player generated");
 
-    // spawnEnemy(&blobType, (Vector2){64,480});
 
     waitForVBlank();
 
@@ -389,20 +379,13 @@ void initGame(void) {
 void updateGame(void) {
 
 
-    // if (BUTTON_PRESSED(BUTTON_L)) {
-    //     PlayerData *playerData = playerSingleton->data;
-
-    //     if (playerData) {
-    //         spawnEnemy(&blobType, (Vector2){playerData->collider.pos.x + 24, playerData->collider.pos.y});
-    //     }
-    // }
-
     GameObject::updateAllGameObjects();
+
+    GameObject::lateUpdateAllGameObjects();
     
     GameObject::clearDestructionQueue();
-    
 
-    fixed32 cameraYTarget = 0;
+    CameraSystem::update();
 
     Player *player = Player::getSingleton();
     
@@ -412,24 +395,6 @@ void updateGame(void) {
 
     spawnNecessaryEnemies(player);
 
-    if (player) {
-        cameraYTarget = (player->getTransform()->position.y - SCREENHEIGHT/2 + 16);
-        cameraYTarget = max(16,cameraYTarget);
-        cameraYTarget = min((currentLevelLength-11)<<4,cameraYTarget);
-    }
-
-    smoothCameraY = smoothCameraY + (cameraYTarget - smoothCameraY) / 16;
-
-    // int invertedCameraProgress = 256 - cameraShiftProgress;
-
-    // int cameraFollowedX = playerData->collider.pos.x + (playerData->collider.size.x - SCREENWIDTH) / 2;
-    // if (cameraFollowedX < -8) cameraFollowedX = -8;
-
-
-    if (player->state != PLAYER_DEAD) {
-        cameraPos.x = -32;
-        cameraPos.y = smoothCameraY;
-    }
 
     generateTilemapUntil(int(cameraPos.y) / 16 + 11);
 

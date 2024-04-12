@@ -52,7 +52,7 @@ MenuItem pauseMenuItems[] = {
         "QUICK START",
         MENU_FUNCTION_BEHAVIOR,
         NULL,
-        [](int index){/*initGame();*/},
+        [](int index){initGame();},
         showOnlyOnSurface
     },
     {
@@ -60,7 +60,7 @@ MenuItem pauseMenuItems[] = {
         "RETRY",
         MENU_FUNCTION_BEHAVIOR,
         NULL,
-        [](int index){/*initGame();*/},
+        [](int index){initGame();},
         showOnlyInGame
     },
     {
@@ -236,7 +236,7 @@ MenuItem loseMenuItems[] = {
         "RETRY",
         MENU_FUNCTION_BEHAVIOR,
         NULL,
-        [](int index){/*initGame();*/},
+        [](int index){initGame();},
     },
     {
         MENU_CONST_TEXT,
