@@ -146,6 +146,7 @@ void initSurface(void) {
 
     gameState = GAME_SURFACE;
     stateTime = 0;
+    CameraSystem::resetToPrimaryCam();
 }
 
 void updateSurface(void) {
@@ -351,6 +352,9 @@ void nextLevel(void) {
     gameState = GAME_PLAY;
 
     level++;
+
+    CameraSystem::resetToPrimaryCam();
+
 
 }
 

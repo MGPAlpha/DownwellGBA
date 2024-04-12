@@ -82,23 +82,36 @@ void CameraSystem::deregisterCamera(Camera* cam) {
 }
 
 void CameraSystem::update() {
-    
-    if (transitionCamera && transitionCamera != currentCamera) {
+    if (reset) {
         if (activeTransition) {
-            delete activeTransition;
-        }
-        activeTransition = new Transition(actualCameraPosition, transitionCamera, 40);
-        currentCamera = transitionCamera;
-        transitionCamera = nullptr;
-    }
-    if (activeTransition) {
-        actualCameraPosition = activeTransition->evaluate();
-        if (actualCameraPosition == currentCamera->smoothedPosition) {
             delete activeTransition;
             activeTransition = nullptr;
         }
-    } else if (currentCamera) {
-        actualCameraPosition = currentCamera->smoothedPosition;
+        reset = false;
+        if (currentCamera || transitionCamera) {
+            currentCamera = transitionCamera;
+            transitionCamera = nullptr;
+            actualCameraPosition = currentCamera->smoothedPosition;
+        }
+    } else {
+
+        if (transitionCamera && transitionCamera != currentCamera) {
+            if (activeTransition) {
+                delete activeTransition;
+            }
+            activeTransition = new Transition(actualCameraPosition, transitionCamera, 40);
+            currentCamera = transitionCamera;
+            transitionCamera = nullptr;
+        }
+        if (activeTransition) {
+            actualCameraPosition = activeTransition->evaluate();
+            if (actualCameraPosition == currentCamera->smoothedPosition) {
+                delete activeTransition;
+                activeTransition = nullptr;
+            }
+        } else if (currentCamera) {
+            actualCameraPosition = currentCamera->smoothedPosition;
+        }
     }
 
     cameraPos = actualCameraPosition - Vector2(120,80);
@@ -124,9 +137,15 @@ Vector2 CameraSystem::Transition::evaluate() {
     return Vector2::lerp(startPos, targetCam->smoothedPosition, t);
 }
 
+void CameraSystem::resetToPrimaryCam() {
+    reset = true;
+    actualCameraPosition = Vector2(0,0);
+}
+
 Camera* CameraSystem::currentCamera;
 Camera* CameraSystem::transitionCamera;
 CameraSystem::Transition* CameraSystem::activeTransition;
+bool CameraSystem::reset = true;
 
 
 Vector2 CameraSystem::getCameraPosition() {

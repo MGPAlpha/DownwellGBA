@@ -54,6 +54,7 @@ namespace GBAEngine {
         public:
             static Vector2 getCameraPosition();
             static void update();
+            static void resetToPrimaryCam();
         private:
             
             static Vector2 actualCameraPosition;
@@ -65,6 +66,8 @@ namespace GBAEngine {
 
             static Camera* currentCamera;
             static Camera* transitionCamera;
+
+            static bool reset;
 
             struct Transition {
                 int startTime;
