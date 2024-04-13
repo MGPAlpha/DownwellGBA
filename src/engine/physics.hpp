@@ -6,6 +6,13 @@
 #include "../collision.hpp"
 
 #include <set>
+#include <typeinfo>
+#include <map>
+
+#define BEGIN_STATIC_CTOR struct constructor{\
+        constructor(){
+#define END_STATIC_CTOR }};\
+        static constructor cons;
 
 namespace GBAEngine {
 
@@ -79,8 +86,24 @@ namespace GBAEngine {
 
     class Physics {
         friend class Collider;
-
+        
+        static std::map<std::pair<const std::type_info*, const std::type_info*>, std::function<bool(Collider*, Collider*)>> intersectionHandlers;
+        
+        public:
+            template <class T1, class T2>
+            static void addIntersectionHandler(std::function<bool(T1*, T2*)> handler) {
+                intersectionHandlers[std::make_pair(&typeid(T1), &typeid(T2))] = [handler](Collider* col1, Collider* col2){
+                    return handler((T1*)col1, (T2*)col2);   
+                };
+                intersectionHandlers[std::make_pair(&typeid(T2), &typeid(T1))] = [handler](Collider* col1, Collider* col2){
+                    return handler((T1*)col2, (T2*)col1); 
+                };
+            }
+            static bool checkIntersection(Collider* a, Collider* b);
         private:
+
+
+
             static std::set<Collider*, Collider::Comparator> activeColliders;
     };
 
@@ -102,12 +125,21 @@ namespace GBAEngine {
             RectCollider(PivotMode pivot);
             RectCollider();
 
+            static bool collideRect(RectCollider* a, RectCollider* b);
+
             Vector2 size;
             Vector2 offset;
 
             PivotMode pivot;
 
             Rect getRect() const;
+
+        private:
+            BEGIN_STATIC_CTOR
+                mgba_open();
+                Physics::addIntersectionHandler<RectCollider, RectCollider>(collideRect);
+                mgba_printf("handler added");
+            END_STATIC_CTOR
     };
 
 }

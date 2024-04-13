@@ -10,8 +10,23 @@ void Collider::destroy() {
     Physics::activeColliders.erase(this);
 }
 
+
+std::map<std::pair<const std::type_info*, const std::type_info*>, std::function<bool(Collider*, Collider*)>> Physics::intersectionHandlers;
+
 std::set<Collider*, Collider::Comparator> Physics::activeColliders;
 
+bool Physics::checkIntersection(Collider* a, Collider* b) {
+    std::pair<const std::type_info*, const std::type_info*> key = std::make_pair(&typeid(*a), &typeid(*b));
+    if (intersectionHandlers.count(key) > 0) {
+        std::function<bool(Collider*, Collider*)> handler = intersectionHandlers[key];
+        if (handler) {
+            return handler(a, b);
+        }
+    }
+    return false;
+}
+
+RectCollider::constructor RectCollider::cons;
 
 RectCollider::RectCollider(Vector2 size, Vector2 offset, PivotMode pivot) {
     this->size = size;
@@ -59,4 +74,9 @@ Rect RectCollider::getRect() const {
     result.size = this->size;
     return result;
 }
+
+bool RectCollider::collideRect(RectCollider* a, RectCollider* b) {
+    return true;
+}
+
 

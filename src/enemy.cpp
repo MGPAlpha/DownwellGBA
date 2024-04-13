@@ -114,7 +114,10 @@ BlobPrefab::BlobPrefab(Vector2 pos) {
     Vector2 adjustedPos = pos - Vector2(18, 11)/2;
     this->addComponent(new BlobEnemy());
     this->addComponent(new Transform(pos - Vector2(18,11)/2));
-    this->addComponent(new RectCollider(Vector2(18,11), RectCollider::TOP_LEFT));
+    RectCollider* collider = new RectCollider(Vector2(18,11), RectCollider::TOP_LEFT);
+    collider->offset.x = 7;
+    collider->offset.y = 2;
+    this->addComponent(collider);
 };  
 
 void Enemy::damageEnemy(int damage) {
