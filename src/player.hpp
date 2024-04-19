@@ -23,6 +23,7 @@ class Player : public GBAEngine::Component {
         static int playerMaxHealth;
         static int playerMaxHealthProgress;
         enum PLAYERSTATE state;
+        GBAEngine::Vector2 velocity;
         int stateTime;
         enum DIRECTION dir;
         int runningJump;

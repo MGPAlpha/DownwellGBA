@@ -33,75 +33,77 @@ int jumpFrames[] = {
     4
 };
 
-int jumpDisplacementFrames[] = {
-    -4,
-    -5,
-    -4,
-    -3,
-    -4,
-    -3,
-    -4,
-    -3,
-    -2,
-    -3,
-    -2,
-    -3,
-    -2,
-    -1,
-    -2,
-    -1,
-    -2,
-    -1,
-    0,
-    -1,
-    0,
-    -1,
-    0,
-    1,
-    0,
-    1,
-    0,
-    1,
-    2,
-    1,
-    2,
-    1,
-    2,
-    3,
-    2,
-    3,
-    2,
-    3,
-    4,
-    3,
-    4,
-    3,
-    4,
-    5,
-    4
-};
+// int jumpDisplacementFrames[] = {
+//     -4,
+//     -5,
+//     -4,
+//     -3,
+//     -4,
+//     -3,
+//     -4,
+//     -3,
+//     -2,
+//     -3,
+//     -2,
+//     -3,
+//     -2,
+//     -1,
+//     -2,
+//     -1,
+//     -2,
+//     -1,
+//     0,
+//     -1,
+//     0,
+//     -1,
+//     0,
+//     1,
+//     0,
+//     1,
+//     0,
+//     1,
+//     2,
+//     1,
+//     2,
+//     1,
+//     2,
+//     3,
+//     2,
+//     3,
+//     2,
+//     3,
+//     4,
+//     3,
+//     4,
+//     3,
+//     4,
+//     5,
+//     4
+// };
 
 int Player::playerHealth = 4;
 int Player::playerMaxHealth = 4;
 int Player::playerMaxHealthProgress = 0;
 
 void Player::checkForEnemyContact(Enemy *enemy) {
-    Collision col = collideRects(this->collider->getRect(), enemy->getComponent<RectCollider>()->getRect());
-    if (col.collided) {
-        if (col.push.y < 0/* && col.push.y > -5<<8*/) {
-            enemy->killEnemy();
-            this->state = PLAYER_HOP;
-            this->stateTime = 6;
-            this->runningJump = 1;
-            this->ammo = this->charge;
-            this->canFire = 0;
-            playSoundBPriority(stompc96_data, stompc96_length, 0, 5);
-        } else if (this->iFrames < 1) {
-            playerHealth--;
-            playSoundBPriority(playerdamagedd66_data, playerdamagedd66_length, 0, 10);
-            this->iFrames = 60;
-        }
+    if (this->state == PLAYER_DEAD) return;
+    fixed32 oldVel = this->velocity.y;
+    if (this->state == PLAYER_JUMPING || this->state == PLAYER_FALLING || this->state == PLAYER_HOP) {
+        enemy->killEnemy();
+        this->state = PLAYER_HOP;
+        this->stateTime = 6;
+        this->velocity.y = -3.4;
+        this->runningJump = 1;
+        this->ammo = this->charge;
+        this->canFire = 0;
+        playSoundBPriority(stompc96_data, stompc96_length, 0, 5);
     }
+    if (this->iFrames < 1 && (this->state == PLAYER_HOP && oldVel < 0) || (this->state != PLAYER_FALLING && this->state != PLAYER_HOP)) {
+        playerHealth--;
+        playSoundBPriority(playerdamagedd66_data, playerdamagedd66_length, 0, 10);
+        this->iFrames = 60;
+    }
+
 }
 
 Player* Player::getSingleton() {
@@ -129,6 +131,11 @@ Player* Player::singleton;
 void Player::awake() {
     this->transform = this->getGameObject()->getComponent<Transform>();
     this->collider = this->getGameObject()->getComponent<RectCollider>();
+    this->collider->onEnter += [this](Collider* c){
+        if (Enemy* e = c->getComponent<Enemy>()) {
+            this->checkForEnemyContact(e);
+        }
+    };
     singleton = this;
 }
 
@@ -160,6 +167,7 @@ void Player::update() {
             this->runningJump = (this->state == PLAYER_WALKING) ? 1 : 0;
             this->state = PLAYER_JUMPING;
             this->stateTime = 0;
+            this->velocity.y = -4.6;
             this->canFire = 0;
         } else {
             this->transform->position.y+= 1;
@@ -169,6 +177,7 @@ void Player::update() {
             } else {
                 this->state = PLAYER_JUMPING;
                 this->runningJump = 0;
+                this->velocity.y = 0;
                 this->stateTime = 24;
             }
         }
@@ -177,13 +186,18 @@ void Player::update() {
     if (this->state == PLAYER_JUMPING || this->state == PLAYER_HOP || this->state == PLAYER_DEAD) {
         if (this->state == PLAYER_JUMPING && !BUTTON_HELD(BUTTON_A) && !BUTTON_HELD(BUTTON_B) && this->stateTime < 12) this->stateTime = 12;
         // playSoundBPriority(playerkilledc50_data, playerkilledc50_length, 0, 200);
-        int jumpDiffIndex = this->stateTime;
-        if (this->stateTime >= sizeof(jumpDisplacementFrames)/sizeof(int)) jumpDiffIndex = sizeof(jumpDisplacementFrames)/sizeof(int) - 1;
-        int jumpDisplacement = jumpDisplacementFrames[jumpDiffIndex];
+        // int jumpDiffIndex = this->stateTime;
+        // if (this->stateTime >= sizeof(jumpDisplacementFrames)/sizeof(int)) jumpDiffIndex = sizeof(jumpDisplacementFrames)/sizeof(int) - 1;
+        // fixed32 jumpDisplacement = jumpDisplacementFrames[jumpDiffIndex];
+        this->velocity.y = this->velocity.y + fixed32(.2);
+        this->velocity.y = min(this->velocity.y, 4);
+        mgba_printf("y vel: %x", this->velocity.y);
+        fixed32 jumpDisplacement = this->velocity.y;
         this->transform->position.y += jumpDisplacement;
         Collision yCollision = collideCollisionMap(this->collider->getRect(), activeCollisionMap, activeCollisionMapWidth, 20);
         if (yCollision.push.y) {
             this->transform->position.y += yCollision.push.y;
+            this->velocity.y = 0;
             if (yCollision.push.y < 0 && this->state != PLAYER_DEAD) {
                 this->state = PLAYER_IDLE;
                 this->ammo = this->charge;
@@ -207,6 +221,7 @@ void Player::update() {
             GameObject::loadGameObject(bullet);
 
             this->stateTime = 21;
+            this->velocity.y = -.2;
             
             playSoundBPriority(machinegunbulletc8a_data, machinegunbulletc8a_length, 0, 0);
         }
@@ -214,14 +229,15 @@ void Player::update() {
         this->fireTime++;
     }
 
-    if (this->state != PLAYER_DEAD) GameObject::doForEachGameObject<Enemy>([this](Enemy* e) {
-        this->checkForEnemyContact(e);
-        return 0;
-    });
+    // if (this->state != PLAYER_DEAD) GameObject::doForEachGameObject<Enemy>([this](Enemy* e) {
+    //     this->checkForEnemyContact(e);
+    //     return 0;
+    // });
 
     if (this->state != PLAYER_DEAD && playerHealth <= 0) {
         this->state = PLAYER_DEAD;
         this->stateTime = 5;
+        this->velocity.y = -3.6;
         stopSound();
         playSoundBPriority(playerkilledc50_data, playerkilledc50_length, 0, 200);
         REG_TM2CNT = 0;
@@ -269,7 +285,10 @@ void Player::destroy() {
 
 PlayerPrefab::PlayerPrefab(Vector2 pos) {
     this->addComponent(new Transform(pos));
-    this->addComponent(new RectCollider(Vector2(6,11), RectCollider::TOP_LEFT));
+    RectCollider* col = new RectCollider(Vector2(6,11), RectCollider::TOP_LEFT);
+    col->layer = L_0;
+    col->mask = L_1 | L_2;
+    this->addComponent(col);
     this->addComponent(new Player());
 }
 

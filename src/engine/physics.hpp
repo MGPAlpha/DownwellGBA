@@ -69,7 +69,7 @@ namespace GBAEngine {
                 }
             };
 
-            bool isTrigger = false;
+            bool isTriggerOnly = false;
 
             GameEvent<Collider*> onEnter;
             GameEvent<Collider*> onExit;

@@ -35,18 +35,18 @@ class GameObject {
 
         static void loadGameObject(GameObject* g); 
 
-        template <class ComponentType>
-        static unsigned int doForEachGameObject(std::function<unsigned int(ComponentType*)> func) {
-            unsigned int outCode = 0;
-            for (GameObject* go : gameObjectRefs) {
-                ComponentType* c = go->getComponent<ComponentType>();
-                if (c) {
-                    unsigned int newOut = func(c);
-                    if (newOut > outCode) outCode = newOut;
-                }
-            }
-            return outCode;
-        }
+        // template <class ComponentType>
+        // static unsigned int doForEachGameObject(std::function<unsigned int(ComponentType*)> func) {
+        //     unsigned int outCode = 0;
+        //     for (GameObject* go : gameObjectRefs) {
+        //         ComponentType* c = go->getComponent<ComponentType>();
+        //         if (c) {
+        //             unsigned int newOut = func(c);
+        //             if (newOut > outCode) outCode = newOut;
+        //         }
+        //     }
+        //     return outCode;
+        // }
         static void updateAllGameObjects(void);
         static void lateUpdateAllGameObjects(void);
         static void drawAllGameObjects(void);
