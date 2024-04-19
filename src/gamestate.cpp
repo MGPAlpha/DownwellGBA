@@ -153,6 +153,8 @@ void updateSurface(void) {
     int playerCanMove = stateTime > 8*6;
 
     if (playerCanMove) GameObject::updateAllGameObjects();
+
+    Physics::updateIntersections();
     
     GameObject::lateUpdateAllGameObjects();
     
@@ -354,6 +356,8 @@ void initGame(void) {
 
     stopSound();    
 
+    GameObject::clearDestructionQueue();
+
 
     Player::playerHealth = 4;
     Player::playerMaxHealth = 4;
@@ -380,6 +384,8 @@ void updateGame(void) {
 
 
     GameObject::updateAllGameObjects();
+
+    Physics::updateIntersections();
 
     GameObject::lateUpdateAllGameObjects();
     

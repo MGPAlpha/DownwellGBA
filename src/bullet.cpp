@@ -41,6 +41,12 @@ unsigned int Bullet::CheckCollisionWithEnemy(Enemy *enemy) {
 void Bullet::awake() {
     this->transform = getComponent<Transform>();
     this->collider = getComponent<RectCollider>();
+    this->collider->onEnter += [this](Collider* c) {
+        if (Enemy* enemy = c->getComponent<Enemy>()) {
+            enemy->damageEnemy(1);
+            this->getGameObject()->destroy();
+        }
+    };
 }
 
 void Bullet::update() {
@@ -57,13 +63,13 @@ void Bullet::update() {
         this->getGameObject()->destroy();
         return;
     }
-    unsigned int bulletCheckResult = GameObject::doForEachGameObject<Enemy>([this](Enemy* g) {
-        return this->CheckCollisionWithEnemy(g);
-    });
-    if (bulletCheckResult) {
-        this->getGameObject()->destroy();
-        return;
-    }
+    // unsigned int bulletCheckResult = GameObject::doForEachGameObject<Enemy>([this](Enemy* g) {
+    //     return this->CheckCollisionWithEnemy(g);
+    // });
+    // if (bulletCheckResult) {
+    //     this->getGameObject()->destroy();
+    //     return;
+    // }
 }
 
 void Bullet::draw() {
@@ -86,6 +92,9 @@ void Bullet::draw() {
 
 BulletPrefab::BulletPrefab(Vector2 pos) {
     this->addComponent(new Transform(pos));
-    this->addComponent(new RectCollider(Vector2(6,4), RectCollider::TOP_LEFT));
+    RectCollider* col = new RectCollider(Vector2(6,4), RectCollider::TOP_LEFT);
+    col->layer = L_3;
+    col->mask = L_1 | L_2;
+    this->addComponent(col);
     this->addComponent(new Bullet());
 }

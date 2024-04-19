@@ -3,6 +3,7 @@
 
 #include "gameobject.hpp"
 #include "transform.hpp"
+#include "events.hpp"
 #include "../collision.hpp"
 
 #include <set>
@@ -54,20 +55,39 @@ namespace GBAEngine {
     class Collider : public Component {
         friend class Physics;
         public:
-            Layer layer = Layer::L_0;
-            Layer mask = Layer::L_0;
+            uint32_t layer = Layer::L_0;
+            uint32_t mask = Layer::L_0;
             int priority = 0;
 
             struct Comparator {
                 bool operator()(const Collider* lhs, const Collider* rhs) const {
+                    // This is important. we need to ensure that it isnt just comparing priorities, otherwise all of same priority are equal
+                    if (lhs->priority == rhs->priority) {
+                        return lhs < rhs;
+                    }
                     return lhs->priority < rhs->priority;
                 }
             };
+
+            bool isTrigger = false;
+
+            GameEvent<Collider*> onEnter;
+            GameEvent<Collider*> onExit;
+            GameEvent<Collider*> onStay;
+
+            bool needsIntersectionCheck();
         protected:
             Transform* transform;
 
+            std::set<Collider*> trackedIntersections;
+
             void awake() override;
             void destroy() override;
+        private:
+            std::set<Collider*> lastFrameIntersections;
+            std::set<Collider*> currentFrameIntersections;
+            void registerIntersection(Collider*);
+            void registerNonintersection(Collider*);
     };
 
     template<class ColliderTypeA, class ColliderTypeB>
@@ -84,22 +104,52 @@ namespace GBAEngine {
         }
     };
 
-    class Physics {
-        friend class Collider;
-        
-        static std::map<std::pair<const std::type_info*, const std::type_info*>, std::function<bool(Collider*, Collider*)>> intersectionHandlers;
-        
+    template <typename _Ret, typename... _Args>
+    class ColliderFunctionTable {
+        private:
+            typedef std::pair<const std::type_info*, const std::type_info*> TypePair;
+            typedef std::function<_Ret(Collider*, Collider*, _Args...)> CollisionFunc;
+            std::map<TypePair, CollisionFunc> handlers;
+            std::function<void(_Args&...)> argReverser;
+            bool hasReverser = false;
         public:
+            ColliderFunctionTable() {}
+            ColliderFunctionTable(std::function<void(_Args&...)> reverser) {
+                this->argReverser = reverser;
+                hasReverser = true;
+            }
+
             template <class T1, class T2>
-            static void addIntersectionHandler(std::function<bool(T1*, T2*)> handler) {
-                intersectionHandlers[std::make_pair(&typeid(T1), &typeid(T2))] = [handler](Collider* col1, Collider* col2){
-                    return handler((T1*)col1, (T2*)col2);   
+            void addHandler(std::function<_Ret(T1*, T2*, _Args...)> handler) {
+                handlers[std::make_pair(&typeid(T1), &typeid(T2))] = [handler](Collider* col1, Collider* col2, _Args... args) -> _Ret {
+                    return handler((T1*)col1, (T2*)col2, args...);   
                 };
-                intersectionHandlers[std::make_pair(&typeid(T2), &typeid(T1))] = [handler](Collider* col1, Collider* col2){
-                    return handler((T1*)col2, (T2*)col1); 
+                handlers[std::make_pair(&typeid(T2), &typeid(T1))] = [this, handler](Collider* col1, Collider* col2, _Args... args) -> _Ret {
+                    if (hasReverser) this->argReverser(args...);
+                    return handler((T1*)col2, (T2*)col1, args...);
                 };
             }
-            static bool checkIntersection(Collider* a, Collider* b);
+            _Ret check(Collider* a, Collider* b, _Args... args) {
+                TypePair key = std::make_pair(&typeid(*a), &typeid(*b));
+                if (handlers.count(key) > 0) {
+                    CollisionFunc handler = handlers[key];
+                    if (handler) {
+                        return handler(a, b, args...);
+                    }
+                }
+                return false;
+            }
+
+    };
+
+    class Physics {
+        friend class Collider;
+       
+        public:
+            static ColliderFunctionTable<bool> intersectionHandlers;
+            static ColliderFunctionTable<Collision, Vector2> collisionHandlers;
+
+            static void updateIntersections();
         private:
 
 
@@ -137,7 +187,8 @@ namespace GBAEngine {
         private:
             BEGIN_STATIC_CTOR
                 mgba_open();
-                Physics::addIntersectionHandler<RectCollider, RectCollider>(collideRect);
+                // mgba_printf("trying to add handler");
+                Physics::intersectionHandlers.addHandler<RectCollider, RectCollider>(collideRect);
                 mgba_printf("handler added");
             END_STATIC_CTOR
     };

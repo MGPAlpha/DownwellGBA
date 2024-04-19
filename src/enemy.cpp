@@ -115,6 +115,8 @@ BlobPrefab::BlobPrefab(Vector2 pos) {
     this->addComponent(new BlobEnemy());
     this->addComponent(new Transform(pos - Vector2(18,11)/2));
     RectCollider* collider = new RectCollider(Vector2(18,11), RectCollider::TOP_LEFT);
+    collider->layer = L_2;
+    collider->mask = L_0;
     collider->offset.x = 7;
     collider->offset.y = 2;
     this->addComponent(collider);

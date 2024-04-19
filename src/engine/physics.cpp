@@ -10,20 +10,64 @@ void Collider::destroy() {
     Physics::activeColliders.erase(this);
 }
 
+bool Collider::needsIntersectionCheck() {
+    return onEnter.size() > 0 || onStay.size() > 0 || onExit.size() > 0;
+}
 
-std::map<std::pair<const std::type_info*, const std::type_info*>, std::function<bool(Collider*, Collider*)>> Physics::intersectionHandlers;
+void Collider::registerIntersection(Collider* c) {
+    this->onStay(c);
+    this->currentFrameIntersections.insert(c);
+    if (this->lastFrameIntersections.count(c) == 0) {
+        this->onEnter(c);
+    }
+}
+void Collider::registerNonintersection(Collider* c) {
+    if (this->lastFrameIntersections.count(c) > 0) {
+        this->onExit(c);
+    }
+}
+
+
+ColliderFunctionTable<bool> Physics::intersectionHandlers;
+ColliderFunctionTable<Collision, Vector2> Physics::collisionHandlers;
 
 std::set<Collider*, Collider::Comparator> Physics::activeColliders;
 
-bool Physics::checkIntersection(Collider* a, Collider* b) {
-    std::pair<const std::type_info*, const std::type_info*> key = std::make_pair(&typeid(*a), &typeid(*b));
-    if (intersectionHandlers.count(key) > 0) {
-        std::function<bool(Collider*, Collider*)> handler = intersectionHandlers[key];
-        if (handler) {
-            return handler(a, b);
+void Physics::updateIntersections() {
+    auto iterA = activeColliders.begin();
+    auto colEnd = activeColliders.end();
+    while (iterA != colEnd) {
+        auto iterB = iterA;
+        iterB++;
+        Collider* colA = *iterA;
+        while (iterB != colEnd) {
+            Collider* colB = *iterB;
+            bool aChecksIntersection = colA->needsIntersectionCheck();
+            bool bChecksIntersection = colB->needsIntersectionCheck();
+            bool aSeesB = colB->layer & colA->mask;
+            bool bSeesA = colA->layer & colB->mask;
+            bool aShouldCheck = aSeesB && aChecksIntersection;
+            bool bShouldCheck = bSeesA && bChecksIntersection;
+            if (aShouldCheck || bShouldCheck) {
+                bool intersected = Physics::intersectionHandlers.check(colA, colB);
+                if (intersected) {
+                    if (aShouldCheck) colA->registerIntersection(colB);
+                    if (bShouldCheck) colB->registerIntersection(colA);
+                } else {
+                    if (aShouldCheck) colA->registerNonintersection(colB);
+                    if (bShouldCheck) colB->registerNonintersection(colA);
+                }
+            }
+            iterB++;
         }
+        iterA++;
     }
-    return false;
+
+    for (Collider* c : activeColliders) {
+        c->lastFrameIntersections = c->currentFrameIntersections;
+        c->currentFrameIntersections.clear();
+    }
+
 }
 
 RectCollider::constructor RectCollider::cons;
@@ -76,7 +120,11 @@ Rect RectCollider::getRect() const {
 }
 
 bool RectCollider::collideRect(RectCollider* a, RectCollider* b) {
-    return true;
+    Rect rectA = a->getRect();
+    Rect rectB = b->getRect();
+
+    Collision col = collideRects(rectA, rectB);
+    return col.collided;
 }
 
 
