@@ -33,54 +33,6 @@ int jumpFrames[] = {
     4
 };
 
-// int jumpDisplacementFrames[] = {
-//     -4,
-//     -5,
-//     -4,
-//     -3,
-//     -4,
-//     -3,
-//     -4,
-//     -3,
-//     -2,
-//     -3,
-//     -2,
-//     -3,
-//     -2,
-//     -1,
-//     -2,
-//     -1,
-//     -2,
-//     -1,
-//     0,
-//     -1,
-//     0,
-//     -1,
-//     0,
-//     1,
-//     0,
-//     1,
-//     0,
-//     1,
-//     2,
-//     1,
-//     2,
-//     1,
-//     2,
-//     3,
-//     2,
-//     3,
-//     2,
-//     3,
-//     4,
-//     3,
-//     4,
-//     3,
-//     4,
-//     5,
-//     4
-// };
-
 int Player::playerHealth = 4;
 int Player::playerMaxHealth = 4;
 int Player::playerMaxHealthProgress = 0;
@@ -185,13 +137,8 @@ void Player::update() {
 
     if (this->state == PLAYER_JUMPING || this->state == PLAYER_HOP || this->state == PLAYER_DEAD) {
         if (this->state == PLAYER_JUMPING && !BUTTON_HELD(BUTTON_A) && !BUTTON_HELD(BUTTON_B) && this->stateTime < 12) this->stateTime = 12;
-        // playSoundBPriority(playerkilledc50_data, playerkilledc50_length, 0, 200);
-        // int jumpDiffIndex = this->stateTime;
-        // if (this->stateTime >= sizeof(jumpDisplacementFrames)/sizeof(int)) jumpDiffIndex = sizeof(jumpDisplacementFrames)/sizeof(int) - 1;
-        // fixed32 jumpDisplacement = jumpDisplacementFrames[jumpDiffIndex];
         this->velocity.y = this->velocity.y + fixed32(.2);
         this->velocity.y = min(this->velocity.y, 4);
-        mgba_printf("y vel: %x", this->velocity.y);
         fixed32 jumpDisplacement = this->velocity.y;
         this->transform->position.y += jumpDisplacement;
         Collision yCollision = collideCollisionMap(this->collider->getRect(), activeCollisionMap, activeCollisionMapWidth, 20);

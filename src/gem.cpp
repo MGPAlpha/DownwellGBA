@@ -46,7 +46,7 @@ void Gem::update() {
 
         case GEM_PHYSICS:
             {
-                this->velocity.y.value += 8;
+                this->velocity.y.value += 8<<8;
 
                 this->transform->position.x += this->velocity.x;
                 Collision xColl = collideCollisionMap(this->collider->getRect(), activeCollisionMap, activeCollisionMapWidth, 20);
