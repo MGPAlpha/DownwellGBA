@@ -3,6 +3,7 @@
 import sys
 import yaml
 import re
+import os
 import subprocess
 from collections import deque
 from pathlib import Path
@@ -207,6 +208,7 @@ def importAnimation(import_options: dict, source_path: Path, dest_path: Path):
     else:
         out_data["name"] = source_path.stem
     out_data["frames"] = frames
+    out_data["type"] = "animation"
 
     return out_data
 
@@ -247,6 +249,77 @@ def import_asset(source_path: Path, dest_path: Path):
             print(f"exporting {dest_path} failed")
             raise exc
 
+def repaletteSprite(sprite: dict, old_pal: list, new_pal: list):
+    pixels = sprite["pixels"]
+    for row in pixels:
+        for i in range(len(row)):
+            row[i] = new_pal.index(old_pal[row[i]])
+    sprite["palette"] = new_pal
+
+def mergePalettes(dest_pal: list, source_pal: list, sprites: list):
+    
+    for color in source_pal:
+        if color == 0: continue
+        if not color in dest_pal:
+            dest_pal.append(color)
+
+    for spr in sprites:
+        if spr["palette"] == source_pal:
+            repaletteSprite(spr, source_pal, dest_pal)
+
+    return dest_pal
+
+
+def reducePalettes(original_palettes: list, sprites: list):
+    if len(original_palettes) == 0:
+        return []
+    palette_len = 16 if len(original_palettes[0]) <= 16 else 256
+    out_palettes = []
+    for pal in original_palettes:
+        merged = None
+        for merge_pal in out_palettes:
+            pal_set = set(tuple(pal))
+            merge_set = set(tuple(merge_pal))
+            if (pal_set.issubset(merge_set) or merge_set.issubset(pal_set) or len(merge_set.union(pal_set)) <= palette_len):
+                #palettes can be merged
+                merged = mergePalettes(merge_pal, pal, sprites)
+                break
+        #palettes cannot be merged
+        if merged == None: out_palettes.append(pal)
+
+    return out_palettes
+
+def buildGraphicsFiles(inputs: list, output_path: Path):
+    cpp_path = output_path.with_suffix(".cpp")
+    hpp_path = output_path.with_suffix(".hpp")
+
+    cpp_text = ""
+    hpp_text = ""
+
+    gfx_data = []
+    for input in inputs:
+        with open(input) as file:
+            try:
+                gfx = yaml.safe_load(file)
+                gfx_data.append(gfx)
+            except yaml.YAMLError as exc:
+                print(f"reading {input} failed")
+                raise exc
+
+    anim_data = list(filter(lambda d: d["type"] == "animation", gfx_data))
+    sprite_data = list(filter(lambda d: d["type"] == "sprite", gfx_data))
+    total_sprites_list = sprite_data + [frame for anim in anim_data for frame in anim["frames"]]
+
+    for sprite in total_sprites_list:
+        sprite["palette"] = [tuple(color) if color != 0 else color for color in sprite["palette"]]
+        print(sprite["palette"])
+
+    spr_palettes = [spr["palette"] for spr in total_sprites_list]
+
+    new_palettes = reducePalettes(spr_palettes, total_sprites_list)
+
+    print(new_palettes)
+    print(total_sprites_list[0]["palette"])
 
 
 arg_iter = iter(sys.argv)
@@ -258,6 +331,26 @@ command = next(arg_iter, None)
 
 if command == "build":
     pass
+    inputs = []
+    output_path = None
+    while True:
+        next_arg = next(arg_iter, None)
+        if next_arg == "-o":
+            output_path = Path(next(arg_iter))
+        elif next_arg == None:
+            break
+        else:
+            new_input = Path(next_arg)
+            if not new_input.exists():
+                print(f"Input file {new_input} does not exist")
+                exit(1)
+            inputs.append(new_input)
+    if output_path == None:
+        output_path = Path(os.getcwd())
+
+    buildGraphicsFiles(inputs, output_path)
+    
+    
 
 
 elif command == "import":
