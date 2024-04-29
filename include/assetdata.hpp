@@ -9,13 +9,8 @@ namespace GBAEngine {
 
     };
 
-    struct Palette16 : public Palette {
-        uint16_t colors[16];
-    };
-
-    struct Palette256 : public Palette {
-        uint16_t colors[256];
-    };
+    typedef uint16_t Palette16[16];
+    typedef uint16_t Palette256[256];
 
     struct Sprite {
         Palette16* palette16;

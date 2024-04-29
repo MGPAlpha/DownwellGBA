@@ -4,6 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
+                "${workspaceFolder}/include/*",
                 "${workspaceFolder}/lib/*",
                 "${workspaceFolder}/lib/fpsqrt",
                 "${env:DEVKITARM}/arm-none-eabi/include/c++/**"

@@ -11,6 +11,8 @@ from PIL import Image
 import itertools as iter_tools
 from operator import itemgetter
 
+from codewriter import HeaderAndImplementationWriter
+
 def generateCImage(name: Path):
     filepath = name.with_suffix(".png")
     resizepath = filepath.with_suffix(".resize")
@@ -289,12 +291,39 @@ def reducePalettes(original_palettes: list, sprites: list):
 
     return out_palettes
 
-def buildGraphicsFiles(inputs: list, output_path: Path):
-    cpp_path = output_path.with_suffix(".cpp")
-    hpp_path = output_path.with_suffix(".hpp")
+def colorToGBAHex(color: int):
+    if color == 0: return "0x0000"
+    print(color)
+    (r,g,b) = color
+    short = r | g<<5 | b<<10
+    hex = "0x%0.4X" % short
+    print(hex)
+    return hex
 
-    cpp_text = ""
-    hpp_text = ""
+def writePalettes(palettes: list, writer: HeaderAndImplementationWriter):
+    writer.openNamespace("Palettes")
+
+    for i, pal in enumerate(palettes):
+
+        writer.writeVarDeclAndDefOpen("GBAEngine::Palette16", f"palette{i}")
+
+        color_texts = [colorToGBAHex(color) for color in pal]
+        fill_colors_count = 16 - len(color_texts)
+        if fill_colors_count > 0:
+            color_texts += ["0x0000"] * fill_colors_count
+        writer.cpp.writeArrayInline(color_texts)
+
+        writer.cpp.writeEndStatement()
+        
+
+
+    writer.closeNamespace()
+
+def writeSprites(sprites: list, palettes: list):
+    pass
+
+def buildGraphicsFiles(inputs: list, output_path: Path):
+    writer = HeaderAndImplementationWriter(output_path.stem)
 
     gfx_data = []
     for input in inputs:
@@ -318,8 +347,27 @@ def buildGraphicsFiles(inputs: list, output_path: Path):
 
     new_palettes = reducePalettes(spr_palettes, total_sprites_list)
 
-    print(new_palettes)
-    print(total_sprites_list[0]["palette"])
+    writer.begin()
+
+    writer.hpp.writeIncludeLibrary("assetdata.hpp")
+
+    writer.openNamespace("Assets")
+    
+    writePalettes(new_palettes, writer)
+
+    writer.closeNamespace()
+
+    writer.end()
+
+    print("cpp file:")
+    print(writer.cpp.text)
+    print("hpp file:")
+    print(writer.hpp.text)
+
+    cpp_path = output_path.with_suffix(".cpp")
+    writer.cpp.dumpFile(cpp_path)
+    hpp_path = output_path.with_suffix(".hpp")
+    writer.hpp.dumpFile(hpp_path)
 
 
 arg_iter = iter(sys.argv)
