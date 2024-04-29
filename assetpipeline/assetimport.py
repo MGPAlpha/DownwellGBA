@@ -305,7 +305,7 @@ def writePalettes(palettes: list, writer: HeaderAndImplementationWriter):
 
     for i, pal in enumerate(palettes):
 
-        writer.writeVarDeclAndDefOpen("GBAEngine::Palette16", f"palette{i}")
+        writer.writeVarDeclAndDefOpen("const GBAEngine::Palette16", f"palette{i}")
 
         color_texts = [colorToGBAHex(color) for color in pal]
         fill_colors_count = 16 - len(color_texts)
@@ -319,8 +319,56 @@ def writePalettes(palettes: list, writer: HeaderAndImplementationWriter):
 
     writer.closeNamespace()
 
-def writeSprites(sprites: list, palettes: list):
-    pass
+def arrangeSpriteDataAsTiles(data: list):
+    height = len(data)
+    width = len(data[0])
+
+    retiled = []
+
+    for tile_x in range(0, width, 8):
+        for tile_y in range(0, height, 8):
+            for row in range(tile_y, tile_y+8):
+                retiled.extend(data[row][tile_x:tile_x+8])
+
+    return retiled
+
+
+def palIndexListToSpriteData(data: list, bpp: str = "4bpp"):
+    data_tiled = arrangeSpriteDataAsTiles(data)
+    it = [iter(data_tiled)] * 4
+    sets = list(zip(*it))
+    out_strs = ["0x%0.4X" % (a | b<<4 | c<<8 | d<< 12) for (a, b, c, d) in sets]
+    return out_strs
+
+def writeSpriteCompoundLiteral(sprite: dict, palettes: list, writer: HeaderAndImplementationWriter):
+    writer.cpp.writeBeginCompoundLiteralMultiline("GBAEngine::Sprite")
+    
+    writer.cpp.writeCompoundLiteralFieldN("sizeX", str(sprite["size"]["x"]))
+    writer.cpp.writeCompoundLiteralFieldN("sizeY", str(sprite["size"]["y"]))
+    writer.cpp.writeCompoundLiteralFieldN("palette16", f"&Palettes::palette{palettes.index(sprite['palette'])}")
+
+    writer.cpp.writeCompoundLiteralFieldOpen("data")
+    writer.cpp.writeIndented("(const uint16_t[]) ")
+    data = palIndexListToSpriteData(sprite["pixels"])
+    writer.cpp.writeArrayMultiline(data, 8)
+    # writer.cpp.writeBeginCompoundLiteralMultiline("const uint16_t[]")
+    # print(data)
+    # writer.cpp.writeEndCompoundLiteralMultiline()
+    writer.cpp.writeLineIndented(",")
+
+    writer.cpp.writeEndCompoundLiteralMultiline()
+
+def writeSprites(sprites: list, palettes: list, writer: HeaderAndImplementationWriter):
+    writer.openNamespace("Sprites")
+
+    for i, spr in enumerate(sprites):
+        writer.writeVarDeclAndDefOpen("const GBAEngine::Sprite", spr["name"])
+        writeSpriteCompoundLiteral(spr, palettes, writer)
+        writer.cpp.writeEndStatement()
+
+
+
+    writer.closeNamespace()
 
 def buildGraphicsFiles(inputs: list, output_path: Path):
     writer = HeaderAndImplementationWriter(output_path.stem)
@@ -354,6 +402,8 @@ def buildGraphicsFiles(inputs: list, output_path: Path):
     writer.openNamespace("Assets")
     
     writePalettes(new_palettes, writer)
+
+    writeSprites(sprite_data, new_palettes, writer)
 
     writer.closeNamespace()
 

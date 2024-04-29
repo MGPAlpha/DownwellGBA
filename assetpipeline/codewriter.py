@@ -68,7 +68,43 @@ class CPPFileWriter:
     def writeBeginCompoundLiteral(self, lit_type: str):
         self.writeIndented("(" + lit_type + ") {")
 
+    def writeBeginCompoundLiteralMultiline(self, lit_type: str):
+        self.writeBeginCompoundLiteral(lit_type)
+        self.writeNewline()
+        self.indent()
+
     def writeEndCompoundLiteral(self):
+        self.writeIndented("}")
+
+    def writeEndCompoundLiteralMultiline(self):
+        self.undent()
+        self.writeIndented("}")
+
+    def writeCompoundLiteralFieldOpen(self, name: str):
+        self.writeIndented(f".{name} = ")
+
+    def writeCompoundLiteralField(self, name: str, value: str):
+        self.writeCompoundLiteralFieldOpen(name)
+        self.writeIndented(f"{value},")
+
+    def writeCompoundLiteralFieldN(self, name: str, value: str):
+        self.writeCompoundLiteralField(name, value)
+        self.writeNewline()
+
+    def writeArrayMultiline(self, data: list, items_per_line: int = 1):
+        self.writeLineIndented("{")
+        self.indent()
+
+        line_item_counter = 0
+        for val in data:
+            if line_item_counter >= items_per_line:
+                line_item_counter = 0
+                self.writeNewline()
+            self.writeIndented(f"{val}, ")
+            line_item_counter += 1
+
+        self.writeNewline()
+        self.undent()
         self.writeIndented("}")
 
     def dumpFile(self, dest: str):
@@ -84,7 +120,7 @@ class HeaderAndImplementationWriter:
         self.name = name
 
     def begin(self):
-        symbol = self.name.capitalize().replace(".", "_").replace(" ", "_")
+        symbol = self.name.upper().replace(".", "_").replace(" ", "_") + "_HPP"
         self.hpp.writeIfndef(symbol)
         self.hpp.writeDefine(symbol)
         self.hpp.writeNewline()

@@ -2,12 +2,17 @@ ifeq ($(strip $(DEVKITARM)),)
 $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM)
 endif
 
+rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+
 PRODUCT_NAME = DownwellGBA
 
 SRC_DIR := src
 OBJ_DIR := obj
 BIN_DIR := bin
 LIB_DIR := lib
+ASS_DIR := assets
+GFX_DIR := gfx
+SRC_GEN_DIR := srcgen
 
 FPSQRT := $(LIB_DIR)/fpsqrt/fpsqrt.o
 
@@ -20,7 +25,13 @@ CPPSRC := $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/**/*.cpp)
 COBJ := $(CSRC:src/%.c=obj/%.o)
 CPPOBJ := $(CPPSRC:src/%.cpp=obj/%.o)
 
-OBJ := $(COBJ) $(CPPOBJ)
+ASSETS := $(call rwildcard, $(ASS_DIR), *.import)
+GFX := $(ASSETS:assets/%.import=gfx/%.gfx)
+
+ASSETS_CPP := $(SRC_GEN_DIR)/assets.cpp
+ASSETS_O := $(OBJ_DIR)/assets.o
+
+OBJ := $(COBJ) $(CPPOBJ) $(ASSETS_O)
 
 
 # $(info $(OBJ))
@@ -45,7 +56,7 @@ CFLAGS             = $(MODEL) -O3 -Wall -pedantic -Wextra -std=c99 -D_ROM=$(ROM_
 
 # --- C++ Compiler
 CPP                = $(DEVKITARM)/bin/arm-none-eabi-g++
-CPPFLAGS           = $(MODEL) -O3 -Wall -pedantic -Wextra -D_ROM=$(ROM_NAME) -I$(DEVKITPRO)/libgba/include -Ilib/fpsqrt
+CPPFLAGS           = $(MODEL) -O3 -Wall -pedantic -Wextra -D_ROM=$(ROM_NAME) -I$(DEVKITPRO)/libgba/include -Iinclude -Ilib/fpsqrt
 
 # --- Linker
 LD                 = $(DEVKITARM)/bin/arm-none-eabi-g++
@@ -56,6 +67,8 @@ OBJCOPYFLAGS       = -O binary
 
 # --- ROM Fixer
 GBAFIX             = gbafix
+
+IMPORTER           = python3 assetpipeline/assetimport.py
 
 .PHONY: all clean
 
@@ -74,14 +87,26 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 		@mkdir -p $(dir $@)
 		$(CC) $(COMMONCFLAGS) $(CFLAGS) -c $< -o $@
 
+$(ASSETS_O) : $(ASSETS_CPP) | $(OBJ_DIR)
+		@mkdir -p $(dir $@)
+		$(CPP) $(COMMONCFLAGS) $(CPPFLAGS) -c $< -o $@
+
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 		@mkdir -p $(dir $@)
 		$(CPP) $(COMMONCFLAGS) $(CPPFLAGS) -c $< -o $@
 
+gfx/%.gfx : $(ASS_DIR)/%.import
+		@mkdir -p $(dir $@)
+		$(IMPORTER) import $< $@
+
+$(ASSETS_CPP) : $(GFX)
+		@mkdir -p $(dir $@)
+		$(IMPORTER) build $^ -o $@
+
 $(FPSQRT) : $(LIB_DIR)/fpsqrt/fpsqrt.c
 		$(CC) $(COMMONCFLAGS) $(CFLAGS) -c $< -o $@
 
-$(BIN_DIR) $(OBJ_DIR):
+$(BIN_DIR) $(OBJ_DIR) $(GFX_DIR):
 		mkdir -p $@
 		
 clean:
