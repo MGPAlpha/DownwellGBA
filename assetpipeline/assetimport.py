@@ -13,6 +13,21 @@ from operator import itemgetter
 
 from codewriter import HeaderAndImplementationWriter
 
+spr_size_codes = {
+    (8, 8): ("TINY", "SQUARE"),
+    (16, 8): ("TINY", "WIDE"),
+    (8, 16): ("TINY", "TALL"),
+    (16, 16): ("SMALL", "SQUARE"),
+    (32, 8): ("SMALL", "WIDE"),
+    (8, 32): ("SMALL", "TALL"),
+    (32, 32): ("MEDIUM", "SQUARE"),
+    (32, 16): ("MEDIUM", "WIDE"),
+    (16, 32): ("MEDIUM", "TALL"),
+    (64, 64): ("BIG", "SQUARE"),
+    (64, 32): ("BIG", "WIDE"),
+    (32, 64): ("BIG", "TALL")
+}
+
 def rgbaToGBAColor(rgba):
     r,g,b,a = rgba
     if (a < 128): return 0
@@ -71,6 +86,9 @@ def generateSpriteGFX(name: Path, bit_mode = "4bpp"):
     sprite_data = {}
     sprite_data['size'] = size
     sprite_data['bit_mode'] = bit_mode
+    size_codes = spr_size_codes[tuple(size.values())]
+    sprite_data['size_code'] = size_codes[0]
+    sprite_data['shape_code'] = size_codes[1]
     
 
     img_data = im.load()
@@ -332,6 +350,9 @@ def writeSpriteCompoundLiteral(sprite: dict, palettes: list, writer: HeaderAndIm
     
     writer.cpp.writeCompoundLiteralFieldN("sizeX", str(sprite["size"]["x"]))
     writer.cpp.writeCompoundLiteralFieldN("sizeY", str(sprite["size"]["y"]))
+    writer.cpp.writeCompoundLiteralFieldN("size", "GBAEngine::SizeCode::" + sprite["size_code"])
+    writer.cpp.writeCompoundLiteralFieldN("shape", "GBAEngine::ShapeCode::" + sprite["shape_code"])
+
     writer.cpp.writeCompoundLiteralFieldN("palette16", f"&Palettes::palette{palettes.index(sprite['palette'])}")
 
     writer.cpp.writeCompoundLiteralFieldOpen("data")
