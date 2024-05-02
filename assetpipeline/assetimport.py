@@ -13,19 +13,6 @@ from operator import itemgetter
 
 from codewriter import HeaderAndImplementationWriter
 
-def generateCImage(name: Path):
-    filepath = name.with_suffix(".png")
-    resizepath = filepath.with_suffix(".resize")
-    print("filepath", filepath, "resizepath", resizepath)
-    im = Image.open(filepath)
-    width,height = im.size
-    width = int((width+7)/8) * 8
-    height = int((height+7)/8) * 8
-    args=[ "-gravity=center", f"{filepath}", "-background", "yellow", "-extent", f"{width}x{height}", f"{resizepath}"]
-    print(args)
-    subprocess.run( args=args, executable="convert")
-    subprocess.run( args=["--force", "--bpp=4", "--mode=sprites", f"{name}", f"{resizepath}"], executable="nin10kit" )
-
 def rgbaToGBAColor(rgba):
     r,g,b,a = rgba
     if (a < 128): return 0
@@ -370,6 +357,31 @@ def writeSprites(sprites: list, palettes: list, writer: HeaderAndImplementationW
 
     writer.closeNamespace()
 
+def writeAnimation(anim: dict, palettes: list, writer: HeaderAndImplementationWriter):
+    writer.writeVarDeclAndDefOpen("const GBAEngine::SpriteAnimation", anim["name"])
+    writer.cpp.writeBeginCompoundLiteralMultiline("const GBAEngine::SpriteAnimation");
+
+    writer.cpp.writeCompoundLiteralFieldOpen("frames")
+    writer.cpp.writeBeginCompoundLiteralMultiline("const GBAEngine::Sprite[]")
+    for frame in anim["frames"]:
+        writeSpriteCompoundLiteral(frame, palettes, writer)
+        writer.cpp.writeLineIndented(",")
+    writer.cpp.writeEndCompoundLiteralMultiline()
+    writer.cpp.writeLineIndented(",")
+    writer.cpp.writeCompoundLiteralFieldN("frameCount", str(len(anim["frames"])))
+        
+
+    writer.cpp.writeEndCompoundLiteralMultiline()
+    writer.cpp.writeEndStatement()
+
+def writeAnimations(anims: list, palettes: list, writer: HeaderAndImplementationWriter):
+    writer.openNamespace("Animations")
+
+    for anim in anims:
+        writeAnimation(anim, palettes, writer)
+
+    writer.closeNamespace()
+
 def buildGraphicsFiles(inputs: list, output_path: Path):
     writer = HeaderAndImplementationWriter(output_path.stem)
 
@@ -404,6 +416,8 @@ def buildGraphicsFiles(inputs: list, output_path: Path):
     writePalettes(new_palettes, writer)
 
     writeSprites(sprite_data, new_palettes, writer)
+
+    writeAnimations(anim_data, new_palettes, writer)
 
     writer.closeNamespace()
 

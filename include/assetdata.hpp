@@ -20,6 +20,12 @@ namespace GBAEngine {
         uint16_t bankInPalette16 = -1; 
     };
 
+    struct SpriteAnimation {
+        const Sprite* frames;
+
+        uint16_t frameCount;
+    };
+
 }
 
 #endif
