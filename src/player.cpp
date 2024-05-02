@@ -136,7 +136,10 @@ void Player::update() {
     }
 
     if (this->state == PLAYER_JUMPING || this->state == PLAYER_HOP || this->state == PLAYER_DEAD) {
-        if (this->state == PLAYER_JUMPING && !BUTTON_HELD(BUTTON_A) && !BUTTON_HELD(BUTTON_B) && this->stateTime < 12) this->stateTime = 12;
+        if (this->state == PLAYER_JUMPING && !BUTTON_HELD(BUTTON_A) && !BUTTON_HELD(BUTTON_B) && this->stateTime < 12) {
+            this->stateTime = 12;
+            if (this->velocity.y < fixed32(-2.2)) this->velocity.y = -2.2;
+        }
         this->velocity.y = this->velocity.y + fixed32(.2);
         this->velocity.y = min(this->velocity.y, 4);
         fixed32 jumpDisplacement = this->velocity.y;
