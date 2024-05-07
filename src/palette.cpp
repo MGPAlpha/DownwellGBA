@@ -62,9 +62,9 @@ void loadPalette(int index) {
     PALETTE[2+16] = palettes[index].colors[2];
     PALETTE[3+16] = palettes[index].colors[0];
 
-    SPRITEPALETTE[1] = palettes[index].colors[1];
-    SPRITEPALETTE[2] = palettes[index].colors[2];
-    SPRITEPALETTE[3] = palettes[index].colors[0];
+    // SPRITEPALETTE[1] = palettes[index].colors[1];
+    // SPRITEPALETTE[2] = palettes[index].colors[2];
+    // SPRITEPALETTE[3] = palettes[index].colors[0];
 
     activePalette = index;
     setSaveDataEntry(1, index);

@@ -18,6 +18,9 @@
 #include "sound.hpp"
 #include "collision.hpp"
 
+#include "engine/sprite.hpp"
+#include "../srcgen/assets.hpp"
+
 extern "C" {
     
 #include "print.h"
