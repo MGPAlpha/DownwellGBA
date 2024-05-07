@@ -77,7 +77,7 @@ void initSurface(void) {
 
     hideSprites();
 
-    REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | BG3_ENABLE | SPRITE_ENABLE | SPRITE_MODE_2D;
+    REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | BG3_ENABLE | SPRITE_ENABLE | SPRITE_MODE_1D;
 
     REG_BG0CNT = BG_CHARBLOCK(0) | BG_SCREENBLOCK(24) | BG_4BPP | BG_SIZE_LARGE | 2; // Terrain
     REG_BG2CNT = BG_CHARBLOCK(1) | BG_SCREENBLOCK(30) | BG_4BPP | BG_SIZE_SMALL | 0; // Dither Layer
@@ -97,8 +97,12 @@ void initSurface(void) {
     initOverlay();
     REG_BG1CNT |= 1; // UI Overlay
 
-    // DMANow(3, spritesheet_palette, SPRITEPALETTE, SPRITESHEET_PALETTE_LENGTH);
-    DMANow(3, spritesheet, &CHARBLOCK[4], SPRITESHEET_LENGTH);
+    // Removed to test dynamic sprite system
+    // DMANow(3, spritesheet, &CHARBLOCK[4], SPRITESHEET_LENGTH);
+
+    for (int i = 0; i < Assets::Animations::playerIdle.frameCount; i++) {
+        GBAEngine::SpriteAllocator::checkoutSprite(Assets::Animations::playerIdle.frames + i);
+    }
 
     activeCollisionMap = (char*)titlecollision;
     activeCollisionMapWidth = TITLECOLLISION_WIDTH;

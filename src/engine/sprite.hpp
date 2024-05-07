@@ -72,6 +72,7 @@ namespace GBAEngine {
 
             static SpriteMapSection* freeList;
             static std::unordered_map<const Sprite*, AllocatedSprite*> allocatedSprites;
+            static AllocatedSprite* allocate(const Sprite*);
     };
 
     class SpriteRenderer : public Component {

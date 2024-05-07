@@ -97,5 +97,81 @@ namespace GBAEngine {
         }
     }
 
+
+    std::unordered_map<const Sprite*, SpriteAllocator::AllocatedSprite*> SpriteAllocator::allocatedSprites;
+    SpriteAllocator::SpriteMapSection* SpriteAllocator::freeList;
+
+
+    void SpriteAllocator::init() {
+        freeList = new SpriteMapSection();
+        freeList->start = 0;
+        freeList->length = 32*32;
+        freeList->next = freeList;
+    }
+
+    SpriteAllocator::AllocatedSprite* SpriteAllocator::checkoutSprite(const Sprite* sp) {
+        if (allocatedSprites.count(sp) > 0) {
+            auto allocated = allocatedSprites[sp];
+            allocated->checkoutCount++;
+            return allocated;
+        } else {
+            auto allocated = allocate(sp);
+            if (!allocated) return nullptr;
+            allocated->checkoutCount++;
+            return allocated;
+        }
+    }
+
+    SpriteAllocator::AllocatedSprite* SpriteAllocator::allocate(const Sprite* sp) {
+        mgba_printf("allocating sprite map space");
+        if (!freeList) return nullptr;
+
+        auto paletteAlloc = SpritePaletteAllocator::checkoutPalette(sp->palette16);
+        if (!paletteAlloc) return nullptr;
+
+        SpriteMapSection* curr = freeList;
+        SpriteMapSection* start = freeList;
+
+        do {
+            if (curr->length >= sp->tileCount) {
+                mgba_printf("found valid spritemap location");
+                auto alloc = new SpriteAllocator::AllocatedSprite();
+                alloc->index = curr->start;
+                alloc->paletteIndex = paletteAlloc->getIndex();
+
+                curr->length -= sp->tileCount;
+                curr->start += sp->tileCount;
+                freeList = curr;
+
+                if (freeList->length == 0) { // Current node should be removed;
+
+                    if (freeList->next == freeList) { // No nodes will be left
+                        delete freeList;
+                        freeList = nullptr;
+                    } else if (freeList->next->next == freeList) { // One node will be left
+                        auto next = freeList->next;
+                        delete freeList;
+                        freeList = next;
+                        freeList->next = freeList;
+                    } else {
+                        auto oldNext = freeList->next;
+                        *freeList = *oldNext;
+                        delete oldNext;
+                    }
+
+                }
+
+                DMANow(3, sp->data, &CHARBLOCK[4].tileimg[alloc->index * 16], DMA_16 | DMA_ON | sp->tileCount * 16);
+                
+                return alloc;
+            }
+            curr = curr->next;
+        } while (curr != start);
+
+        // this technically could miss valid sections, but awaiting logic to reorder and combine list nodes
+        SpritePaletteAllocator::returnPalette(sp->palette16);
+        return nullptr;
+    }
+
 }
 

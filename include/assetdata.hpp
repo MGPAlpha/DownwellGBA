@@ -31,6 +31,7 @@ namespace GBAEngine {
         const Palette256* palette256;
         
         const uint16_t* data;
+        const uint16_t tileCount;
         
         uint16_t bankInPalette16 = -1; 
     };

@@ -33,6 +33,8 @@
 #include "HW05Lib.hpp"
 #include "sound.hpp"
 
+#include "engine/sprite.hpp"
+
 extern "C" {
 
 #include "print.h"
@@ -63,7 +65,9 @@ int main() {
 
     waitForVBlank();
 
-    REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE;
+    GBAEngine::SpriteAllocator::init();    
+
+    REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | SPRITE_MODE_1D;
 
     REG_BG0CNT = BG_CHARBLOCK(0) | BG_SCREENBLOCK(24) | BG_4BPP | BG_SIZE_SMALL | 2;
     REG_BG1CNT = BG_CHARBLOCK(1) | BG_SCREENBLOCK(30) | BG_4BPP | BG_SIZE_SMALL | 0;

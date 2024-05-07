@@ -124,6 +124,8 @@ def generateSpriteGFX(name: Path, bit_mode = "4bpp"):
 
     sprite_data['type'] = "sprite"
     sprite_data['original_file'] = name.name
+
+    sprite_data['tile_count'] = (size['x'] // 8) * (size['y'] // 8)
     
     return sprite_data
     
@@ -330,8 +332,8 @@ def arrangeSpriteDataAsTiles(data: list):
 
     retiled = []
 
-    for tile_x in range(0, width, 8):
-        for tile_y in range(0, height, 8):
+    for tile_y in range(0, height, 8):
+        for tile_x in range(0, width, 8):
             for row in range(tile_y, tile_y+8):
                 retiled.extend(data[row][tile_x:tile_x+8])
 
@@ -363,6 +365,7 @@ def writeSpriteCompoundLiteral(sprite: dict, palettes: list, writer: HeaderAndIm
     # print(data)
     # writer.cpp.writeEndCompoundLiteralMultiline()
     writer.cpp.writeLineIndented(",")
+    writer.cpp.writeCompoundLiteralFieldN("tileCount", str(sprite['tile_count']))
 
     writer.cpp.writeEndCompoundLiteralMultiline()
 
