@@ -122,8 +122,42 @@ namespace GBAEngine {
         }
     }
 
+    void SpriteAllocator::returnSprite(const Sprite* sp) {
+        auto allocated = allocatedSprites[sp];
+        allocated->checkoutCount--;
+        if (allocated->checkoutCount == 0) {
+            free(sp);
+        }
+    }
+
+    void SpriteAllocator::free(const Sprite* sp) {
+        auto allocated = allocatedSprites[sp];
+
+        if (freeList == nullptr) { // Create only node in freelist
+            SpriteMapSection* newSection = new SpriteMapSection();
+            newSection->start = allocated->index;
+            newSection->length = sp->tileCount;
+        } else {
+            if (allocated->index + sp->tileCount == freeList->start) { //Check for adding to beginning of start node
+                freeList->start = allocated->index;
+                freeList->length += sp->tileCount;
+            } else if (freeList->start + freeList->length == allocated->index) { // Check for adding to end of start node
+                freeList->length += sp->tileCount;
+            } else { // Cannot merge with start node, so create a new node
+                SpriteMapSection* newSection = new SpriteMapSection();
+
+                *newSection = *freeList;
+                freeList->start = allocated->index;
+                freeList->length = sp->tileCount;
+                freeList->next = newSection;
+            }
+        }
+
+        allocatedSprites.erase(sp);
+        delete allocated;
+    }
+
     SpriteAllocator::AllocatedSprite* SpriteAllocator::allocate(const Sprite* sp) {
-        mgba_printf("allocating sprite map space");
         if (!freeList) return nullptr;
 
         auto paletteAlloc = SpritePaletteAllocator::checkoutPalette(sp->palette16);
@@ -134,7 +168,6 @@ namespace GBAEngine {
 
         do {
             if (curr->length >= sp->tileCount) {
-                mgba_printf("found valid spritemap location");
                 auto alloc = new SpriteAllocator::AllocatedSprite();
                 alloc->index = curr->start;
                 alloc->paletteIndex = paletteAlloc->getIndex();
@@ -163,6 +196,7 @@ namespace GBAEngine {
 
                 DMANow(3, sp->data, &CHARBLOCK[4].tileimg[alloc->index * 16], DMA_16 | DMA_ON | sp->tileCount * 16);
                 
+                allocatedSprites[sp] = alloc;
                 return alloc;
             }
             curr = curr->next;
@@ -171,6 +205,42 @@ namespace GBAEngine {
         // this technically could miss valid sections, but awaiting logic to reorder and combine list nodes
         SpritePaletteAllocator::returnPalette(sp->palette16);
         return nullptr;
+    }
+
+    SpriteRenderer::SpriteRenderer(Sprite* sp) {
+        this->currentSprite = sp;
+    }
+    SpriteRenderer::SpriteRenderer() : SpriteRenderer(nullptr) {}
+
+    void SpriteRenderer::awake() {
+        this->objAttr = OAMManager::alloc();
+        if (!this->allocatedSprite && this->currentSprite) this->allocatedSprite = SpriteAllocator::checkoutSprite(this->currentSprite);
+    }
+
+    void SpriteRenderer::destroy() {
+        if (this->objAttr) {
+            OAMManager::free(this->objAttr);
+            this->objAttr = nullptr;
+        }
+        if (this->allocatedSprite) {
+            SpriteAllocator::returnSprite(this->currentSprite);
+            this->allocatedSprite = nullptr;
+        }
+    }
+
+    void SpriteRenderer::draw() {
+        // TODO
+    }
+
+    void SpriteRenderer::setSprite(Sprite* sp) {
+        if (this->currentSprite && this->allocatedSprite) {
+            SpriteAllocator::returnSprite(this->currentSprite);
+            this->allocatedSprite = nullptr;
+        }
+        this->currentSprite = sp;
+        if (sp) {
+            this->allocatedSprite = SpriteAllocator::checkoutSprite(sp);
+        }
     }
 
 }

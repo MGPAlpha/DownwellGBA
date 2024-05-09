@@ -17,6 +17,8 @@ namespace GBAEngine {
     
     class OAMManager {
 
+        friend class SpriteRenderer;
+
         static void init();
 
         static OBJ_ATTR shadowOAM[128];
@@ -35,8 +37,8 @@ namespace GBAEngine {
                 public:
                     uint16_t getIndex() {return index;}
                 private:
-                    uint16_t index;
-                    uint16_t checkoutCount;
+                    uint16_t index = -1;
+                    uint16_t checkoutCount = 0;
             };
 
             static AllocatedPalette* checkoutPalette(const Palette16* pal);
@@ -56,9 +58,9 @@ namespace GBAEngine {
                     uint16_t getIndex() {return index;}
                     uint16_t getPaletteIndex() {return paletteIndex;}
                 private:
-                    uint16_t index;
-                    uint16_t paletteIndex;
-                    uint16_t checkoutCount;
+                    uint16_t index = -1;
+                    uint16_t paletteIndex = -1;
+                    uint16_t checkoutCount = 0;
             };
             static void init();
             static AllocatedSprite* checkoutSprite(const Sprite*);
@@ -73,18 +75,22 @@ namespace GBAEngine {
             static SpriteMapSection* freeList;
             static std::unordered_map<const Sprite*, AllocatedSprite*> allocatedSprites;
             static AllocatedSprite* allocate(const Sprite*);
+            static void free(const Sprite*);
     };
 
     class SpriteRenderer : public Component {
         public:
             SpriteRenderer(Sprite* sp);
             SpriteRenderer();
+
+            void setSprite(Sprite* sp);
         protected:
             void awake() override;
             void draw() override;
             void destroy() override;
         private:
             Sprite* currentSprite;
+            SpriteAllocator::AllocatedSprite* allocatedSprite;
             OBJ_ATTR* objAttr;
     };
 
