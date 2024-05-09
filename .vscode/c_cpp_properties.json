@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/lib/*",
+                "${workspaceFolder}/lib/fpsqrt",
+                "${env:DEVKITARM}/arm-none-eabi/include/c++/**"
+            ],
+            "defines": [],
+            "compilerPath": "${env:DEVKITARM}/bin/arm-none-eabi-g++",
+            "cStandard": "c17",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-clang-x64"
+        }
+    ],
+    "version": 4
+}

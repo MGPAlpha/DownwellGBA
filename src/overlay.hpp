@@ -1,0 +1,38 @@
+#ifndef OVERLAY_HPP
+#define OVERLAY_HPP
+
+#include "menus.hpp"
+
+void initOverlay(void);
+
+void clearOverlayCenter(void);
+
+void fillOverlayCenter(void);
+
+void fillOverlayRect(int col, int row, int width, int height, short tileId);
+
+void printToOverlay(char *str, int col, int row, int font);
+
+void updateAmmoDisplay(int ammo, int perShot);
+
+void updateHealthDisplay(int health, int max, int maxProgress);
+
+void updateGemsDisplay(int gems);
+
+void drawGemProgress(int val, int prevMax, int max, int row);
+
+void drawTimeDisplay(void);
+
+extern unsigned int currentMenuIndex;
+
+void loadMenu(Menu* menu);
+
+void updateMenu(void);
+
+void drawMenu(Menu *menu, int selectedIndex, int col, int row, int width, int height);
+
+void drawScrollingMenu(Menu *menu, int selectedIndex, int col, int row, int width, int height);
+
+void drawCurrentMenu(void);
+
+#endif
