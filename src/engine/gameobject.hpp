@@ -6,13 +6,17 @@
 #include <set>
 // #include <typeinfo>
 
+namespace GBAEngine {
+
+    class GameObject;
+    class Component;
+
+}
+
 #include "gbamath.hpp"
 #include "../spritedata.hpp"
 
 namespace GBAEngine {
-
-class GameObject;
-class Component;
 
 #define MAX_GAME_OBJECTS 128
 
@@ -81,6 +85,8 @@ class Component {
             if (!gameObject) return nullptr;
             return gameObject->getComponent<ComponentType>();
         }
+
+        bool isAwake() {return this->awoken;}
     protected:
 
         virtual void awake();
@@ -96,6 +102,7 @@ class Component {
     
     private:
         GameObject* gameObject;
+        bool awoken = false;
 };
 
 // typedef struct gameobjecttype {

@@ -207,7 +207,7 @@ namespace GBAEngine {
         return nullptr;
     }
 
-    SpriteRenderer::SpriteRenderer(Sprite* sp) {
+    SpriteRenderer::SpriteRenderer(const Sprite* sp) {
         this->currentSprite = sp;
     }
     SpriteRenderer::SpriteRenderer() : SpriteRenderer(nullptr) {}
@@ -232,13 +232,13 @@ namespace GBAEngine {
         // TODO
     }
 
-    void SpriteRenderer::setSprite(Sprite* sp) {
+    void SpriteRenderer::setSprite(const Sprite* sp) {
         if (this->currentSprite && this->allocatedSprite) {
             SpriteAllocator::returnSprite(this->currentSprite);
             this->allocatedSprite = nullptr;
         }
         this->currentSprite = sp;
-        if (sp) {
+        if (this->isAwake() && sp) {
             this->allocatedSprite = SpriteAllocator::checkoutSprite(sp);
         }
     }

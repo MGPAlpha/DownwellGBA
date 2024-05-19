@@ -2,6 +2,8 @@
 #define ANIMATION_HPP
 
 #include <functional>
+#include <unordered_set>
+#include "sprite.hpp"
 #include "gbamath.hpp"
 #include "transform.hpp"
 
@@ -37,6 +39,22 @@ namespace GBAEngine {
             Vector2 startPos;
             int length;
             int timer = 0;
+    };
+
+    class SpriteAnimator : public Component {
+        public:
+            SpriteAnimator(const SpriteAnimation* anim);
+            SpriteAnimator();
+
+            void setAnimation(const SpriteAnimation*);
+        protected:
+            void awake() override;
+            void lateUpdate() override;
+            void destroy() override;
+        private:
+            SpriteRenderer* spriteRenderer;
+            const SpriteAnimation* currentAnimation;
+            std::unordered_set<const Sprite*> loadedSprites;
     };
 }
 

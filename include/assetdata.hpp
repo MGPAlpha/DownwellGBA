@@ -40,6 +40,7 @@ namespace GBAEngine {
         const Sprite* frames;
 
         uint16_t frameCount;
+        uint16_t frameLength = 1;
     };
 
 }

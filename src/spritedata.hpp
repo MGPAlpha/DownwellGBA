@@ -4,12 +4,16 @@
 #include "HW05Lib.hpp"
 
 // Sprite Attribute Struct
-typedef struct {
-    unsigned short attr0;
-    unsigned short attr1;
-    unsigned short attr2;
-    unsigned short fill;
-} OBJ_ATTR;
+// typedef struct {
+//     unsigned short attr0;
+//     unsigned short attr1;
+//     unsigned short attr2;
+//     unsigned short fill;
+// } OBJ_ATTR;
+namespace GBAEngine {
+    struct OBJ_ATTR;
+    
+}
 
 // Object Attribute Memory
 #define OAM ((OBJ_ATTR*)(0x7000000))
@@ -48,8 +52,8 @@ void hideSprites(void);
 #define RESERVED_OAM_SIZE 0
 
 void initSpriteMemory(void);
-OBJ_ATTR *spriteAlloc(void);
-void spriteFree(OBJ_ATTR* sprite);
+GBAEngine::OBJ_ATTR *spriteAlloc(void);
+void spriteFree(GBAEngine::OBJ_ATTR* sprite);
 
 void updateSprites(void);
 

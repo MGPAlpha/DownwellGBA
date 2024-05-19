@@ -216,6 +216,11 @@ def importAnimation(import_options: dict, source_path: Path, dest_path: Path):
         out_data["name"] = import_options["name"]
     else:
         out_data["name"] = source_path.stem
+    
+    if "frame_length" in import_options:
+        out_data["frame_length"] = import_options["frame_length"]
+    else:
+        out_data["frame_length"] = 4
     out_data["frames"] = frames
     out_data["type"] = "animation"
 
@@ -393,6 +398,7 @@ def writeAnimation(anim: dict, palettes: list, writer: HeaderAndImplementationWr
     writer.cpp.writeEndCompoundLiteralMultiline()
     writer.cpp.writeLineIndented(",")
     writer.cpp.writeCompoundLiteralFieldN("frameCount", str(len(anim["frames"])))
+    writer.cpp.writeCompoundLiteralFieldN("frameLength", str(anim["frame_length"]))
         
 
     writer.cpp.writeEndCompoundLiteralMultiline()

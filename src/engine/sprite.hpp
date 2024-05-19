@@ -1,10 +1,19 @@
 #ifndef SPRITE_HPP
 #define SPRITE_HPP
 
-#include "gameobject.hpp"
 #include <assetdata.hpp>
 #include <unordered_map>
 #include <stack>
+
+namespace GBAEngine {
+    struct OBJ_ATTR;
+    class OAMManager;
+    class SpriteAllocator;
+    class SpritePaletteAllocator;
+    class SpriteRenderer;
+}
+
+#include "gameobject.hpp"
 
 namespace GBAEngine {
 
@@ -78,18 +87,18 @@ namespace GBAEngine {
             static void free(const Sprite*);
     };
 
-    class SpriteRenderer : public Component {
+    class SpriteRenderer : public GBAEngine::Component {
         public:
-            SpriteRenderer(Sprite* sp);
+            SpriteRenderer(const Sprite* sp);
             SpriteRenderer();
 
-            void setSprite(Sprite* sp);
+            void setSprite(const Sprite* sp);
         protected:
             void awake() override;
             void draw() override;
             void destroy() override;
         private:
-            Sprite* currentSprite;
+            const Sprite* currentSprite;
             SpriteAllocator::AllocatedSprite* allocatedSprite;
             OBJ_ATTR* objAttr;
     };

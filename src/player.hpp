@@ -4,6 +4,7 @@
 #include "engine/gameobject.hpp"
 #include "engine/transform.hpp"
 #include "engine/physics.hpp"
+#include "engine/sprite.hpp"
 #include "enemy.hpp"
 
 // const extern GameObjectType playerType;
@@ -41,6 +42,7 @@ class Player : public GBAEngine::Component {
     private:
         GBAEngine::Transform* transform;
         GBAEngine::RectCollider* collider;
+        GBAEngine::SpriteRenderer* spriteRenderer;
 
         static Player* singleton;
         void checkForEnemyContact(Enemy *enemy);

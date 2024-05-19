@@ -100,11 +100,11 @@ void initSurface(void) {
     // Removed to test dynamic sprite system
     // DMANow(3, spritesheet, &CHARBLOCK[4], SPRITESHEET_LENGTH);
 
-    for (int i = 0; i < Assets::Animations::playerIdle.frameCount; i++) {
-        GBAEngine::SpriteAllocator::checkoutSprite(Assets::Animations::playerIdle.frames + i);
-    }
-    GBAEngine::SpriteAllocator::returnSprite(Assets::Animations::playerIdle.frames + 1);
-    GBAEngine::SpriteAllocator::checkoutSprite(Assets::Animations::playerShoot.frames);
+    // for (int i = 0; i < Assets::Animations::playerIdle.frameCount; i++) {
+    //     GBAEngine::SpriteAllocator::checkoutSprite(Assets::Animations::playerIdle.frames + i);
+    // }
+    // GBAEngine::SpriteAllocator::returnSprite(Assets::Animations::playerIdle.frames + 1);
+    // GBAEngine::SpriteAllocator::checkoutSprite(Assets::Animations::playerShoot.frames);
 
     activeCollisionMap = (char*)titlecollision;
     activeCollisionMapWidth = TITLECOLLISION_WIDTH;

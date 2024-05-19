@@ -10,6 +10,8 @@
 #include "engine/camera.hpp"
 #include "sound.hpp"
 #include "collision.hpp"
+#include "engine/sprite.hpp"
+#include <assets.hpp>
 
 extern "C" {
 
@@ -88,6 +90,7 @@ void Player::awake() {
             this->checkForEnemyContact(e);
         }
     };
+    this->spriteRenderer = this->getComponent<SpriteRenderer>();
     singleton = this;
 }
 
@@ -240,6 +243,7 @@ PlayerPrefab::PlayerPrefab(Vector2 pos) {
     col->mask = L_1 | L_2;
     this->addComponent(col);
     this->addComponent(new Player());
+    this->addComponent(new SpriteRenderer(Assets::Animations::playerIdle.frames));
 }
 
 PlayerPrefab::PlayerPrefab() : PlayerPrefab(Vector2(0,0)) {}

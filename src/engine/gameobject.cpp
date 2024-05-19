@@ -20,7 +20,7 @@ Component::Component() {
 }
 
 Component::~Component() {
-    this->sprite->attr0 = ATTR0_HIDE;
+    // this->sprite->attr0 = ATTR0_HIDE;
     spriteFree(this->sprite);
 }
 
@@ -68,6 +68,7 @@ int GameObject::getLifetime() {
 void GameObject::awakeComponents() {
     for (Component* c : this->components) {
         c->awake();
+        c->awoken = true;
     }
 }
 void GameObject::updateComponents() {

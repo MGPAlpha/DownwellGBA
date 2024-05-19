@@ -56,7 +56,7 @@ CFLAGS             = $(MODEL) -O3 -Wall -pedantic -Wextra -std=c99 -D_ROM=$(ROM_
 
 # --- C++ Compiler
 CPP                = $(DEVKITARM)/bin/arm-none-eabi-g++
-CPPFLAGS           = $(MODEL) -O3 -Wall -pedantic -Wextra -D_ROM=$(ROM_NAME) -I$(DEVKITPRO)/libgba/include -Iinclude -Ilib/fpsqrt
+CPPFLAGS           = $(MODEL) -O3 -Wall -pedantic -Wextra -D_ROM=$(ROM_NAME) -I$(DEVKITPRO)/libgba/include -Iinclude -Isrcgen -Ilib/fpsqrt
 
 # --- Linker
 LD                 = $(DEVKITARM)/bin/arm-none-eabi-g++

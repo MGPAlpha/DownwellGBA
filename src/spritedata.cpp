@@ -1,6 +1,8 @@
 #include "spritedata.hpp"
-
+#include "engine/sprite.hpp"
 #include <cstdlib>
+
+using namespace GBAEngine;
 
 static OBJ_ATTR shadowOAM[128];
 

@@ -50,3 +50,29 @@ void MovementAnimator::update() {
         }
     }
 }
+
+SpriteAnimator::SpriteAnimator(const SpriteAnimation* anim) {
+    this->currentAnimation = anim;
+}
+
+SpriteAnimator::SpriteAnimator() : SpriteAnimator(nullptr) {}
+
+void SpriteAnimator::awake() {
+    this->spriteRenderer = getComponent<SpriteRenderer>();
+    if (this->currentAnimation) {
+        for (int i = 0; i < this->currentAnimation->frameCount; i++) {
+            auto loadedSprite = SpriteAllocator::checkoutSprite(this->currentAnimation->frames + i);
+            if (loadedSprite) this->loadedSprites.insert(this->currentAnimation->frames + i);
+        }
+    }
+}
+
+void SpriteAnimator::destroy() {
+    for (auto sp : loadedSprites) {
+        SpriteAllocator::returnSprite(sp);
+    }
+}
+
+void SpriteAnimator::lateUpdate() {
+
+}
