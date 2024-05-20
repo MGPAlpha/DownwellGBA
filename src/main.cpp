@@ -27,6 +27,7 @@
 #include "palette.hpp"
 #include "cheats.hpp"
 #include "engine/gameobject.hpp"
+#include "engine/sprite.hpp"
 #include "player.hpp"
 #include "gem.hpp"
 #include "savedata.hpp"
@@ -60,6 +61,7 @@ int main() {
     initCheats();
 
     initSpriteMemory();
+    GBAEngine::OAMManager::init();
     // initGameObjects();
     initGemData();
 

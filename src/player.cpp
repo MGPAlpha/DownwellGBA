@@ -12,6 +12,7 @@
 #include "collision.hpp"
 #include "engine/sprite.hpp"
 #include <assets.hpp>
+#include "engine/animation.hpp"
 
 extern "C" {
 
@@ -203,6 +204,7 @@ void Player::update() {
 }
 
 void Player::draw() {
+    return;
     int posY = this->transform->position.y - cameraPos.y - 4;
     int posX = (this->transform->position.x - cameraPos.x - 5);
     if ((this->iFrames > 0 && this->iFrames % 2) || posY < -16 || posY > 160 || posX < -16 || posX > 240) {
@@ -244,6 +246,7 @@ PlayerPrefab::PlayerPrefab(Vector2 pos) {
     this->addComponent(col);
     this->addComponent(new Player());
     this->addComponent(new SpriteRenderer(Assets::Animations::playerIdle.frames));
+    this->addComponent(new SpriteAnimator(&Assets::Animations::playerRun));
 }
 
 PlayerPrefab::PlayerPrefab() : PlayerPrefab(Vector2(0,0)) {}

@@ -1,5 +1,6 @@
 #include "sprite.hpp"
 #include "../HW05Lib.hpp"
+#include "camera.hpp"
 
 
 // Object Attribute Memory
@@ -42,6 +43,7 @@ namespace GBAEngine {
     void OAMManager::init() {
         for (int i = 0; i < 128; i++) {
             freeOAM.push(shadowOAM + i);
+            freeOAM.top()->attr0 = ATTR0_HIDE;
         }
     }
 
@@ -213,6 +215,7 @@ namespace GBAEngine {
     SpriteRenderer::SpriteRenderer() : SpriteRenderer(nullptr) {}
 
     void SpriteRenderer::awake() {
+        this->transform = getComponent<Transform>();
         this->objAttr = OAMManager::alloc();
         if (!this->allocatedSprite && this->currentSprite) this->allocatedSprite = SpriteAllocator::checkoutSprite(this->currentSprite);
     }
@@ -229,7 +232,21 @@ namespace GBAEngine {
     }
 
     void SpriteRenderer::draw() {
-        // TODO
+        Vector2 anchor = this->transform->position - cameraPos;
+        int anchorX = anchor.x;
+        int anchorY = anchor.y;
+        if (!this->objAttr) return;
+        if (!this->allocatedSprite) {
+            this->objAttr->attr0 = ATTR0_HIDE;
+            return;
+        }
+        if (this->objAttr && this->allocatedSprite) {
+            mgba_printf("rendering sprite");
+            OBJ_ATTR* obj = this->objAttr;
+            obj->attr0 = ATTR0_REGULAR | this->currentSprite->shape | anchorY & 0x00ff;
+            obj->attr1 = this->currentSprite->size | anchorX & 0x01ff;
+            obj->attr2 = this->allocatedSprite->getIndex() | ATTR2_PRIORITY(0);
+        }
     }
 
     void SpriteRenderer::setSprite(const Sprite* sp) {

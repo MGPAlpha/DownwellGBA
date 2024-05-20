@@ -227,7 +227,7 @@ void updateSurface(void) {
 
     updateHealthDisplay(Player::playerHealth,Player::playerMaxHealth,Player::playerMaxHealthProgress);
 
-    updateSprites();
+    OAMManager::updateSprites();
 
     checkToEnableCheats();
 

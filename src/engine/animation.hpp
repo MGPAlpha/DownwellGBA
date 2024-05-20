@@ -55,6 +55,11 @@ namespace GBAEngine {
             SpriteRenderer* spriteRenderer;
             const SpriteAnimation* currentAnimation;
             std::unordered_set<const Sprite*> loadedSprites;
+            void loadAnimation(const SpriteAnimation* anim);
+            void unloadAnimation();
+            int animTimer = 0;
+            int totalAnimLength = 0;
+            int currentFrame = 0;
     };
 }
 

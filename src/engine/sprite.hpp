@@ -14,6 +14,7 @@ namespace GBAEngine {
 }
 
 #include "gameobject.hpp"
+#include "transform.hpp"
 
 namespace GBAEngine {
 
@@ -28,14 +29,15 @@ namespace GBAEngine {
 
         friend class SpriteRenderer;
 
-        static void init();
 
         static OBJ_ATTR shadowOAM[128];
         static std::stack<OBJ_ATTR*> freeOAM;
         static OBJ_ATTR* alloc();
         static void free(OBJ_ATTR* sprite);
 
-        static void updateSprites();
+        public:
+            static void init();
+            static void updateSprites();
 
     };
 
@@ -98,6 +100,7 @@ namespace GBAEngine {
             void draw() override;
             void destroy() override;
         private:
+            Transform* transform;
             const Sprite* currentSprite;
             SpriteAllocator::AllocatedSprite* allocatedSprite;
             OBJ_ATTR* objAttr;

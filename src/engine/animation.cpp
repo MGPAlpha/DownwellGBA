@@ -60,19 +60,43 @@ SpriteAnimator::SpriteAnimator() : SpriteAnimator(nullptr) {}
 void SpriteAnimator::awake() {
     this->spriteRenderer = getComponent<SpriteRenderer>();
     if (this->currentAnimation) {
+        loadAnimation(this->currentAnimation);
+    }
+}
+
+void SpriteAnimator::loadAnimation(const SpriteAnimation* anim) {
+    unloadAnimation();
+    this->currentAnimation = anim;
+    if (this->currentAnimation) {
         for (int i = 0; i < this->currentAnimation->frameCount; i++) {
             auto loadedSprite = SpriteAllocator::checkoutSprite(this->currentAnimation->frames + i);
             if (loadedSprite) this->loadedSprites.insert(this->currentAnimation->frames + i);
         }
+        this->totalAnimLength = anim->frameCount * anim->frameLength;
+        this->animTimer = 0;
+        this->currentFrame = -1;
     }
 }
 
-void SpriteAnimator::destroy() {
+void SpriteAnimator::unloadAnimation() {
+    this->currentAnimation = nullptr;
     for (auto sp : loadedSprites) {
         SpriteAllocator::returnSprite(sp);
     }
 }
 
-void SpriteAnimator::lateUpdate() {
+void SpriteAnimator::destroy() {
+    unloadAnimation();
+}
 
+void SpriteAnimator::lateUpdate() {
+    int newFrameIndex = this->animTimer / this->currentAnimation->frameLength;
+    if (newFrameIndex != this->currentFrame) {
+        if (this->spriteRenderer) {
+            this->currentFrame = newFrameIndex;
+            this->spriteRenderer->setSprite(this->currentAnimation->frames + this->currentFrame);
+        }
+    }
+    this->animTimer++;
+    if (this->animTimer >= this->totalAnimLength) this->animTimer = 0;
 }
