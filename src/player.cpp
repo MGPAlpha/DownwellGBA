@@ -240,7 +240,7 @@ void Player::destroy() {
 
 PlayerPrefab::PlayerPrefab(Vector2 pos) {
     this->addComponent(new Transform(pos));
-    RectCollider* col = new RectCollider(Vector2(6,11), RectCollider::TOP_LEFT);
+    RectCollider* col = new RectCollider(Vector2(6,11), RectCollider::CENTER);
     col->layer = L_0;
     col->mask = L_1 | L_2;
     this->addComponent(col);

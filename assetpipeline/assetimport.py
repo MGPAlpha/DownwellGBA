@@ -33,35 +33,120 @@ def rgbaToGBAColor(rgba):
     if (a < 128): return 0
     return (r>>3, g>>3, b>>3)
 
-def generateValidSpriteSize(size: dict):
-    result = {}
-    for dim in size:
-        val = size[dim]
-        if val <= 8: result[dim] = 8
-        elif val <= 16: result[dim] = 16
-        elif val <= 32: result[dim] = 32
-        else: result[dim] = 64
-    if result['x'] == 64 and result['y'] < 32: result['y'] = 32
-    if result['y'] == 64 and result['x'] < 32: result['x'] = 32
+def analyzeSpriteSizeAndBias(im: Image):
+    size = {}
+    bias = {"x": 0, "y": 0}
+    data = im.load()
+    
+    # calc minimum height
+    reducible_height = 0
+    row = 0
+    while row < im.height:
+        row_empty = True
+        for i in range(im.width):
+            if (data[row,i][3] != 0): row_empty = False
+        if not row_empty: break
+        row += 1
+        reducible_height += 1
+        bias["y"] += 1
+    end_row = im.height - 1
+    while end_row > row:
+        row_empty = True
+        for i in range(im.width):
+            if (data[end_row,i][3] != 0): row_empty = False
+        if not row_empty: break
+        end_row -= 1
+        reducible_height += 1
+        bias["y"] -= 1
+    min_height = im.height - reducible_height
+    bias["y"] //= 2
 
-    return result
+    # calc min width
+    reducible_width = 0
+    col = 0
+    while col < im.width:
+        col_empty = True
+        for i in range(im.height):
+            if (data[i,col][3] != 0): col_empty = False
+        if not col_empty: break
+        col += 1
+        reducible_width += 1
+        bias["x"] += 1
+    end_col = im.width - 1
+    while end_col > col:
+        col_empty = True
+        for i in range(im.height):
+            if (data[i,end_col][3] != 0): col_empty = False
+        if not col_empty: break
+        end_col -= 1
+        reducible_width += 1
+        bias["x"] -= 1
+    min_width = im.width - reducible_width
+    bias["x"] //= 2
 
-def expandSpriteDataToSize(data: deque, size: dict):
+    actual_size = {"x": min_width, "y": min_height}
+
+    for dim in actual_size:
+        val = actual_size[dim]
+        if val <= 8: size[dim] = 8
+        elif val <= 16: size[dim] = 16
+        elif val <= 32: size[dim] = 32
+        else: size[dim] = 64
+    if size['x'] == 64 and size['y'] < 32: size['y'] = 32
+    if size['y'] == 64 and size['x'] < 32: size['x'] = 32
+
+    print("bias", bias)
+    return (size, bias)
+
+def resizeSpriteDataToSize(data: deque, size: dict, bias: dict, pivot_pos: dict):
     original_size = {'x': len(data[0]), 'y': len(data)}
     size_diff = {'x': size['x'] - original_size['x'], 'y': size['y'] - original_size['y']}
 
     left_pad = size_diff['x'] // 2
     right_pad = size_diff['x'] // 2 + (1 if size_diff['x'] % 2 == 1 else 0)
-
     top_pad = size_diff['y'] // 2
     bottom_pad = size_diff['y'] // 2 + (1 if size_diff['y'] % 2 == 1 else 0)
 
+    left_pad -= bias["x"]
+    right_pad += bias["x"]
+    top_pad -= bias["y"]
+    bottom_pad += bias["y"]
+
+    pivot_pos["x"] += left_pad
+    pivot_pos["y"] += top_pad
+
+    # trim top and bottom
+    if top_pad < 0:
+        for _ in range(-top_pad):
+            data.popleft()
+    if bottom_pad < 0:
+        for _ in range(-bottom_pad):
+            data.pop()
+
+    # trim sides
+    if left_pad < 0:
+        for row in data:
+            for _ in range(-left_pad):
+                row.popleft()
+    if right_pad < 0:
+        for row in data:
+            for _ in range(-right_pad):
+                row.pop()
+
     # pad sides
-    for row in data:
-        row.extendleft([0 for _ in range(left_pad)])
-        row.extend([0 for _ in range(right_pad)])
-    data.extendleft([0 for __ in range(size['x'])] for _ in range(top_pad))
-    data.extend([0 for __ in range(size['x'])] for _ in range(bottom_pad))
+    if left_pad > 0:
+        for row in data:
+            row.extendleft([0 for _ in range(left_pad)])
+    if right_pad > 0:
+        for row in data:
+            row.extend([0 for _ in range(right_pad)])
+    
+    # pad top & bottom
+    if top_pad > 0:
+        data.extendleft([0 for __ in range(size['x'])] for _ in range(top_pad))
+    if bottom_pad > 0:
+        data.extend([0 for __ in range(size['x'])] for _ in range(bottom_pad))
+
 
 def convertDeque2DToList2D(d: deque):
     result = []
@@ -69,7 +154,7 @@ def convertDeque2DToList2D(d: deque):
         result.append(list(row))
     return result
 
-def generateSpriteGFX(name: Path, bit_mode = "4bpp"):
+def generateSpriteGFX(name: Path, bit_mode = "4bpp", pivot_mode = "center", pivot_offset = {"x": 0, "y": 0}):
     bit_mode = bit_mode.lower()
     if (bit_mode != "4bpp" and bit_mode != "8bpp"): 
         raise ValueError("bit_mode must be either '4bpp' or '8bpp'")
@@ -80,8 +165,26 @@ def generateSpriteGFX(name: Path, bit_mode = "4bpp"):
     if (im.width > 64 or im.height > 64):
         raise Exception(f"image at {inputpath} is too large to create sprite. Maximum size is 64x64")
 
+    pivot_pos = None
+
+    if pivot_mode == "center":
+        pivot_pos = {"x": im.width // 2, "y": im.height // 2}
+    elif pivot_mode == "topleft":
+        pivot_pos = {"x": 0, "y": 0}
+    elif pivot_mode == "topright":
+        pivot_pos = {"x": im.width, "y": 0}
+    elif pivot_mode == "bottomleft":
+        pivot_pos = {"x": 0, "y": im.height}
+    elif pivot_mode == "bottomright":
+        pivot_pos = {"x": im.width, "y": im.height}
+    else:
+        raise Exception(f"{pivot_mode} is not a valid pivot mode")
+    
+    pivot_pos["x"] += pivot_offset["x"]
+    pivot_pos["y"] += pivot_offset["y"]
+
     size = {'x': im.width, 'y': im.height}
-    size = generateValidSpriteSize(size)
+    size, bias = analyzeSpriteSizeAndBias(im)
 
     sprite_data = {}
     sprite_data['size'] = size
@@ -117,10 +220,11 @@ def generateSpriteGFX(name: Path, bit_mode = "4bpp"):
     if (len(palette) > palette_limit):
         raise Exception(f"Sprite cannot be generated from file {inputpath} because it exceeds the palette size")
 
-    expandSpriteDataToSize(data, size)
+    resizeSpriteDataToSize(data, size, bias, pivot_pos)
 
     sprite_data['pixels'] = convertDeque2DToList2D(data)
     sprite_data['palette'] = palette
+    sprite_data['pivot_pos'] = pivot_pos
 
     sprite_data['type'] = "sprite"
     sprite_data['original_file'] = name.name
@@ -357,6 +461,8 @@ def writeSpriteCompoundLiteral(sprite: dict, palettes: list, writer: HeaderAndIm
     
     writer.cpp.writeCompoundLiteralFieldN("sizeX", str(sprite["size"]["x"]))
     writer.cpp.writeCompoundLiteralFieldN("sizeY", str(sprite["size"]["y"]))
+    writer.cpp.writeCompoundLiteralFieldN("pivotX", str(sprite["pivot_pos"]["x"]))
+    writer.cpp.writeCompoundLiteralFieldN("pivotY", str(sprite["pivot_pos"]["y"]))
     writer.cpp.writeCompoundLiteralFieldN("size", "GBAEngine::SizeCode::" + sprite["size_code"])
     writer.cpp.writeCompoundLiteralFieldN("shape", "GBAEngine::ShapeCode::" + sprite["shape_code"])
 

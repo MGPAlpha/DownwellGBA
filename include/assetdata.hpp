@@ -24,6 +24,8 @@ namespace GBAEngine {
     struct Sprite {
         uint16_t sizeX;
         uint16_t sizeY;
+        uint16_t pivotX;
+        uint16_t pivotY;
         SizeCode size;
         ShapeCode shape;
 

@@ -232,15 +232,15 @@ namespace GBAEngine {
     }
 
     void SpriteRenderer::draw() {
-        Vector2 anchor = this->transform->position - cameraPos;
-        int anchorX = anchor.x;
-        int anchorY = anchor.y;
         if (!this->objAttr) return;
         if (!this->allocatedSprite) {
             this->objAttr->attr0 = ATTR0_HIDE;
             return;
         }
         if (this->objAttr && this->allocatedSprite) {
+            Vector2 anchor = this->transform->position - cameraPos;
+            int anchorX = anchor.x - this->currentSprite->pivotX;
+            int anchorY = anchor.y - this->currentSprite->pivotY;
             mgba_printf("rendering sprite");
             OBJ_ATTR* obj = this->objAttr;
             obj->attr0 = ATTR0_REGULAR | this->currentSprite->shape | anchorY & 0x00ff;
