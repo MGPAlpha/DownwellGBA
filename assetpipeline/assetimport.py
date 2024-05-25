@@ -44,16 +44,17 @@ def analyzeSpriteSizeAndBias(im: Image):
     while row < im.height:
         row_empty = True
         for i in range(im.width):
-            if (data[row,i][3] != 0): row_empty = False
+            if (data[i,row][3] != 0): row_empty = False
         if not row_empty: break
         row += 1
         reducible_height += 1
         bias["y"] += 1
     end_row = im.height - 1
+
     while end_row > row:
         row_empty = True
         for i in range(im.width):
-            if (data[end_row,i][3] != 0): row_empty = False
+            if (data[i,end_row][3] != 0): row_empty = False
         if not row_empty: break
         end_row -= 1
         reducible_height += 1
@@ -67,7 +68,7 @@ def analyzeSpriteSizeAndBias(im: Image):
     while col < im.width:
         col_empty = True
         for i in range(im.height):
-            if (data[i,col][3] != 0): col_empty = False
+            if (data[col,i][3] != 0): col_empty = False
         if not col_empty: break
         col += 1
         reducible_width += 1
@@ -76,7 +77,7 @@ def analyzeSpriteSizeAndBias(im: Image):
     while end_col > col:
         col_empty = True
         for i in range(im.height):
-            if (data[i,end_col][3] != 0): col_empty = False
+            if (data[end_col,i][3] != 0): col_empty = False
         if not col_empty: break
         end_col -= 1
         reducible_width += 1
@@ -95,7 +96,6 @@ def analyzeSpriteSizeAndBias(im: Image):
     if size['x'] == 64 and size['y'] < 32: size['y'] = 32
     if size['y'] == 64 and size['x'] < 32: size['x'] = 32
 
-    print("bias", bias)
     return (size, bias)
 
 def resizeSpriteDataToSize(data: deque, size: dict, bias: dict, pivot_pos: dict):
@@ -247,7 +247,15 @@ def importSprite(import_options: dict, source_path: Path, dest_path: Path):
             spritePngPath = path_candidates[0]
         else:
             raise FileNotFoundError(f"Could not find a valid png to generate sprite for {source_path}")
-    out_data = generateSpriteGFX(spritePngPath)
+    pivot_mode = "center"
+    if "pivot_mode" in import_options:
+        pivot_mode = import_options["pivot_mode"]
+
+    pivot_offset = {"x": 0, "y": 0}
+    if "pivot_offset" in import_options:
+        pivot_offset = import_options["pivot_offset"]
+    
+    out_data = generateSpriteGFX(spritePngPath, pivot_mode=pivot_mode, pivot_offset=pivot_offset)
 
 
     if "name" in import_options:
@@ -304,13 +312,20 @@ def importAnimation(import_options: dict, source_path: Path, dest_path: Path):
                         match = base_name_regex.match(name)
                         frame_base_name = match.group(1)
 
+    pivot_mode = "center"
+    if "pivot_mode" in import_options:
+        pivot_mode = import_options["pivot_mode"]
+
+    pivot_offset = {"x": 0, "y": 0}
+    if "pivot_offset" in import_options:
+        pivot_offset = import_options["pivot_offset"]
 
     frames = []
     frame_index = start_index
     while True:
         candidate_path = source_path.with_name(frame_base_name + delim + str(frame_index)).with_suffix(".png")
         if candidate_path.exists():
-            frames.append(generateSpriteGFX(candidate_path))
+            frames.append(generateSpriteGFX(candidate_path, pivot_mode=pivot_mode, pivot_offset=pivot_offset))
         else:
             break
         frame_index += 1

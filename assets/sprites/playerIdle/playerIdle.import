@@ -1,3 +1,6 @@
 ---
 type: animation
 frame_length: 16
+pivot_offset:
+  x: 0
+  y: 3
