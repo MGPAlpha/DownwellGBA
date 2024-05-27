@@ -12,7 +12,7 @@ extern "C" {
 using namespace GBAEngine;
 
 Component::Component() {
-    this->sprite = spriteAlloc();
+    // this->sprite = spriteAlloc();
     if (!this->sprite) {
         mgba_printf("Sprite allocation failed");
         // return NULL;
@@ -21,7 +21,7 @@ Component::Component() {
 
 Component::~Component() {
     // this->sprite->attr0 = ATTR0_HIDE;
-    spriteFree(this->sprite);
+    // spriteFree(this->sprite);
 }
 
 GameObject* Component::getGameObject() {

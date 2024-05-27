@@ -42,7 +42,7 @@ void LogoSprite::draw() {
     for (int i = 0; i < 3; i++) {
         int srcOffset = 16*16*i + 16*8*this->index + 16*16*4*frameNum;
         int dstOffset = 16*16+16*32*i+16*8*this->index;
-        DMANow(3, logo + srcOffset, CHARBLOCK[4].tileimg + dstOffset, 16*8);
+        // DMANow(3, logo + srcOffset, CHARBLOCK[4].tileimg + dstOffset, 16*8);
     }
     int posY = this->transform->position.y - cameraPos.y + yOffset;
     int posX = this->transform->position.x - cameraPos.x;

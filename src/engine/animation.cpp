@@ -70,6 +70,7 @@ void SpriteAnimator::loadAnimation(const SpriteAnimation* anim) {
     if (this->currentAnimation) {
         for (int i = 0; i < this->currentAnimation->frameCount; i++) {
             auto loadedSprite = SpriteAllocator::checkoutSprite(this->currentAnimation->frames + i);
+            mgba_printf("loaded sprite %p at tile %d", this->currentAnimation->frames + i, loadedSprite->getIndex());
             if (loadedSprite) this->loadedSprites.insert(this->currentAnimation->frames + i);
         }
         this->totalAnimLength = anim->frameCount * anim->frameLength;
@@ -83,6 +84,25 @@ void SpriteAnimator::unloadAnimation() {
     for (auto sp : loadedSprites) {
         SpriteAllocator::returnSprite(sp);
     }
+    loadedSprites.clear();
+}
+
+void SpriteAnimator::playAnimation(const SpriteAnimation* anim, int frame, bool loop) {
+    if (this->currentAnimation != anim) {
+        loadAnimation(anim);
+    }
+    if (anim) this->animTimer = frame * anim->frameLength;
+    else this->animTimer = 0;
+    this->loop = loop;
+}
+void SpriteAnimator::playAnimation(const SpriteAnimation* anim, int frame) {
+    this->playAnimation(anim, frame, true);
+}
+void SpriteAnimator::playAnimation(const SpriteAnimation* anim, bool loop) {
+    this->playAnimation(anim, 0, loop);
+}
+void SpriteAnimator::playAnimation(const SpriteAnimation* anim) {
+    this->playAnimation(anim, true);
 }
 
 void SpriteAnimator::destroy() {
@@ -98,5 +118,8 @@ void SpriteAnimator::lateUpdate() {
         }
     }
     this->animTimer++;
-    if (this->animTimer >= this->totalAnimLength) this->animTimer = 0;
+    if (this->animTimer >= this->totalAnimLength) {
+        if (this->loop) this->animTimer = 0;
+        else this->animTimer = this->totalAnimLength - 1;
+    }
 }

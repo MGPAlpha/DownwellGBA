@@ -241,7 +241,6 @@ namespace GBAEngine {
             Vector2 anchor = this->transform->position - cameraPos;
             int anchorX = anchor.x - this->currentSprite->pivotX;
             int anchorY = anchor.y - this->currentSprite->pivotY;
-            mgba_printf("rendering sprite");
             OBJ_ATTR* obj = this->objAttr;
             obj->attr0 = ATTR0_REGULAR | this->currentSprite->shape | anchorY & 0x00ff;
             obj->attr1 = this->currentSprite->size | anchorX & 0x01ff;

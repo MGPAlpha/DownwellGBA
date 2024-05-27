@@ -46,7 +46,13 @@ namespace GBAEngine {
             SpriteAnimator(const SpriteAnimation* anim);
             SpriteAnimator();
 
-            void setAnimation(const SpriteAnimation*);
+            void playAnimation(const SpriteAnimation*);
+            void playAnimation(const SpriteAnimation*, int frame);
+            void playAnimation(const SpriteAnimation*, bool loop);
+            void playAnimation(const SpriteAnimation*, int frame, bool loop);
+
+
+            bool loop = true;
         protected:
             void awake() override;
             void lateUpdate() override;

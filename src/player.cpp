@@ -92,6 +92,7 @@ void Player::awake() {
         }
     };
     this->spriteRenderer = this->getComponent<SpriteRenderer>();
+    this->spriteAnimator = this->getComponent<SpriteAnimator>();
     singleton = this;
 }
 
@@ -107,10 +108,12 @@ void Player::update() {
         }
         if (this->state == PLAYER_IDLE){
             this->state = PLAYER_WALKING;
+            this->spriteAnimator->playAnimation(&Assets::Animations::playerRun);
             this->stateTime = 0;
         }
     } else if (this->state == PLAYER_WALKING) {
         this->state = PLAYER_IDLE;
+        this->spriteAnimator->playAnimation(&Assets::Animations::playerIdle);
         this->stateTime = 0;
     }
     Collision walkCollision = collideCollisionMap(this->collider->getRect(), activeCollisionMap, activeCollisionMapWidth, 20);
@@ -122,6 +125,11 @@ void Player::update() {
         if (BUTTON_PRESSED(BUTTON_A) || BUTTON_PRESSED(BUTTON_B)) {
             this->runningJump = (this->state == PLAYER_WALKING) ? 1 : 0;
             this->state = PLAYER_JUMPING;
+            if (this->runningJump) {
+                this->spriteAnimator->playAnimation(&Assets::Animations::playerSpin);
+            } else {
+                this->spriteAnimator->playAnimation(&Assets::Animations::playerAir, false);
+            }
             this->stateTime = 0;
             this->velocity.y = -4.6;
             this->canFire = 0;
@@ -133,6 +141,7 @@ void Player::update() {
             } else {
                 this->state = PLAYER_JUMPING;
                 this->runningJump = 0;
+                this->spriteAnimator->playAnimation(&Assets::Animations::playerAir, 2, false);
                 this->velocity.y = 0;
                 this->stateTime = 24;
             }
@@ -144,6 +153,9 @@ void Player::update() {
             this->stateTime = 12;
             if (this->velocity.y < fixed32(-2.2)) this->velocity.y = -2.2;
         }
+        if (this->stateTime < 12 && !runningJump) {
+            this->spriteAnimator->playAnimation(&Assets::Animations::playerAir, 1, false);
+        }
         this->velocity.y = this->velocity.y + fixed32(.2);
         this->velocity.y = min(this->velocity.y, 4);
         fixed32 jumpDisplacement = this->velocity.y;
@@ -154,6 +166,7 @@ void Player::update() {
             this->velocity.y = 0;
             if (yCollision.push.y < 0 && this->state != PLAYER_DEAD) {
                 this->state = PLAYER_IDLE;
+                this->spriteAnimator->playAnimation(&Assets::Animations::playerIdle);
                 this->ammo = this->charge;
             } else if (yCollision.push.y > 0) {
                 this->stateTime = 24;
@@ -170,6 +183,7 @@ void Player::update() {
         if (this->canFire && (BUTTON_HELD(BUTTON_A) || BUTTON_HELD(BUTTON_B)) && this->fireTime >= 7 && (this->ammo > 0 || infiniteAmmoCheat)) {
             this->fireTime = 0;
             this->runningJump = 0;
+            this->spriteAnimator->playAnimation(&Assets::Animations::playerShoot, false);
             if (!infiniteAmmoCheat) this->ammo -= 1;
             BulletPrefab* bullet = new BulletPrefab(this->transform->position);
             GameObject::loadGameObject(bullet);
@@ -246,7 +260,7 @@ PlayerPrefab::PlayerPrefab(Vector2 pos) {
     this->addComponent(col);
     this->addComponent(new Player());
     this->addComponent(new SpriteRenderer(Assets::Animations::playerIdle.frames));
-    this->addComponent(new SpriteAnimator(&Assets::Animations::playerRun));
+    this->addComponent(new SpriteAnimator(&Assets::Animations::playerIdle));
 }
 
 PlayerPrefab::PlayerPrefab() : PlayerPrefab(Vector2(0,0)) {}
