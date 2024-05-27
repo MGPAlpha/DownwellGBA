@@ -1,0 +1,5 @@
+---
+type: animation_sheet
+frame_size:
+  x: 64
+  y: 32
