@@ -372,6 +372,8 @@ def import_asset(source_path: Path, dest_path: Path):
         out_data = importSprite(data, source_path, dest_path)
     elif import_type == "animation":
         out_data = importAnimation(data, source_path, dest_path)
+    elif import_type == "animation_sheet":
+        out_data = {"type": "animation_sheet"}
     else:
         raise Exception(f"unknown import type '{import_type}'")
 
