@@ -73,6 +73,7 @@ void Bullet::update() {
 }
 
 void Bullet::draw() {
+    if (!this->sprite) return;
     int lifetime = this->getGameObject()->getLifetime();
     int posY = (this->transform->position.y) - cameraPos.y - 7;
     int posX = (this->transform->position.x) - cameraPos.x - 1;

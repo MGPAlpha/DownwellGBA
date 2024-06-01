@@ -23,9 +23,9 @@ spr_size_codes = {
     (32, 32): ("MEDIUM", "SQUARE"),
     (32, 16): ("MEDIUM", "WIDE"),
     (16, 32): ("MEDIUM", "TALL"),
-    (64, 64): ("BIG", "SQUARE"),
-    (64, 32): ("BIG", "WIDE"),
-    (32, 64): ("BIG", "TALL")
+    (64, 64): ("LARGE", "SQUARE"),
+    (64, 32): ("LARGE", "WIDE"),
+    (32, 64): ("LARGE", "TALL")
 }
 
 def rgbaToGBAColor(rgba):
@@ -33,56 +33,58 @@ def rgbaToGBAColor(rgba):
     if (a < 128): return 0
     return (r>>3, g>>3, b>>3)
 
-def analyzeSpriteSizeAndBias(im: Image):
+def analyzeSpriteSizeAndBias(im):
     size = {}
     bias = {"x": 0, "y": 0}
-    data = im.load()
+    data = im
+    width = len(im)
+    height = len(im[0])
     
     # calc minimum height
     reducible_height = 0
     row = 0
-    while row < im.height:
+    while row < height:
         row_empty = True
-        for i in range(im.width):
-            if (data[i,row][3] != 0): row_empty = False
+        for i in range(width):
+            if (data[i][row][3] != 0): row_empty = False
         if not row_empty: break
         row += 1
         reducible_height += 1
         bias["y"] += 1
-    end_row = im.height - 1
+    end_row = height - 1
 
     while end_row > row:
         row_empty = True
-        for i in range(im.width):
-            if (data[i,end_row][3] != 0): row_empty = False
+        for i in range(width):
+            if (data[i][end_row][3] != 0): row_empty = False
         if not row_empty: break
         end_row -= 1
         reducible_height += 1
         bias["y"] -= 1
-    min_height = im.height - reducible_height
+    min_height = height - reducible_height
     bias["y"] //= 2
 
     # calc min width
     reducible_width = 0
     col = 0
-    while col < im.width:
+    while col < width:
         col_empty = True
-        for i in range(im.height):
-            if (data[col,i][3] != 0): col_empty = False
+        for i in range(height):
+            if (data[col][i][3] != 0): col_empty = False
         if not col_empty: break
         col += 1
         reducible_width += 1
         bias["x"] += 1
-    end_col = im.width - 1
+    end_col = width - 1
     while end_col > col:
         col_empty = True
-        for i in range(im.height):
-            if (data[end_col,i][3] != 0): col_empty = False
+        for i in range(height):
+            if (data[end_col][i][3] != 0): col_empty = False
         if not col_empty: break
         end_col -= 1
         reducible_width += 1
         bias["x"] -= 1
-    min_width = im.width - reducible_width
+    min_width = width - reducible_width
     bias["x"] //= 2
 
     actual_size = {"x": min_width, "y": min_height}
@@ -154,37 +156,97 @@ def convertDeque2DToList2D(d: deque):
         result.append(list(row))
     return result
 
-def generateSpriteGFX(name: Path, bit_mode = "4bpp", pivot_mode = "center", pivot_offset = {"x": 0, "y": 0}):
-    bit_mode = bit_mode.lower()
-    if (bit_mode != "4bpp" and bit_mode != "8bpp"): 
-        raise ValueError("bit_mode must be either '4bpp' or '8bpp'")
+def imgTo2DArray(im: Image):
+    data = im.load()
+    out_data = [[data[i,j] for j in range(im.height)] for i in range(im.width)]
+    return out_data
+
+def slice2DArray(arr: list, slice_1: slice, slice_2: slice):
+    result = [row[slice_2] for row in arr[slice_1]]
+    # print(result)
+    return result
+
+def generateSpritesheetFromFile(name: Path, sprite_size: dict, frame_length = 4, sheet_mode = "animation_rows", bit_mode = "4bpp", pivot_mode = "center", pivot_offset = {"x": 0, "y": 0}):
+    inputpath = name.with_suffix(".png")
+    im = Image.open(inputpath)
     
+    sprite_width = sprite_size["x"]
+    sprite_height = sprite_size["y"]
+    if (im.width % sprite_width != 0 or im.height % sprite_height != 0):
+        raise Exception(f"spritesheet size must be an exact multiple of the chosen sprite size")
+
+    spritesheet_data = imgTo2DArray(im)
+
+    frame_count_x = im.width // sprite_width 
+    frame_count_y = im.height // sprite_height
+
+    frame_data = [[generateSpriteGFX(slice2DArray(spritesheet_data, slice(i*sprite_width,(i+1)*sprite_width), slice(j*sprite_height,(j+1)*sprite_height)), bit_mode, pivot_mode, pivot_offset) for i in range(frame_count_x)] for j in range(frame_count_y)]
+
+    print(sheet_mode)
+
+    out_data = None
+
+    if sheet_mode == "sprites":
+        out_data = [item for row in frame_data for item in row]
+    elif sheet_mode == "animation_rows":
+        out_data = [generateAnimationFromFrames(row, frame_length) for row in frame_data]
+    elif sheet_mode == "animation_columns":
+        tranposed = [[frame_data[j][i] for j in range(len(frame_data))] for i in range(len(frame_data[0]))]
+        out_data = [generateAnimationFromFrames(row, frame_length) for row in tranposed]
+    elif sheet_mode == "animation":
+        flattened = [item for row in frame_data for item in row]
+        out_data = generateAnimationFromFrames(flattened, frame_length)
+
+    print(out_data)
+
+    return {"type": "spritesheet", "sheet_mode": sheet_mode, "sheet_data": out_data}
+
+def generateAnimationFromFrames(frames: list, frame_length = 4):
+    out_data = {"type": "animation", "frames": frames, "frame_length": frame_length}
+    return out_data
+
+def generateSpriteGFXFromFile(name: Path, bit_mode = "4bpp", pivot_mode = "center", pivot_offset = {"x": 0, "y": 0}):
+
     inputpath = name.with_suffix(".png")
     im = Image.open(inputpath)
 
     if (im.width > 64 or im.height > 64):
         raise Exception(f"image at {inputpath} is too large to create sprite. Maximum size is 64x64")
+    img_data = imgTo2DArray(im);
+    sprite_data = generateSpriteGFX(img_data, bit_mode, pivot_mode, pivot_offset)
+    sprite_data['original_file'] = name.name
+    return sprite_data
+
+
+
+def generateSpriteGFX(img_data: list, bit_mode = "4bpp", pivot_mode = "center", pivot_offset = {"x": 0, "y": 0}):
+    bit_mode = bit_mode.lower()
+    if (bit_mode != "4bpp" and bit_mode != "8bpp"): 
+        raise ValueError("bit_mode must be either '4bpp' or '8bpp'")
+    
+    height = len(img_data[0])
+    width = len(img_data)
 
     pivot_pos = None
 
     if pivot_mode == "center":
-        pivot_pos = {"x": im.width // 2, "y": im.height // 2}
+        pivot_pos = {"x": width // 2, "y": height // 2}
     elif pivot_mode == "topleft":
         pivot_pos = {"x": 0, "y": 0}
     elif pivot_mode == "topright":
-        pivot_pos = {"x": im.width, "y": 0}
+        pivot_pos = {"x": width, "y": 0}
     elif pivot_mode == "bottomleft":
-        pivot_pos = {"x": 0, "y": im.height}
+        pivot_pos = {"x": 0, "y": height}
     elif pivot_mode == "bottomright":
-        pivot_pos = {"x": im.width, "y": im.height}
+        pivot_pos = {"x": width, "y": height}
     else:
         raise Exception(f"{pivot_mode} is not a valid pivot mode")
     
     pivot_pos["x"] += pivot_offset["x"]
     pivot_pos["y"] += pivot_offset["y"]
 
-    size = {'x': im.width, 'y': im.height}
-    size, bias = analyzeSpriteSizeAndBias(im)
+    size = {'x': width, 'y': height}
+    size, bias = analyzeSpriteSizeAndBias(img_data)
 
     sprite_data = {}
     sprite_data['size'] = size
@@ -194,15 +256,14 @@ def generateSpriteGFX(name: Path, bit_mode = "4bpp", pivot_mode = "center", pivo
     sprite_data['shape_code'] = size_codes[1]
     
 
-    img_data = im.load()
 
     data = deque()
     palette = [0]
 
-    for i in range(im.height):
+    for i in range(height):
         row = deque()
-        for j in range(im.width):
-            color = rgbaToGBAColor(img_data[j, i])
+        for j in range(width):
+            color = rgbaToGBAColor(img_data[j][i])
             if (color == 0):
                 row.append(0)
             else:
@@ -227,7 +288,6 @@ def generateSpriteGFX(name: Path, bit_mode = "4bpp", pivot_mode = "center", pivo
     sprite_data['pivot_pos'] = pivot_pos
 
     sprite_data['type'] = "sprite"
-    sprite_data['original_file'] = name.name
 
     sprite_data['tile_count'] = (size['x'] // 8) * (size['y'] // 8)
     
@@ -255,7 +315,7 @@ def importSprite(import_options: dict, source_path: Path, dest_path: Path):
     if "pivot_offset" in import_options:
         pivot_offset = import_options["pivot_offset"]
     
-    out_data = generateSpriteGFX(spritePngPath, pivot_mode=pivot_mode, pivot_offset=pivot_offset)
+    out_data = generateSpriteGFXFromFile(spritePngPath, pivot_mode=pivot_mode, pivot_offset=pivot_offset)
 
 
     if "name" in import_options:
@@ -325,25 +385,49 @@ def importAnimation(import_options: dict, source_path: Path, dest_path: Path):
     while True:
         candidate_path = source_path.with_name(frame_base_name + delim + str(frame_index)).with_suffix(".png")
         if candidate_path.exists():
-            frames.append(generateSpriteGFX(candidate_path, pivot_mode=pivot_mode, pivot_offset=pivot_offset))
+            frames.append(generateSpriteGFXFromFile(candidate_path, pivot_mode=pivot_mode, pivot_offset=pivot_offset))
         else:
             break
         frame_index += 1
 
-    out_data = {}
+    frame_length = 4
+    if "frame_length" in import_options:
+        frame_length = import_options["frame_length"]
+    
+    out_data = generateAnimationFromFrames(frames, frame_length)
     if "name" in import_options:
         out_data["name"] = import_options["name"]
     else:
         out_data["name"] = source_path.stem
-    
-    if "frame_length" in import_options:
-        out_data["frame_length"] = import_options["frame_length"]
-    else:
-        out_data["frame_length"] = 4
-    out_data["frames"] = frames
-    out_data["type"] = "animation"
 
     return out_data
+
+def importSpritesheet(import_options: dict, source_path: Path, dest_path: Path):
+    if "frame_size" not in import_options:
+        raise Exception("spritesheet requires a 'frame_size' property (max 64*64)")
+    frame_size = import_options["frame_size"]
+    if "x" not in frame_size or "y" not in frame_size:
+        raise Exception("spritesheet 'frame_size' property must contain values 'x' and 'y' between [1,64]")
+    
+    sheet_mode = "animation_rows"
+    if "sheet_mode" in import_options:
+        sheet_mode = import_options["sheet_mode"]
+        if sheet_mode != "animation_rows" and sheet_mode != "animation_columns" and sheet_mode != "animation" and sheet_mode != "sprites":
+            raise Exception(f"{sheet_mode} is not a valid spritesheet mode.")
+        
+
+    print(sheet_mode)
+
+    frame_length = 4
+    if "frame_length" in import_options:
+        frame_length = import_options["frame_length"]
+
+    sheet_data = generateSpritesheetFromFile(source_path, frame_size, sheet_mode=sheet_mode, frame_length=frame_length)
+    sheet_data["name"] = source_path.stem
+    
+    # result = {"name": source_path.stem, "type": "spritesheet", "data": sheet_data}
+    
+    return sheet_data
 
 def import_asset(source_path: Path, dest_path: Path):
     with open(source_path) as stream:
@@ -372,8 +456,8 @@ def import_asset(source_path: Path, dest_path: Path):
         out_data = importSprite(data, source_path, dest_path)
     elif import_type == "animation":
         out_data = importAnimation(data, source_path, dest_path)
-    elif import_type == "animation_sheet":
-        out_data = {"type": "animation_sheet"}
+    elif import_type == "spritesheet":
+        out_data = importSpritesheet(data, source_path, dest_path)
     else:
         raise Exception(f"unknown import type '{import_type}'")
 
@@ -511,6 +595,11 @@ def writeSprites(sprites: list, palettes: list, writer: HeaderAndImplementationW
 
 def writeAnimation(anim: dict, palettes: list, writer: HeaderAndImplementationWriter):
     writer.writeVarDeclAndDefOpen("const GBAEngine::SpriteAnimation", anim["name"])
+    writeAnimationCompoundLiteral(anim, palettes, writer)
+    writer.cpp.writeEndStatement()
+
+
+def writeAnimationCompoundLiteral(anim: dict, palettes: list, writer: HeaderAndImplementationWriter):
     writer.cpp.writeBeginCompoundLiteralMultiline("const GBAEngine::SpriteAnimation");
 
     writer.cpp.writeCompoundLiteralFieldOpen("frames")
@@ -525,13 +614,57 @@ def writeAnimation(anim: dict, palettes: list, writer: HeaderAndImplementationWr
         
 
     writer.cpp.writeEndCompoundLiteralMultiline()
-    writer.cpp.writeEndStatement()
 
 def writeAnimations(anims: list, palettes: list, writer: HeaderAndImplementationWriter):
     writer.openNamespace("Animations")
 
     for anim in anims:
         writeAnimation(anim, palettes, writer)
+
+    writer.closeNamespace()
+
+def findAllSpritesFromSpritesheets(sheets: list):
+    sprites = []
+    for sheet in sheets:
+        if sheet["sheet_mode"] == "sprites":
+            sprites += sheet["sheet_data"]
+        elif sheet["sheet_mode"] == "animation":
+            sprites += sheet["sheet_data"]["frames"]
+        elif sheet["sheet_mode"] == "animation_columns" or sheet["sheet_mode"] == "animation_rows":
+            for anim in sheet["sheet_data"]:
+                sprites += anim["frames"]
+    return sprites
+
+def writeSpritesheet(sheet: dict, palettes: list, writer: HeaderAndImplementationWriter):
+    sheet_mode = sheet["sheet_mode"]
+    name = sheet["name"]
+    if sheet_mode == "sprites":
+        writer.writeVarDeclAndDefOpen("const GBAEngine::Sprite*", name)
+        writer.cpp.writeBeginCompoundLiteralMultiline("const GBAEngine::Sprite[]")
+        for sprite in sheet["sheet_data"]:
+            writeSpriteCompoundLiteral(sprite, palettes, writer)
+            writer.cpp.writeLineIndented(",")
+        writer.cpp.writeEndCompoundLiteralMultiline()
+        writer.cpp.writeEndStatement()
+    elif sheet_mode == "animation_columns" or sheet_mode == "animation_rows":
+        writer.writeVarDeclAndDefOpen("const GBAEngine::SpriteAnimation*", name)
+        writer.cpp.writeBeginCompoundLiteralMultiline("const GBAEngine::SpriteAnimation[]")
+        for anim in sheet["sheet_data"]:
+            writeAnimationCompoundLiteral(anim, palettes, writer)
+            writer.cpp.writeLineIndented(",")
+        writer.cpp.writeEndCompoundLiteralMultiline()
+        writer.cpp.writeEndStatement()
+    elif sheet_mode == "animation":
+        writer.writeVarDeclAndDefOpen("const GBAEngine::SpriteAnimation", name)
+        writeAnimationCompoundLiteral(sheet["sheet_data"], palettes, writer)
+        writer.cpp.writeEndStatement()
+            
+
+def writeSpritesheets(sheets: list, palettes: list, writer: HeaderAndImplementationWriter):
+    writer.openNamespace("Spritesheets")
+
+    for sheet in sheets:
+        writeSpritesheet(sheet, palettes, writer)    
 
     writer.closeNamespace()
 
@@ -550,9 +683,12 @@ def buildGraphicsFiles(inputs: list, output_path: Path):
 
     anim_data = list(filter(lambda d: d["type"] == "animation", gfx_data))
     sprite_data = list(filter(lambda d: d["type"] == "sprite", gfx_data))
-    total_sprites_list = sprite_data + [frame for anim in anim_data for frame in anim["frames"]]
+    spritesheet_data = list(filter(lambda d: d["type"] == "spritesheet", gfx_data))
+
+    total_sprites_list = sprite_data + [frame for anim in anim_data for frame in anim["frames"]] + findAllSpritesFromSpritesheets(spritesheet_data)
 
     for sprite in total_sprites_list:
+        print(sprite)
         sprite["palette"] = [tuple(color) if color != 0 else color for color in sprite["palette"]]
         print(sprite["palette"])
 
@@ -571,6 +707,8 @@ def buildGraphicsFiles(inputs: list, output_path: Path):
     writeSprites(sprite_data, new_palettes, writer)
 
     writeAnimations(anim_data, new_palettes, writer)
+
+    writeSpritesheets(spritesheet_data, new_palettes, writer)
 
     writer.closeNamespace()
 
