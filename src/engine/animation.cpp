@@ -58,11 +58,19 @@ SpriteAnimator::SpriteAnimator(const SpriteAnimation* anim) {
 SpriteAnimator::SpriteAnimator() : SpriteAnimator(nullptr) {}
 
 void SpriteAnimator::awake() {
-    this->spriteRenderer = getComponent<SpriteRenderer>();
+    
+    if (!this->spriteRenderer) {
+        this->spriteRenderer = getComponent<SpriteRenderer>();
+    }
     if (this->currentAnimation) {
         loadAnimation(this->currentAnimation);
     }
 }
+
+void SpriteAnimator::setRenderer(SpriteRenderer* r) {
+    this->spriteRenderer = r;
+}
+
 
 void SpriteAnimator::loadAnimation(const SpriteAnimation* anim) {
     unloadAnimation();

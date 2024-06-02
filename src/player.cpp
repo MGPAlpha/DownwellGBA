@@ -217,34 +217,34 @@ void Player::update() {
     if (this->iFrames > 0) this->iFrames--;
 }
 
-void Player::draw() {
-    return;
-    int posY = this->transform->position.y - cameraPos.y - 4;
-    int posX = (this->transform->position.x - cameraPos.x - 5);
-    if ((this->iFrames > 0 && this->iFrames % 2) || posY < -16 || posY > 160 || posX < -16 || posX > 240) {
-        this->sprite->attr0 = ATTR0_HIDE;
-        return;
-    }
-    this->sprite->attr0 = ATTR0_REGULAR | ATTR0_SQUARE | posY & 0x00ff;
-    this->sprite->attr1 = ATTR1_SMALL | posX & 0x01ff | this->dir << 12;
-    if (this->state == PLAYER_IDLE) {
-        this->sprite->attr2 = ATTR2_TILEID(vBlankCount / 16 % 4 * 2,0) | ATTR2_PRIORITY(2);
-    } else if (this->state == PLAYER_WALKING) {
-        this->sprite->attr2 = ATTR2_TILEID(vBlankCount / 4 % 8 * 2,2) | ATTR2_PRIORITY(2);
-    } else if (this->state == PLAYER_JUMPING || this->state == PLAYER_HOP) {
-        if (this->canFire && this->fireTime <= 5) {
-            this->sprite->attr2 = ATTR2_TILEID(0,8) | ATTR2_PRIORITY(2);
-        } else if (this->runningJump) {
-            this->sprite->attr2 = ATTR2_TILEID(vBlankCount / 4 % 8 * 2,6) | ATTR2_PRIORITY(2);
-        } else {
-            int jumpAniFrame = this->stateTime;
-            if (this->stateTime >= sizeof(jumpFrames)/sizeof(int)) jumpAniFrame = sizeof(jumpFrames)/sizeof(int) - 1;
-            this->sprite->attr2 = ATTR2_TILEID(jumpFrames[jumpAniFrame] * 2,4) | ATTR2_PRIORITY(2);
-        }
-    } else if (this->state == PLAYER_DEAD) {
-        this->sprite->attr2 = ATTR2_TILEID(this->stateTime < 60 ? 2 : 4,8) | ATTR2_PRIORITY(2);
-    }
-}
+// void Player::draw() {
+//     return;
+//     int posY = this->transform->position.y - cameraPos.y - 4;
+//     int posX = (this->transform->position.x - cameraPos.x - 5);
+//     if ((this->iFrames > 0 && this->iFrames % 2) || posY < -16 || posY > 160 || posX < -16 || posX > 240) {
+//         this->sprite->attr0 = ATTR0_HIDE;
+//         return;
+//     }
+//     this->sprite->attr0 = ATTR0_REGULAR | ATTR0_SQUARE | posY & 0x00ff;
+//     this->sprite->attr1 = ATTR1_SMALL | posX & 0x01ff | this->dir << 12;
+//     if (this->state == PLAYER_IDLE) {
+//         this->sprite->attr2 = ATTR2_TILEID(vBlankCount / 16 % 4 * 2,0) | ATTR2_PRIORITY(2);
+//     } else if (this->state == PLAYER_WALKING) {
+//         this->sprite->attr2 = ATTR2_TILEID(vBlankCount / 4 % 8 * 2,2) | ATTR2_PRIORITY(2);
+//     } else if (this->state == PLAYER_JUMPING || this->state == PLAYER_HOP) {
+//         if (this->canFire && this->fireTime <= 5) {
+//             this->sprite->attr2 = ATTR2_TILEID(0,8) | ATTR2_PRIORITY(2);
+//         } else if (this->runningJump) {
+//             this->sprite->attr2 = ATTR2_TILEID(vBlankCount / 4 % 8 * 2,6) | ATTR2_PRIORITY(2);
+//         } else {
+//             int jumpAniFrame = this->stateTime;
+//             if (this->stateTime >= sizeof(jumpFrames)/sizeof(int)) jumpAniFrame = sizeof(jumpFrames)/sizeof(int) - 1;
+//             this->sprite->attr2 = ATTR2_TILEID(jumpFrames[jumpAniFrame] * 2,4) | ATTR2_PRIORITY(2);
+//         }
+//     } else if (this->state == PLAYER_DEAD) {
+//         this->sprite->attr2 = ATTR2_TILEID(this->stateTime < 60 ? 2 : 4,8) | ATTR2_PRIORITY(2);
+//     }
+// }
 
 void Player::destroy() {
     if (singleton == this) {
@@ -259,7 +259,9 @@ PlayerPrefab::PlayerPrefab(Vector2 pos) {
     col->mask = L_1 | L_2;
     this->addComponent(col);
     this->addComponent(new Player());
-    this->addComponent(new SpriteRenderer(Assets::Animations::playerIdle.frames));
+    SpriteRenderer* sp = new SpriteRenderer(Assets::Animations::playerIdle.frames);
+    sp->renderPriority = 2;
+    this->addComponent(sp);
     this->addComponent(new SpriteAnimator(&Assets::Animations::playerIdle));
 }
 

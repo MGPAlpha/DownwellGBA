@@ -51,6 +51,7 @@ namespace GBAEngine {
             void playAnimation(const SpriteAnimation*, bool loop);
             void playAnimation(const SpriteAnimation*, int frame, bool loop);
 
+            void setRenderer(SpriteRenderer* r);
 
             bool loop = true;
         protected:

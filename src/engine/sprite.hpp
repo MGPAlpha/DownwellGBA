@@ -95,6 +95,9 @@ namespace GBAEngine {
             SpriteRenderer();
 
             void setSprite(const Sprite* sp);
+
+            Vector2 offset;
+            uint8_t renderPriority;
         protected:
             void awake() override;
             void draw() override;

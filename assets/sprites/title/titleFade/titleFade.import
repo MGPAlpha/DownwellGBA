@@ -1,6 +1,7 @@
 ---
 type: spritesheet
 sheet_mode: animation_columns
+frame_length: 6
 frame_size:
   x: 64
   y: 32

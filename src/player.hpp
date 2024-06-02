@@ -38,7 +38,6 @@ class Player : public GBAEngine::Component {
     protected:
         void awake() override;
         void update() override;
-        void draw() override;
         void destroy() override;
 
     private:

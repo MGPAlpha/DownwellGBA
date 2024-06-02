@@ -52,8 +52,7 @@ enum GAMESTATE unpauseState;
 int stateTime = 0;
 int vBlankCount = 0;
 
-LogoSprite *logoSprite0;
-LogoSprite *logoSprite1;
+LogoSprite *logoSprite;
 
 Camera* titleCamComponent;
 MovementAnimator* titleCamAnimator;
@@ -124,19 +123,23 @@ void initSurface(void) {
     Player* playerComponent = player->getComponent<Player>();
     GameObject::loadGameObject(player);
 
-    GameObject* logoSpriteObj0 = new GameObject();
-    logoSprite0 = new LogoSprite(0);
-    Transform* logoSpriteTransform0 = new Transform(Vector2(288, 60));
-    logoSpriteObj0->addComponent(logoSprite0);
-    logoSpriteObj0->addComponent(logoSpriteTransform0);
-    GameObject::loadGameObject(logoSpriteObj0);
+    GameObject* logoSpritePrefab = new LogoSpritePrefab(Vector2(354, 73));
+    logoSprite = logoSpritePrefab->getComponent<LogoSprite>();
+    GameObject::loadGameObject(logoSpritePrefab);
 
-    GameObject* logoSpriteObj1 = new GameObject();
-    logoSprite1 = new LogoSprite(1);
-    Transform* logoSpriteTransform1 = new Transform(Vector2(354, 60));
-    logoSpriteObj1->addComponent(logoSprite1);
-    logoSpriteObj1->addComponent(logoSpriteTransform1);
-    GameObject::loadGameObject(logoSpriteObj1);
+    // GameObject* logoSpriteObj0 = new GameObject();
+    // logoSprite0 = new LogoSprite(0);
+    // Transform* logoSpriteTransform0 = new Transform(Vector2(288, 60));
+    // logoSpriteObj0->addComponent(logoSprite0);
+    // logoSpriteObj0->addComponent(logoSpriteTransform0);
+    // GameObject::loadGameObject(logoSpriteObj0);
+
+    // GameObject* logoSpriteObj1 = new GameObject();
+    // logoSprite1 = new LogoSprite(1);
+    // Transform* logoSpriteTransform1 = new Transform(Vector2(354, 60));
+    // logoSpriteObj1->addComponent(logoSprite1);
+    // logoSpriteObj1->addComponent(logoSpriteTransform1);
+    // GameObject::loadGameObject(logoSpriteObj1);
 
     GameObject* titleCam = new GameObject();
     titleCamComponent = new Camera(5, false);
@@ -182,10 +185,9 @@ void updateSurface(void) {
             playerCamera->offset.x = 0;
             titleCamComponent->enable();
         }
-        if (logoSprite0 && logoSprite1){
-            if (!logoSprite0->animationStart && playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
-                logoSprite0->animationStart = logoSprite0->getGameObject()->getLifetime();
-                logoSprite1->animationStart = logoSprite1->getGameObject()->getLifetime();
+        if (logoSprite) {
+            if (!logoSprite->getStarted() && playerCanMove && (BUTTON_HELD(BUTTON_LEFT) || BUTTON_HELD(BUTTON_RIGHT))) {
+                logoSprite->fadeIn();
                 playSoundA(logosound_data, logosound_length, 0);
             }
         }

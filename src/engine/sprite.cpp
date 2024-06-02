@@ -238,13 +238,13 @@ namespace GBAEngine {
             return;
         }
         if (this->objAttr && this->allocatedSprite) {
-            Vector2 anchor = this->transform->position - cameraPos;
+            Vector2 anchor = this->transform->position - cameraPos + this->offset;
             int anchorX = anchor.x - this->currentSprite->pivotX;
             int anchorY = anchor.y - this->currentSprite->pivotY;
             OBJ_ATTR* obj = this->objAttr;
             obj->attr0 = ATTR0_REGULAR | this->currentSprite->shape | anchorY & 0x00ff;
             obj->attr1 = this->currentSprite->size | anchorX & 0x01ff;
-            obj->attr2 = this->allocatedSprite->getIndex() | ATTR2_PRIORITY(0);
+            obj->attr2 = this->allocatedSprite->getIndex() | ATTR2_PRIORITY(this->renderPriority);
         }
     }
 

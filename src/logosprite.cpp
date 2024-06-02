@@ -6,6 +6,8 @@
 #include "engine/transform.hpp"
 #include "gamestate.hpp"
 #include "engine/camera.hpp"
+#include "engine/animation.hpp"
+#include <assets.hpp>
 
 extern "C" {
 
@@ -17,40 +19,42 @@ extern "C" {
 
 using namespace GBAEngine;
 
-LogoSprite::LogoSprite(int index) {
-    
-    this->index = index;
+LogoSprite::LogoSprite(SpriteAnimator* anim1, SpriteAnimator* anim2) {
+    this->anim1 = anim1;
+    this->anim2 = anim2;
+}
+
+void LogoSprite::fadeIn() {
+    this->anim1->playAnimation(&Assets::Spritesheets::titleFade[0], false);
+    this->anim2->playAnimation(&Assets::Spritesheets::titleFade[1], false);
+    this->moveAnim->start();
+    started = true;
+}
+
+bool LogoSprite::getStarted() {
+    return started;
 }
 
 void LogoSprite::awake() {
-    this->transform = getComponent<Transform>();
+    this->moveAnim = getComponent<MovementAnimator>();
 }
 
-void LogoSprite::draw() {
-
-    if (!this->animationStart) {
-        this->sprite->attr0 = ATTR0_HIDE;
-        return;
-    }
-
-    int frameNum = (this->getGameObject()->getLifetime() - this->animationStart) / 6;
-    frameNum = MIN(frameNum, 7);
-    int yOffset = (this->getGameObject()->getLifetime() - this->animationStart) / 20;
-    yOffset = MIN(yOffset, 4);
-    yOffset *= -1;
-
-    for (int i = 0; i < 3; i++) {
-        int srcOffset = 16*16*i + 16*8*this->index + 16*16*4*frameNum;
-        int dstOffset = 16*16+16*32*i+16*8*this->index;
-        // DMANow(3, logo + srcOffset, CHARBLOCK[4].tileimg + dstOffset, 16*8);
-    }
-    int posY = this->transform->position.y - cameraPos.y + yOffset;
-    int posX = this->transform->position.x - cameraPos.x;
-    if (posY < -32 || posY > 160 || posX < -64 || posY > 240) {
-        this->sprite->attr0 = ATTR0_HIDE;
-        return;
-    }
-    this->sprite->attr0 = ATTR0_REGULAR | ATTR0_WIDE | (posY) & 0x00ff;
-    this->sprite->attr1 = ATTR1_LARGE | (posX) & 0x01ff;
-    this->sprite->attr2 = ATTR2_PRIORITY(3) | ATTR2_TILEID(16+8*this->index,0);
+LogoSpritePrefab::LogoSpritePrefab(Vector2 pos) {
+    this->addComponent(new Transform(pos));
+    SpriteAnimator* animator1 = new SpriteAnimator();
+    SpriteAnimator* animator2 = new SpriteAnimator();
+    SpriteRenderer* sprite1 = new SpriteRenderer();
+    SpriteRenderer* sprite2 = new SpriteRenderer();
+    sprite1->offset = Vector2(-32,0);
+    sprite2->offset = Vector2(32,0);
+    sprite1->renderPriority = 3;
+    sprite2->renderPriority = 3;
+    animator1->setRenderer(sprite1);
+    animator2->setRenderer(sprite2);
+    this->addComponent(sprite1);
+    this->addComponent(sprite2);
+    this->addComponent(animator1);
+    this->addComponent(animator2);
+    this->addComponent(new MovementAnimator(Vector2(0,-4), 80, EasingFunction::LINEAR));
+    this->addComponent(new LogoSprite(animator1, animator2));
 }
