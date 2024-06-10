@@ -14,7 +14,7 @@ using namespace GBAEngine;
 Component::Component() {
     // this->sprite = spriteAlloc();
     if (!this->sprite) {
-        mgba_printf("Sprite allocation failed");
+        // mgba_printf("Sprite allocation failed");
         // return NULL;
     }
 }

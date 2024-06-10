@@ -7,6 +7,7 @@
 #include "enemy.hpp"
 #include "engine/camera.hpp"
 #include "collision.hpp"
+#include <assets.hpp>
 
 extern "C" {
 
@@ -97,5 +98,9 @@ BulletPrefab::BulletPrefab(Vector2 pos) {
     col->layer = L_3;
     col->mask = L_1 | L_2;
     this->addComponent(col);
+    SpriteRenderer* spriteRenderer = new SpriteRenderer(Assets::Animations::bulletM.frames);
+    spriteRenderer->renderPriority = 1;
+    this->addComponent(spriteRenderer);
+    mgba_printf("added bullet sprite");
     this->addComponent(new Bullet());
 }

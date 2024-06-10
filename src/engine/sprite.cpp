@@ -2,6 +2,8 @@
 #include "../HW05Lib.hpp"
 #include "camera.hpp"
 
+#include <assets.hpp>
+
 
 // Object Attribute Memory
 #define OAM ((OBJ_ATTR*)(0x7000000))
@@ -112,6 +114,7 @@ namespace GBAEngine {
     }
 
     SpriteAllocator::AllocatedSprite* SpriteAllocator::checkoutSprite(const Sprite* sp) {
+        
         if (allocatedSprites.count(sp) > 0) {
             auto allocated = allocatedSprites[sp];
             allocated->checkoutCount++;
@@ -133,7 +136,12 @@ namespace GBAEngine {
     }
 
     void SpriteAllocator::free(const Sprite* sp) {
+        mgba_printf("freeing sprite");
+
         auto allocated = allocatedSprites[sp];
+
+        uint16_t fill = 0;
+        DMANow(3, &fill, &CHARBLOCK[4].tileimg[allocated->index * 16], DMA_16 | DMA_ON | DMA_SOURCE_FIXED | sp->tileCount * 16);
 
         if (freeList == nullptr) { // Create only node in freelist
             SpriteMapSection* newSection = new SpriteMapSection();
@@ -157,6 +165,7 @@ namespace GBAEngine {
 
         allocatedSprites.erase(sp);
         delete allocated;
+        debugFreeList();
     }
 
     SpriteAllocator::AllocatedSprite* SpriteAllocator::allocate(const Sprite* sp) {
@@ -165,49 +174,89 @@ namespace GBAEngine {
         auto paletteAlloc = SpritePaletteAllocator::checkoutPalette(sp->palette16);
         if (!paletteAlloc) return nullptr;
 
+        mgba_printf("attempting sprite alloc");
+
         SpriteMapSection* curr = freeList;
         SpriteMapSection* start = freeList;
 
+        SpriteMapSection* bestNode = nullptr;
         do {
-            if (curr->length >= sp->tileCount) {
-                auto alloc = new SpriteAllocator::AllocatedSprite();
-                alloc->index = curr->start;
-                alloc->paletteIndex = paletteAlloc->getIndex();
+            if (curr->length >= sp->tileCount && (!bestNode || curr->length < bestNode->length)) {
 
-                curr->length -= sp->tileCount;
-                curr->start += sp->tileCount;
-                freeList = curr;
+                bestNode = curr;
+                if (bestNode->length == sp->tileCount) {
+                    break;
+                } 
 
-                if (freeList->length == 0) { // Current node should be removed;
-
-                    if (freeList->next == freeList) { // No nodes will be left
-                        delete freeList;
-                        freeList = nullptr;
-                    } else if (freeList->next->next == freeList) { // One node will be left
-                        auto next = freeList->next;
-                        delete freeList;
-                        freeList = next;
-                        freeList->next = freeList;
-                    } else {
-                        auto oldNext = freeList->next;
-                        *freeList = *oldNext;
-                        delete oldNext;
-                    }
-
-                }
-
-                DMANow(3, sp->data, &CHARBLOCK[4].tileimg[alloc->index * 16], DMA_16 | DMA_ON | sp->tileCount * 16);
-                
-                allocatedSprites[sp] = alloc;
-                return alloc;
             }
+
             curr = curr->next;
         } while (curr != start);
 
+        if (bestNode) {
+
+            auto alloc = new SpriteAllocator::AllocatedSprite();
+            alloc->index = bestNode->start;
+            alloc->paletteIndex = paletteAlloc->getIndex();
+            alloc->checkoutCount = 0;
+
+            bestNode->length -= sp->tileCount;
+            bestNode->start += sp->tileCount;
+            freeList = bestNode;
+
+            if (freeList->length == 0) { // Current node should be removed;
+
+                if (freeList->next == freeList) { // No nodes will be left
+                    delete freeList;
+                    freeList = nullptr;
+                } else if (freeList->next->next == freeList) { // One node will be left
+                    auto next = freeList->next;
+                    delete freeList;
+                    freeList = next;
+                    freeList->next = freeList;
+                } else {
+                    auto oldNext = freeList->next;
+                    *freeList = *oldNext;
+                    delete oldNext;
+                }
+
+            }
+
+            DMANow(3, sp->data, &CHARBLOCK[4].tileimg[alloc->index * 16], DMA_16 | DMA_ON | sp->tileCount * 16);
+            
+            allocatedSprites[sp] = alloc;
+            debugFreeList();
+            return alloc;
+        }
+
         // this technically could miss valid sections, but awaiting logic to reorder and combine list nodes
         SpritePaletteAllocator::returnPalette(sp->palette16);
+        mgba_printf("allocation failed");
         return nullptr;
     }
+
+    void SpriteAllocator::debugFreeList() {
+        auto start = freeList;
+        if (!start) {
+            mgba_printf("freelist is empty");
+            return;
+        }
+        mgba_printf("freelist starts at %p", start);
+        mgba_printf("traversing freelist", start);
+        auto current = start;
+        int largestNode = 0;
+        int totalSize = 0;
+        do {
+            if (current->length > largestNode) largestNode = current->length;
+            totalSize += current->length;
+            mgba_printf("Node with index %d and size %d", current->start, current->length);
+            current = current->next;
+        } while (current != start);
+        mgba_printf("Reached end of freelist");
+        mgba_printf("Largest node has size %d", largestNode);
+        mgba_printf("total freelist size %d", totalSize);
+    }
+
 
     SpriteRenderer::SpriteRenderer(const Sprite* sp) {
         this->currentSprite = sp;

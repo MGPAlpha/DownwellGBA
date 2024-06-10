@@ -76,6 +76,7 @@ namespace GBAEngine {
             static void init();
             static AllocatedSprite* checkoutSprite(const Sprite*);
             static void returnSprite(const Sprite*);
+            static void debugFreeList();
         private:
             struct SpriteMapSection {
                 uint16_t start;
@@ -103,10 +104,10 @@ namespace GBAEngine {
             void draw() override;
             void destroy() override;
         private:
-            Transform* transform;
-            const Sprite* currentSprite;
-            SpriteAllocator::AllocatedSprite* allocatedSprite;
-            OBJ_ATTR* objAttr;
+            Transform* transform = nullptr;
+            const Sprite* currentSprite = nullptr;
+            SpriteAllocator::AllocatedSprite* allocatedSprite = nullptr;
+            OBJ_ATTR* objAttr = nullptr;
     };
 
 }

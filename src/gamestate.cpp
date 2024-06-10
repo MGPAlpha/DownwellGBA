@@ -110,7 +110,7 @@ void initSurface(void) {
 
     wellDescentTime = 0;
 
-    GameObject* player = new PlayerPrefab(Vector2(152,133));
+    GameObject* player = new PlayerPrefab(Vector2(152,139));
     Camera* playerCam = new Camera();
     playerCam->damping = 15;
     playerCam->lockPos.y = 80;
