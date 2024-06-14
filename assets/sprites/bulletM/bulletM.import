@@ -2,5 +2,5 @@
 type: animation
 rotation_mode: cw
 pivot_offset:
-  x: -8
+  x: -2
   y: 0

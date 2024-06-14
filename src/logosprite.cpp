@@ -41,8 +41,8 @@ void LogoSprite::awake() {
 
 LogoSpritePrefab::LogoSpritePrefab(Vector2 pos) {
     this->addComponent(new Transform(pos));
-    SpriteAnimator* animator1 = new SpriteAnimator();
-    SpriteAnimator* animator2 = new SpriteAnimator();
+    SpriteAnimator* animator1 = new SpriteAnimator(nullptr, false);
+    SpriteAnimator* animator2 = new SpriteAnimator(nullptr, false);
     SpriteRenderer* sprite1 = new SpriteRenderer();
     SpriteRenderer* sprite2 = new SpriteRenderer();
     sprite1->offset = Vector2(-32,0);

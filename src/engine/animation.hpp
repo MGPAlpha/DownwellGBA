@@ -43,6 +43,7 @@ namespace GBAEngine {
 
     class SpriteAnimator : public Component {
         public:
+            SpriteAnimator(const SpriteAnimation* anim, bool preloadFrames);
             SpriteAnimator(const SpriteAnimation* anim);
             SpriteAnimator();
 
@@ -67,6 +68,7 @@ namespace GBAEngine {
             int animTimer = 0;
             int totalAnimLength = 0;
             int currentFrame = 0;
+            bool preloadFrames = true;
     };
 }
 

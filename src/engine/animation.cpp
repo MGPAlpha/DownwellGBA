@@ -51,9 +51,12 @@ void MovementAnimator::update() {
     }
 }
 
-SpriteAnimator::SpriteAnimator(const SpriteAnimation* anim) {
+SpriteAnimator::SpriteAnimator(const SpriteAnimation* anim, bool preloadFrames) {
     this->currentAnimation = anim;
+    this->preloadFrames = preloadFrames;
 }
+
+SpriteAnimator::SpriteAnimator(const SpriteAnimation* anim) : SpriteAnimator(anim, true) {}
 
 SpriteAnimator::SpriteAnimator() : SpriteAnimator(nullptr) {}
 
@@ -76,10 +79,12 @@ void SpriteAnimator::loadAnimation(const SpriteAnimation* anim) {
     unloadAnimation();
     this->currentAnimation = anim;
     if (this->currentAnimation) {
-        for (int i = 0; i < this->currentAnimation->frameCount; i++) {
-            auto loadedSprite = SpriteAllocator::checkoutSprite(this->currentAnimation->frames + i);
-            mgba_printf("loaded sprite %p at tile %d", this->currentAnimation->frames + i, loadedSprite->getIndex());
-            if (loadedSprite) this->loadedSprites.insert(this->currentAnimation->frames + i);
+        if (preloadFrames) {
+            for (int i = 0; i < this->currentAnimation->frameCount; i++) {
+                auto loadedSprite = SpriteAllocator::checkoutSprite(this->currentAnimation->frames + i);
+                mgba_printf("loaded sprite %p at tile %d", this->currentAnimation->frames + i, loadedSprite->getIndex());
+                if (loadedSprite) this->loadedSprites.insert(this->currentAnimation->frames + i);
+            }
         }
         this->totalAnimLength = anim->frameCount * anim->frameLength;
         this->animTimer = 0;
