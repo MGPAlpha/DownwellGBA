@@ -1,2 +1,6 @@
 ---
 type: animation
+rotation_mode: cw
+pivot_offset:
+  x: -8
+  y: 0

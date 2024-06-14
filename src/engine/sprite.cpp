@@ -136,7 +136,7 @@ namespace GBAEngine {
     }
 
     void SpriteAllocator::free(const Sprite* sp) {
-        mgba_printf("freeing sprite");
+        // mgba_printf("freeing sprite");
 
         auto allocated = allocatedSprites[sp];
 
@@ -165,7 +165,7 @@ namespace GBAEngine {
 
         allocatedSprites.erase(sp);
         delete allocated;
-        debugFreeList();
+        // debugFreeList();
     }
 
     SpriteAllocator::AllocatedSprite* SpriteAllocator::allocate(const Sprite* sp) {
@@ -174,7 +174,7 @@ namespace GBAEngine {
         auto paletteAlloc = SpritePaletteAllocator::checkoutPalette(sp->palette16);
         if (!paletteAlloc) return nullptr;
 
-        mgba_printf("attempting sprite alloc");
+        // mgba_printf("attempting sprite alloc");
 
         SpriteMapSection* curr = freeList;
         SpriteMapSection* start = freeList;
@@ -225,7 +225,7 @@ namespace GBAEngine {
             DMANow(3, sp->data, &CHARBLOCK[4].tileimg[alloc->index * 16], DMA_16 | DMA_ON | sp->tileCount * 16);
             
             allocatedSprites[sp] = alloc;
-            debugFreeList();
+            // debugFreeList();
             return alloc;
         }
 

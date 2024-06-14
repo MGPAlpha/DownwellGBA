@@ -205,7 +205,7 @@ def generateAnimationFromFrames(frames: list, frame_length = 4):
     out_data = {"type": "animation", "frames": frames, "frame_length": frame_length}
     return out_data
 
-def generateSpriteGFXFromFile(name: Path, bit_mode = "4bpp", pivot_mode = "center", pivot_offset = {"x": 0, "y": 0}):
+def generateSpriteGFXFromFile(name: Path, bit_mode = "4bpp", pivot_mode = "center", pivot_offset = {"x": 0, "y": 0}, rotation_mode = "none"):
 
     inputpath = name.with_suffix(".png")
     im = Image.open(inputpath)
@@ -213,13 +213,24 @@ def generateSpriteGFXFromFile(name: Path, bit_mode = "4bpp", pivot_mode = "cente
     if (im.width > 64 or im.height > 64):
         raise Exception(f"image at {inputpath} is too large to create sprite. Maximum size is 64x64")
     img_data = imgTo2DArray(im);
-    sprite_data = generateSpriteGFX(img_data, bit_mode, pivot_mode, pivot_offset)
+    sprite_data = generateSpriteGFX(img_data, bit_mode, pivot_mode, pivot_offset, rotation_mode)
     sprite_data['original_file'] = name.name
     return sprite_data
 
+def rotateSpriteData(img_data: list, rotation_mode: str):
+    if (rotation_mode == "none"):
+        return [[img_data[i][j] for j in range(len(img_data[0]))] for i in range(len(img_data))]
+    elif (rotation_mode == "cw"):
+        return [[img_data[i][len(img_data[0])-1-j] for i in range(len(img_data))] for j in range(len(img_data[0]))]
+    elif (rotation_mode == "ccw"):
+        return [[img_data[len(img_data)-1-i][j] for i in range(len(img_data))] for j in range(len(img_data[0]))]
+    elif (rotation_mode == "flip"):
+        return [[img_data[len(img_data)-1-i][len(img_data[0])-1-j] for j in range(len(img_data[0]))] for i in range(len(img_data))]
+    else:
+        raise Exception(f"{rotation_mode} is not a valid rotation mode")
 
 
-def generateSpriteGFX(img_data: list, bit_mode = "4bpp", pivot_mode = "center", pivot_offset = {"x": 0, "y": 0}):
+def generateSpriteGFX(img_data: list, bit_mode = "4bpp", pivot_mode = "center", pivot_offset = {"x": 0, "y": 0}, rotation_mode = "none"):
     bit_mode = bit_mode.lower()
     if (bit_mode != "4bpp" and bit_mode != "8bpp"): 
         raise ValueError("bit_mode must be either '4bpp' or '8bpp'")
@@ -244,6 +255,28 @@ def generateSpriteGFX(img_data: list, bit_mode = "4bpp", pivot_mode = "center", 
     
     pivot_pos["x"] += pivot_offset["x"]
     pivot_pos["y"] += pivot_offset["y"]
+
+    img_data = rotateSpriteData(img_data, rotation_mode)
+    if rotation_mode == "cw" or rotation_mode == "ccw":
+        temp = width
+        width = height
+        height = temp
+
+    if rotation_mode == "cw":
+        new_piv_x = width - pivot_pos["y"]
+        new_piv_y = pivot_pos["x"]
+        pivot_pos["x"] = new_piv_x
+        pivot_pos["y"] = new_piv_y
+    elif rotation_mode == "ccw":
+        new_piv_x = pivot_pos["y"]
+        new_piv_y = height - pivot_pos["x"]
+        pivot_pos["x"] = new_piv_x
+        pivot_pos["y"] = new_piv_y
+    elif rotation_mode == "flip":
+        new_piv_x = width - pivot_pos["x"]
+        new_piv_y = height - pivot_pos["y"]
+        pivot_pos["x"] = new_piv_x
+        pivot_pos["y"] = new_piv_y
 
     size = {'x': width, 'y': height}
     size, bias = analyzeSpriteSizeAndBias(img_data)
@@ -314,8 +347,12 @@ def importSprite(import_options: dict, source_path: Path, dest_path: Path):
     pivot_offset = {"x": 0, "y": 0}
     if "pivot_offset" in import_options:
         pivot_offset = import_options["pivot_offset"]
+
+    rotation_mode = "none"
+    if "rotation_mode" in import_options:
+        rotation_mode = import_options["rotation_mode"]
     
-    out_data = generateSpriteGFXFromFile(spritePngPath, pivot_mode=pivot_mode, pivot_offset=pivot_offset)
+    out_data = generateSpriteGFXFromFile(spritePngPath, pivot_mode=pivot_mode, pivot_offset=pivot_offset, rotation_mode=rotation_mode)
 
 
     if "name" in import_options:
@@ -380,12 +417,16 @@ def importAnimation(import_options: dict, source_path: Path, dest_path: Path):
     if "pivot_offset" in import_options:
         pivot_offset = import_options["pivot_offset"]
 
+    rotation_mode = "none"
+    if "rotation_mode" in import_options:
+        rotation_mode = import_options["rotation_mode"]
+
     frames = []
     frame_index = start_index
     while True:
         candidate_path = source_path.with_name(frame_base_name + delim + str(frame_index)).with_suffix(".png")
         if candidate_path.exists():
-            frames.append(generateSpriteGFXFromFile(candidate_path, pivot_mode=pivot_mode, pivot_offset=pivot_offset))
+            frames.append(generateSpriteGFXFromFile(candidate_path, pivot_mode=pivot_mode, pivot_offset=pivot_offset, rotation_mode=rotation_mode))
         else:
             break
         frame_index += 1
