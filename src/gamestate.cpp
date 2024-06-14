@@ -19,6 +19,7 @@
 #include "collision.hpp"
 
 #include "engine/sprite.hpp"
+#include "engine/assetpreloader.hpp"
 #include "../srcgen/assets.hpp"
 
 extern "C" {
@@ -126,6 +127,18 @@ void initSurface(void) {
     GameObject* logoSpritePrefab = new LogoSpritePrefab(Vector2(354, 73));
     logoSprite = logoSpritePrefab->getComponent<LogoSprite>();
     GameObject::loadGameObject(logoSpritePrefab);
+
+    GameObject* allocator = new GameObject();
+    const SpriteAnimation* anims[] = {
+        &Assets::Animations::playerIdle,
+        &Assets::Animations::playerRun,
+        &Assets::Animations::playerShoot,
+        &Assets::Animations::playerSpin,
+        &Assets::Animations::playerAir,
+        &Assets::Animations::bulletM,
+    };
+    allocator->addComponent(new AnimationPreloader(std::begin(anims), std::end(anims)));
+    GameObject::loadGameObject(allocator);
 
     // GameObject* logoSpriteObj0 = new GameObject();
     // logoSprite0 = new LogoSprite(0);
