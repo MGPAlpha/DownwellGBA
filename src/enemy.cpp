@@ -5,6 +5,7 @@
 #include "player.hpp"
 #include "gem.hpp"
 #include "engine/camera.hpp"
+#include "engine/sprite.hpp"
 #include "spritedata.hpp"
 #include "collision.hpp"
 
@@ -115,12 +116,16 @@ BlobPrefab::BlobPrefab(Vector2 pos) {
     Vector2 adjustedPos = pos - Vector2(18, 11)/2;
     this->addComponent(new BlobEnemy());
     this->addComponent(new Transform(pos - Vector2(18,11)/2));
-    RectCollider* collider = new RectCollider(Vector2(18,11), RectCollider::TOP_LEFT);
+    RectCollider* collider = new RectCollider(Vector2(18,11), RectCollider::CENTER);
     collider->layer = L_2;
     collider->mask = L_0;
     collider->offset.x = 7;
     collider->offset.y = 2;
     this->addComponent(collider);
+    SpriteRenderer* sp = new SpriteRenderer();
+    sp->renderPriority = 3;
+    this->addComponent(sp);
+    this->addComponent(new SpriteAnimator(&Assets::Animations::enmJelly));
 };  
 
 void Enemy::damageEnemy(int damage) {

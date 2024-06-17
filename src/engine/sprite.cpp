@@ -305,7 +305,7 @@ namespace GBAEngine {
             OBJ_ATTR* obj = this->objAttr;
             obj->attr0 = ATTR0_REGULAR | this->currentSprite->shape | anchorY & 0x00ff;
             obj->attr1 = this->currentSprite->size | anchorX & 0x01ff;
-            obj->attr2 = this->allocatedSprite->getIndex() | ATTR2_PRIORITY(this->renderPriority);
+            obj->attr2 = this->allocatedSprite->getIndex() | ATTR2_PRIORITY(this->renderPriority) | ATTR2_PALROW(this->allocatedSprite->getPaletteIndex());
         }
     }
 

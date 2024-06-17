@@ -98,8 +98,8 @@ namespace GBAEngine {
 
             void setSprite(const Sprite* sp);
 
-            Vector2 offset;
-            uint8_t renderPriority;
+            Vector2 offset = Vector2();
+            uint8_t renderPriority = 0;
         protected:
             void awake() override;
             void draw() override;
