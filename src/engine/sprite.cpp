@@ -303,6 +303,10 @@ namespace GBAEngine {
             int anchorX = anchor.x - this->currentSprite->pivotX;
             int anchorY = anchor.y - this->currentSprite->pivotY;
             OBJ_ATTR* obj = this->objAttr;
+            if (anchorX <= -64 || anchorY < -64 || anchorX >= 240 || anchorY >= 160) {
+                this->objAttr->attr0 = ATTR0_HIDE;
+                return;
+            }
             obj->attr0 = ATTR0_REGULAR | this->currentSprite->shape | anchorY & 0x00ff;
             obj->attr1 = this->currentSprite->size | anchorX & 0x01ff;
             obj->attr2 = this->allocatedSprite->getIndex() | ATTR2_PRIORITY(this->renderPriority) | ATTR2_PALROW(this->allocatedSprite->getPaletteIndex());
