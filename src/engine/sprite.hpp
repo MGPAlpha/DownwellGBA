@@ -77,6 +77,7 @@ namespace GBAEngine {
             static AllocatedSprite* checkoutSprite(const Sprite*);
             static void returnSprite(const Sprite*);
             static void debugFreeList();
+            static void debugAllocatedList();
         private:
             struct SpriteMapSection {
                 uint16_t start;

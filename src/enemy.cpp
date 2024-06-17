@@ -26,6 +26,7 @@ void Enemy::update() {
 }
 
 void Enemy::draw() {
+    return;
     OBJ_ATTR *sprite = this->sprite;
     int posX = (this->transform->position.x) /*+ this->spriteOffset.x*/ - cameraPos.x;
     int posY = (this->transform->position.y) /*+ this->spriteOffset.y*/ - cameraPos.y;

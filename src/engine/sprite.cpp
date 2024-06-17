@@ -257,6 +257,18 @@ namespace GBAEngine {
         mgba_printf("total freelist size %d", totalSize);
     }
 
+    void SpriteAllocator::debugAllocatedList() {
+        mgba_printf("debugging allocated sprites");
+        if (allocatedSprites.size() == 0) {
+            mgba_printf("no allocated sprites");
+            return;
+        }
+        for (auto sp : allocatedSprites) {
+            mgba_printf("Sprite %p allocated at %d", sp.first, sp.second->index);
+        }
+        
+    }
+
 
     SpriteRenderer::SpriteRenderer(const Sprite* sp) {
         this->currentSprite = sp;

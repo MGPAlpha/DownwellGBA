@@ -60,8 +60,8 @@ namespace GBAEngine {
             void lateUpdate() override;
             void destroy() override;
         private:
-            SpriteRenderer* spriteRenderer;
-            const SpriteAnimation* currentAnimation;
+            SpriteRenderer* spriteRenderer = nullptr;
+            const SpriteAnimation* currentAnimation = nullptr;
             std::unordered_set<const Sprite*> loadedSprites;
             void loadAnimation(const SpriteAnimation* anim);
             void unloadAnimation();

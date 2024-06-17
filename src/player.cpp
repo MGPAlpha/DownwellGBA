@@ -259,10 +259,12 @@ PlayerPrefab::PlayerPrefab(Vector2 pos) {
     col->mask = L_1 | L_2;
     this->addComponent(col);
     this->addComponent(new Player());
-    SpriteRenderer* sp = new SpriteRenderer(Assets::Animations::playerIdle.frames);
+    SpriteRenderer* sp = new SpriteRenderer();
     sp->renderPriority = 2;
     this->addComponent(sp);
-    this->addComponent(new SpriteAnimator(&Assets::Animations::playerIdle));
+    auto anim = new SpriteAnimator(&Assets::Animations::playerIdle);
+    mgba_printf("player animator: %p", anim);
+    this->addComponent(anim);
 }
 
 PlayerPrefab::PlayerPrefab() : PlayerPrefab(Vector2(0,0)) {}

@@ -363,7 +363,7 @@ void nextLevel(void) {
     REG_BG0HOFF = -32;
     REG_BG0VOFF = 0;
 
-    REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | SPRITE_ENABLE | SPRITE_MODE_2D;
+    REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | SPRITE_ENABLE | SPRITE_MODE_1D;
 
     gameState = GAME_PLAY;
 
@@ -450,7 +450,7 @@ void updateGame(void) {
 
 
 
-    updateSprites();
+    OAMManager::updateSprites();
 
     checkToEnableCheats();
 

@@ -109,6 +109,7 @@ void Gem::update() {
 }
 
 void Gem::draw() {
+    return;
     int lifetime = this->getGameObject()->getLifetime();
     int spOffset = this->type == GEM_SMALL ? 2 : 6;
     fixed32 posY = (this->transform->position.y) - cameraPos.y - spOffset;
