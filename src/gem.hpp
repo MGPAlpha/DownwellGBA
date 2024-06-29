@@ -3,6 +3,7 @@
 
 #include "engine/gameobject.hpp"
 #include "engine/physics.hpp"
+#include "engine/animation.hpp"
 
 enum GEMSTATE {GEM_PHYSICS, GEM_ATTRACT};
 enum GEMTYPE {GEM_SMALL, GEM_LARGE};
@@ -21,6 +22,7 @@ class Gem : public GBAEngine::Component {
     private:
         GBAEngine::Transform* transform;
         GBAEngine::RectCollider* collider;
+        GBAEngine::SpriteAnimator* animator;
 
         GBAEngine::Vector2 velocity;
         enum GEMSTATE state;

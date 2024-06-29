@@ -38,6 +38,7 @@ Gem::Gem() {
 void Gem::awake() {
     this->transform = getComponent<Transform>();
     this->collider = getComponent<RectCollider>();
+    this->animator = getComponent<SpriteAnimator>();
     this->randomizeGem();
 }
 
@@ -139,14 +140,23 @@ void Gem::randomizeGem() {
     this->velocity = vel;
     this->rotationDirection = (rand() % 2) ? GEM_CCW : GEM_CW;
     this->type = (rand() % 4) ? GEM_SMALL : GEM_LARGE;
+    this->animator->reversed = this->rotationDirection;
+    if (this->type == GEM_LARGE) {
+        this->animator->playAnimation(&Assets::Animations::gemMedium);
+        this->collider->size = Vector2(8,8);
+    } else {
+        this->animator->playAnimation(&Assets::Animations::gemSmall);
+    }
 }
 
 GemPrefab::GemPrefab(Vector2 pos) {
-    Vector2 actualPos = pos - Vector2(2);
+    Vector2 actualPos = pos;
     this->addComponent(new Transform(actualPos));
 
     this->addComponent(new Gem());
-    this->addComponent(new RectCollider(Vector2(4,4), RectCollider::TOP_LEFT));
+    this->addComponent(new RectCollider(Vector2(4,4)));
+    this->addComponent(new SpriteAnimator());
+    this->addComponent(new SpriteRenderer());
 }
 GemPrefab::GemPrefab() : GemPrefab(Vector2()) {}
 

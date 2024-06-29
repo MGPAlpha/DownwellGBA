@@ -55,6 +55,7 @@ namespace GBAEngine {
             void setRenderer(SpriteRenderer* r);
 
             bool loop = true;
+            bool reversed = false;
         protected:
             void awake() override;
             void lateUpdate() override;

@@ -86,7 +86,7 @@ void SpriteAnimator::loadAnimation(const SpriteAnimation* anim) {
             }
         }
         this->totalAnimLength = anim->frameCount * anim->frameLength;
-        this->animTimer = 0;
+        this->animTimer = this->reversed ? this->totalAnimLength-1 : 0;
         this->currentFrame = -1;
     }
 }
@@ -130,9 +130,16 @@ void SpriteAnimator::lateUpdate() {
             this->spriteRenderer->setSprite(this->currentAnimation->frames + this->currentFrame);
         }
     }
-    this->animTimer++;
+    if (this->reversed) {
+        this->animTimer--;
+    } else {
+        this->animTimer++;
+    }
     if (this->animTimer >= this->totalAnimLength) {
         if (this->loop) this->animTimer = 0;
         else this->animTimer = this->totalAnimLength - 1;
+    } else if (this->animTimer < 0) {
+        if (this->loop) this->animTimer = this->totalAnimLength - 1;
+        else this->animTimer = 0;
     }
 }

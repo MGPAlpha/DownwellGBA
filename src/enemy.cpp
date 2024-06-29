@@ -81,7 +81,9 @@ void BlobEnemy::update() {
         enemyPos = enemyPos + this->collider->size / 2;
 
         Vector2 displacement = playerPos - enemyPos;
-        displacement = displacement.normalized();
+        // displacement = displacement.normalized();
+        fixed32 displacementLengthEstimate = fixed32::abs(displacement.x) + fixed32::abs(displacement.y);
+        displacement = displacement / displacementLengthEstimate;
         displacement = displacement / 64;
 
         this->velocity.x += displacement.x;
@@ -97,10 +99,6 @@ void BlobEnemy::update() {
 
     this->transform->position.x += this->velocity.x + this->frameExtraMovement.x;
 
-    mgba_printf("enm pos: %x, %x", this->transform->position.x, this->transform->position.y);
-    auto colliderRect = this->collider->getRect();
-    mgba_printf("enm anchor pos: %x, %x", colliderRect.pos.x, colliderRect.pos.y);
-    mgba_printf("enm collider offset: %x, %x", this->collider->offset.x, this->collider->offset.y);
     Collision terrainCollision = collideCollisionMap(this->collider->getRect(), activeCollisionMap, activeCollisionMapWidth, 20);
     if (terrainCollision.collided) {
         this->transform->position.x += terrainCollision.push.x;

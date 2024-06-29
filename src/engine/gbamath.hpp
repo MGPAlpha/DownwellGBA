@@ -2,6 +2,7 @@
 #define GBAMATH_HPP
 
 #include <cstdint>
+#include <cstdlib>
 
 extern "C" {
 
@@ -57,6 +58,12 @@ struct fixed32 {
     inline fixed32 pow(int b);
 
     inline static fixed32 lerp(fixed32 a, fixed32 b, fixed32 t);
+
+    inline static fixed32 abs(fixed32 v) {
+        fixed32 result;
+        result.value = std::abs(v.value);
+        return result;
+    }
 
     inline operator short() {
         return this->value >> 16;
@@ -164,8 +171,7 @@ inline fixed32 operator*=(fixed32& a, const int& b) {
 
 inline fixed32 operator/(const fixed32& a, const fixed32& b) {
     fixed32 result;
-    long long dividend = ((long long)a.value) << 16;
-    result.value = (dividend / (b.value));
+    result.value = (a.value / (b.value >> 8)) << 8;
     return result;
 }
 inline fixed32 operator/(const fixed32& a, const int& b) {
@@ -175,13 +181,12 @@ inline fixed32 operator/(const fixed32& a, const int& b) {
 }
 inline fixed32 operator/(const int& a, const fixed32& b) {
     fixed32 result;
-    long long dividend = ((long long)a) << 32;
-    result.value = (dividend / (b.value));
+    result.value = (a << 16 / (b.value>>8)) << 8;
     return result;
 }
 inline fixed32 operator/=(fixed32& a, const fixed32& b) {
     long long dividend = ((long long)a.value) << 16;
-    a.value = (dividend / (b.value));
+    a.value = (a.value / (b.value >> 8)) << 8;
     return a;
 }
 inline fixed32 operator/=(fixed32& a, const int& b) {
