@@ -177,10 +177,10 @@ namespace GBAEngine {
 
             static bool collideRect(RectCollider* a, RectCollider* b);
 
-            Vector2 size;
-            Vector2 offset;
+            Vector2 size = Vector2(0);
+            Vector2 offset = Vector2(0);
 
-            PivotMode pivot;
+            PivotMode pivot = PivotMode::CENTER;
 
             Rect getRect() const;
 

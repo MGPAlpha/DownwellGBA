@@ -96,6 +96,11 @@ void BlobEnemy::update() {
 
 
     this->transform->position.x += this->velocity.x + this->frameExtraMovement.x;
+
+    mgba_printf("enm pos: %x, %x", this->transform->position.x, this->transform->position.y);
+    auto colliderRect = this->collider->getRect();
+    mgba_printf("enm anchor pos: %x, %x", colliderRect.pos.x, colliderRect.pos.y);
+    mgba_printf("enm collider offset: %x, %x", this->collider->offset.x, this->collider->offset.y);
     Collision terrainCollision = collideCollisionMap(this->collider->getRect(), activeCollisionMap, activeCollisionMapWidth, 20);
     if (terrainCollision.collided) {
         this->transform->position.x += terrainCollision.push.x;
@@ -119,8 +124,6 @@ BlobPrefab::BlobPrefab(Vector2 pos) {
     RectCollider* collider = new RectCollider(Vector2(18,11), RectCollider::CENTER);
     collider->layer = L_2;
     collider->mask = L_0;
-    collider->offset.x = 7;
-    collider->offset.y = 2;
     this->addComponent(collider);
     SpriteRenderer* sp = new SpriteRenderer();
     sp->renderPriority = 3;
